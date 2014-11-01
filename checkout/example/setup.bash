@@ -44,7 +44,7 @@ if [ -f $catkin_dir/devel/setup.bash ]
 then
   echo configuring ROS workspace via $catkin_dir/devel/setup.bash ...
 
-  source $catkin_dir/catkin_ws/devel/setup.bash
+  source $catkin_dir/devel/setup.bash
   alias cdros='cd $catkin_dir'
 else
   echo no ROS workspace found inside $catkin_dir.
