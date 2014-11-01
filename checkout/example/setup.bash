@@ -26,6 +26,11 @@ then
   export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
   export PATH=$ic_dir/export/bin:${PATH}
   export QML_IMPORT_PATH=$ic_dir/export/plugins/qml:$QML_IMPORT_PATH
+  export CMAKE_PREFIX_PATH=$ic_dir/export
+  export IC_MAKER_DIR=$ic_dir/icmaker
+
+  export LC_ALL=C
+
   alias cdic='cd $ic_dir'
 else
   echo no ICL workspace found inside $ic_dir.
