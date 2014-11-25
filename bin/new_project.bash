@@ -35,7 +35,7 @@ ros_workspace_dir_name_="catkin_ws"
 linux_user_=$USER
 
 # Where to copy script template(s) from
-template_dir_="/home/$linux_user_/bin"
+template_dir_="/home/$linux_user_/checkout/example"
 
 project_dir_=/home/$linux_user_/checkout/$1/
 
