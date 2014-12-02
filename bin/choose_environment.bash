@@ -17,28 +17,37 @@
 #
 ###############################################################
 
+# set -e
 
-# get checkout dir relative to this script
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-checkout_dir=$SCRIPT_DIR/../checkout
+checkout_dir=$( readlink -e $SCRIPT_DIR/../checkout )
+test -e ${checkout_dir} || { echo "Checkout Directory: ${checkout_dir} does not exist"; exit 0; }
+workspace_name="${1}"
 
-# let the user choose an environment
-#
-# TODO: auto-search for available workspaces (holding setup.bash or similar) 
-# in the checkout_dir
-#
-# TODO: change this script to a commandline-only version where you can either
-# add a commandline parameter directly or choose the desired workspace from 
-# a list at the commandline.
-#
-# TODO: maybe change this script to python
-#
-workspace_name=`kdialog --menu "Choose a Workspace:" "example" "Example"` 
+reset 
+MENU=$(find ${checkout_dir}/* -maxdepth 1 -iname "setup.bash" -exec readlink -e {} \; | rev | cut -f 2 -d '/' | rev )
 
-environment=$checkout_dir/$workspace_name
+if [ "${workspace_name}" == "" ]; then 
+
+  select workspace_name in ${MENU} "CANCEL"; do
+    break;
+  done
+  
+  [ "${workspace_name}" == "CANCEL" ] && { echo "You chose to cancel"; exit 0; }
+  [ "${workspace_name}" == "" ] && { echo "You chose an invalid option"; exit 0; }
+
+  echo ""
+  echo "INFO: You can use \"ce ${workspace_name}\" without any dialog next time!"
+  echo ""
+
+fi
+
+environment=$( readlink -e $checkout_dir/$workspace_name)
 echo Switching to environment: $environment
 
+
 echo Running $environment/setup.bash ...
+test -e $environment/setup.bash || { echo "$environment/setup.bash does not exist!"; exit 0; }
 source $environment/setup.bash
 
 
