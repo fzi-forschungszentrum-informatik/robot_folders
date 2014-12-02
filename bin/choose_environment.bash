@@ -38,8 +38,8 @@ if [ "${workspace_name}" == "" ]; then
     fi
   done
   
-  [ "${workspace_name}" == "CANCEL" ] && { echo "You chose to cancel"; exit 0; }
-  [ "${workspace_name}" == "" ] && { echo "You chose an invalid option"; exit 0; }
+  [ "${workspace_name}" == "CANCEL" ] && { echo "You chose to cancel"; return 0; }
+  [ "${workspace_name}" == "" ] && { echo "You chose an invalid option"; return 0; }
 
   echo ""
   echo "INFO: You can use \"ce ${workspace_name}\" without any dialog next time!"
@@ -52,7 +52,7 @@ echo Switching to environment: $environment
 
 
 echo Running $environment/setup.bash ...
-test -e $environment/setup.bash || { echo "$environment/setup.bash does not exist!"; exit 0; }
+test -e $environment/setup.bash || { echo "$environment/setup.bash does not exist!"; return 0; }
 source $environment/setup.bash
 
 
