@@ -32,6 +32,7 @@ then
   export LC_ALL=C
 
   alias cdic='cd $ic_dir'
+  test $ic_dir/build && alias makeic="PWDD=\$(pwd); cd $ic_dir/build; make -j4 install; cd \${PWDD}"
 else
   echo no ICL workspace found inside $ic_dir.
 fi
@@ -46,6 +47,7 @@ then
 
   source $catkin_dir/devel/setup.bash
   alias cdros='cd $catkin_dir'
+  alias makeros="PWDD=\$(pwd); cd $catkin_dir; catkin_make; cd \${PWDD}" 
 else
   echo no ROS workspace found inside $catkin_dir.
 fi
