@@ -79,4 +79,23 @@ if [ $create_ros_workspace_ = true ]; then
     fi
 fi
 
-
+echo ""
+echo ""
+echo "--------------------------------"
+echo "Typical next steps are:"
+echo ""
+echo "  source checkout/$project_dir_/setup.bash"
+echo "  cd $project_dir_/$ic_workspace_dir_name_"
+echo "  mkdir build"
+echo "  cd build"
+echo "  cmake .."
+echo "  make -j4 install"
+echo ""
+echo "  source /opt/ros/indigo/setup.bash"
+echo "  cd $project_dir_/$ros_workspace_dir_name_"
+echo "  catkin_make"
+echo "  source checkout/$project_dir_/setup.bash"
+echo ""
+echo "  cd $project_dir_/$ic_workspace_dir_name_"
+echo "  ./IcWorkspace.py grab icl_timesync"
+echo "--------------------------------"
