@@ -29,7 +29,7 @@ MENU=$(find ${checkout_dir}/* -maxdepth 1 -iname "setup.bash" -exec readlink -e 
 
 if [ "${workspace_name}" == "" ]; then 
 
-  select workspace_name in ${MENU} "CANCEL"; do
+  select workspace_name in "CANCEL" ${MENU}; do
 
     if [ "${workspace_name}" == "" ]; then
       echo "Please select a number..."
