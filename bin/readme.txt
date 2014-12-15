@@ -14,5 +14,5 @@ You should add the following lines to your .bashrc:
  alias ce='source $HOME/bin/choose_environment.bash'
 
  # delete the .cmake folder since it is not working with mutliple workspaces
- cd $HOME/.cmake/packages && rm -rf *
+ (cd $HOME/.cmake/packages && rm -rf *)
 
