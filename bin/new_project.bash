@@ -31,13 +31,10 @@ ros_workspace_dir_name_="catkin_ws"
 #   Advanced configuration
 # ==================================================
 
-# linux user name that is used
-linux_user_=$USER
-
 # Where to copy script template(s) from
-template_dir_="/home/$linux_user_/checkout/example"
+template_dir_="$HOME/checkout/example"
 
-project_dir_=/home/$linux_user_/checkout/$1/
+project_dir_=$HOME/checkout/$1/
 
 # ==================================================
 #   Sanity checks
