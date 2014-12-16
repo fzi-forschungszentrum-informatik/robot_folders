@@ -27,3 +27,11 @@ Now you should add some useful aliases and environment variables to your ~/.bash
  # delete the .cmake folder since it is not working with mutliple workspaces
  (cd $HOME/.cmake/packages && rm -rf *)
 
+
+If you are finished you can open a new terminal and create your first project:
+ add_fzi_project main
+
+At the end of the script you will get useful instructions that could be run afterwards. If you haven't worked with an ic_workspace or catkin_ws before you should first read the tutorials in the wiki:
+
+http://idswiki.fzi.de/wiki/index.php/Dokumentation/Tutorials/IcWorkspace
+http://idswiki.fzi.de/wiki/index.php/Dokumentation/Tutorials/Icl_ROS
