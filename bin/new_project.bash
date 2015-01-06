@@ -34,7 +34,7 @@ ros_workspace_dir_name_="catkin_ws"
 # Where to copy script template(s) from
 template_dir_="$HOME/checkout/example"
 
-project_dir_=$HOME/checkout/$1/
+project_dir_=$HOME/checkout/$1
 
 # ==================================================
 #   Sanity checks
@@ -81,7 +81,7 @@ echo ""
 echo "--------------------------------"
 echo "Typical next steps are:"
 echo ""
-echo "  source checkout/$project_dir_/setup.bash"
+echo "  source $project_dir_/setup.bash"
 echo "  cdic"
 echo "  mkdir build"
 echo "  cd build"
@@ -91,7 +91,7 @@ echo ""
 echo "  source /opt/ros/indigo/setup.bash"
 echo "  cdros"
 echo "  catkin_make"
-echo "  source checkout/$project_dir_/setup.bash"
+echo "  source $project_dir_/setup.bash"
 echo ""
 echo "  cd $project_dir_/$ic_workspace_dir_name_"
 echo "  ./IcWorkspace.py grab icl_timesync"
