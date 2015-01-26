@@ -13,6 +13,14 @@
 
 
 # ==================================================
+#   Default Variables
+# ==================================================
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+CHECKOUT_DIR=$( readlink -e $SCRIPT_DIR/../checkout )
+
+
+# ==================================================
 #   Base configuration
 # ==================================================
 
@@ -32,9 +40,9 @@ ros_workspace_dir_name_="catkin_ws"
 # ==================================================
 
 # Where to copy script template(s) from
-template_dir_="$HOME/checkout/example"
+template_dir_="$CHECKOUT_DIR/example"
 
-project_dir_=$HOME/checkout/$1
+project_dir_=$CHECKOUT_DIR/$1
 
 # ==================================================
 #   Sanity checks
