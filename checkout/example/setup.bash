@@ -49,7 +49,7 @@ then
   alias cdros='cd $catkin_dir'
   alias makeros="(cd $catkin_dir && catkin_make)" 
 else
-  echo no ROS workspace found inside $catkin_dir.
+  echo no setup.bash for the ROS workspace found: $catkin_dir/devel/setup.bash. Run catkin_make inside $catkin_dir to create the devel/setup.bash.
 fi
 
 
