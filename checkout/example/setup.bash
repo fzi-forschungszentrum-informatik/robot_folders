@@ -33,6 +33,10 @@ then
 
   alias cdic='cd $ic_dir'
   test $ic_dir/build && alias makeic="(cd $ic_dir/build && make -j4 install)"
+
+  # if you use ninja you can activate this line:
+#  test $ic_dir/build && alias makeic="(cd $ic_dir/build && ninja install)"
+
 else
   echo no ICL workspace found inside $ic_dir.
 fi
