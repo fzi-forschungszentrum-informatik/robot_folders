@@ -24,7 +24,7 @@ then
   echo configuring ICL workspace inside $ic_dir ...
 
   export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
-  export PYTHONPATH=$ic_dir/export/lib/:$PYTHONPATH
+  export PYTHONPATH=$ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
   export PATH=$ic_dir/export/bin:${PATH}
   export QML_IMPORT_PATH=$ic_dir/export/plugins/qml:$QML_IMPORT_PATH
   export CMAKE_PREFIX_PATH=$ic_dir/export
