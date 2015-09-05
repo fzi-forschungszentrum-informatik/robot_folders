@@ -32,11 +32,11 @@ then
 
   export LC_ALL=C
 
-  alias cdic='cd $ic_dir'
+  alias cdic="cd $ic_dir"
 
   # qtcreatoric will start the qtcreator and tries to load a
   # session matching the name of the project
-  alias qtcreatoric='(cd $ic_dir/.. && qtcreator .)'
+  alias qtcreatoric="(cd $ic_dir/.. && qtcreator .)"
 
 
   # add makeic according to build environment
@@ -67,7 +67,7 @@ then
   echo configuring ROS workspace via $catkin_dir/devel/setup.bash ...
 
   source $catkin_dir/devel/setup.bash
-  alias cdros='cd $catkin_dir'
+  alias cdros="cd $catkin_dir"
   alias makeros="(cd $catkin_dir && catkin_make)" 
 else
   echo no setup.bash for the ROS workspace found: $catkin_dir/devel/setup.bash. Run catkin_make inside $catkin_dir to create the devel/setup.bash.
