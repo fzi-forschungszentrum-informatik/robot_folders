@@ -38,10 +38,21 @@ then
   # session matching the name of the project
   alias qtcreatoric='(cd $ic_dir/.. && qtcreator .)'
 
-  test $ic_dir/build && alias makeic="(cd $ic_dir/build && make -j4 install)"
 
-  # if you use ninja you can activate this line:
-#  test $ic_dir/build && alias makeic="(cd $ic_dir/build && ninja install)"
+  # add makeic according to build environment
+
+  #ninja
+  if [ -f $ic_dir/build/build.ninja ]
+  then
+    alias makeic="(cd $ic_dir/build && ninja install)"
+  fi
+
+  #make
+  if [ -f $ic_dir/build/Makefile ]
+  then
+    alias makeic="(cd $ic_dir/build && make -j4 install)"
+  fi
+
 
 else
   echo no ICL workspace found inside $ic_dir.
