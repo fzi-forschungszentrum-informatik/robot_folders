@@ -33,6 +33,11 @@ then
   export LC_ALL=C
 
   alias cdic='cd $ic_dir'
+
+  # qtcreatoric will start the qtcreator and tries to load a
+  # session matching the name of the project
+  alias qtcreatoric='(cd $ic_dir/.. && qtcreator .)'
+
   test $ic_dir/build && alias makeic="(cd $ic_dir/build && make -j4 install)"
 
   # if you use ninja you can activate this line:
