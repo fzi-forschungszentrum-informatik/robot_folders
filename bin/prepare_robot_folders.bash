@@ -27,3 +27,4 @@ CHECKOUT_DIR=$( readlink -e $SCRIPT_DIR/../checkout )
  # delete the .cmake folder since it is not working with mutliple workspaces
  (cd $HOME/.cmake/packages && rm -rf *)
  
+source $SCRIPT_DIR/bash_completion.sh

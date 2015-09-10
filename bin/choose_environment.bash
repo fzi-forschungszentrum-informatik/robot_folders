@@ -24,8 +24,14 @@ checkout_dir=$( readlink -e $SCRIPT_DIR/../checkout )
 test -e ${checkout_dir} || { echo "Checkout Directory: ${checkout_dir} does not exist"; exit 0; }
 workspace_name="${1}"
 
-reset 
 MENU=$(find ${checkout_dir}/* -maxdepth 1 -iname "setup.bash" -exec readlink -e {} \; | rev | cut -f 2 -d '/' | rev )
+
+if [ "${workspace_name}" == "shortlist" ]; then
+  echo $MENU
+  exit
+fi
+
+reset
 
 if [ "${workspace_name}" == "" ]; then 
 
