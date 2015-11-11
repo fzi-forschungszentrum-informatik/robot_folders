@@ -25,6 +25,6 @@ CHECKOUT_DIR=$( readlink -e $SCRIPT_DIR/../checkout )
  alias ce='source '$SCRIPT_DIR'/choose_environment.bash'
 
  # delete the .cmake folder since it is not working with mutliple workspaces
- (cd $HOME/.cmake/packages && rm -rf *)
- 
+ rm -rf $HOME/.cmake/packages/*
+
 source $SCRIPT_DIR/bash_completion.sh
