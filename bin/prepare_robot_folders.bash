@@ -19,7 +19,7 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 CHECKOUT_DIR=$( readlink -e $SCRIPT_DIR/../checkout )
 
 # add ~/bin to PATH
- export PATH=$PATH:$SCRIPT_DIR
+ export PATH=$SCRIPT_DIR:$PATH
 
  # add an alias that sources the choose_environment.bash
  alias ce='source '$SCRIPT_DIR'/choose_environment.bash'
