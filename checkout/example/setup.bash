@@ -16,6 +16,7 @@
 # get this script's directory
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+alias cdhome="cd $SCRIPT_DIR"
 
 # Run ic_workspace initialization if available
 ic_dir=$SCRIPT_DIR/ic_workspace
@@ -41,17 +42,23 @@ then
 
   # add makeic according to build environment
 
-  #ninja
+  # ninja
   if [ -f $ic_dir/build/build.ninja ]
   then
     alias makeic="(cd $ic_dir/build && ninja install)"
   fi
 
-  #make
+  # make
   if [ -f $ic_dir/build/Makefile ]
   then
     alias makeic="(cd $ic_dir/build && make -j4 install)"
   fi
+
+  # git shortcuts
+  alias statusic="pushd . &> /dev/null && cd $ic_dir && ./IcWorkspace.py status; popd &> /dev/null "
+  alias fetchic="pushd . &> /dev/null  && cd $ic_dir && ./IcWorkspace.py fetch;  popd &> /dev/null"
+  alias pullic="pushd . &> /dev/null   && cd $ic_dir && ./IcWorkspace.py pull;   popd &> /dev/null"
+  alias pushic="pushd . &> /dev/null   && cd $ic_dir && ./IcWorkspace.py push;   popd &> /dev/null"
 
 
 else
@@ -72,6 +79,65 @@ then
 else
   echo no setup.bash for the ROS workspace found: $catkin_dir/devel/setup.bash. Run catkin_make inside $catkin_dir to create the devel/setup.bash.
 fi
+
+# git shortcuts
+alias statusros="pushd . &> /dev/null && cd $catkin_dir/src &&
+for dir in *
+do
+  if [ -d '$dir' ];
+  then
+    cd '$dir' &> /dev/null
+    echo 'Package $dir:'
+    git status;
+    printf '\n'
+    cd .. &> /dev/null
+  fi
+done;
+popd &> /dev/null"
+
+alias fetchros="pushd . &> /dev/null && cd $catkin_dir/src &&
+for dir in *
+do
+  if [ -d '$dir' ];
+  then
+    cd '$dir' &> /dev/null
+    echo 'Package $dir:'
+    git fetch;
+    printf '\n'
+    cd .. &> /dev/null
+  fi
+done;
+popd &> /dev/null"
+
+
+alias pullros="pushd . &> /dev/null && cd $catkin_dir/src &&
+for dir in *
+do
+  if [ -d '$dir' ];
+  then
+    cd '$dir' &> /dev/null
+    echo 'Package $dir:'
+    git pull;
+    printf '\n'
+    cd .. &> /dev/null
+  fi
+done;
+popd &> /dev/null"
+
+
+alias pushros="pushd . &> /dev/null && cd $catkin_dir/src &&
+for dir in *
+do
+  if [ -d '$dir' ];
+  then
+    cd '$dir' &> /dev/null
+    echo 'Package $dir:'
+    git push;
+    printf '\n'
+    cd .. &> /dev/null
+  fi
+done;
+popd &> /dev/null"
 
 
 # Special initialization for this workspace config
