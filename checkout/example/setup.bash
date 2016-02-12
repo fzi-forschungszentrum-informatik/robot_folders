@@ -5,9 +5,9 @@
 # This file is part of the robot_folders repository system.
 #
 # You can copy this file to your personal workspace checkout.
-# It should work out of the box for many ic_workspace with 
-# catkin_ws configurations. You can also add special commands 
-# you want to run. There is a place already prepared at the 
+# It should work out of the box for many ic_workspace with
+# catkin_ws configurations. You can also add special commands
+# you want to run. There is a place already prepared at the
 # end of this script.
 #
 ###############################################################
@@ -68,7 +68,7 @@ then
 
   source $catkin_dir/devel/setup.bash
   alias cdros="cd $catkin_dir"
-  alias makeros="(cd $catkin_dir && catkin_make)" 
+  alias makeros="(cd $catkin_dir && catkin_make)"
 else
   echo no setup.bash for the ROS workspace found: $catkin_dir/devel/setup.bash. Run catkin_make inside $catkin_dir to create the devel/setup.bash.
 fi
@@ -77,6 +77,3 @@ fi
 # Special initialization for this workspace config
 
 ## ADD YOUR CHANGES HERE!
-
-
-

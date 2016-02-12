@@ -8,7 +8,7 @@
 # available workspaces. Instead use the setup.bash inside your
 # workspace to add personal modifications.
 #
-# If you want to add a new workspace you can start with the 
+# If you want to add a new workspace you can start with the
 # setup.bash from the example project.
 #
 # This script can also be available as an alias (ce) by adding
@@ -33,7 +33,7 @@ fi
 
 reset
 
-if [ "${workspace_name}" == "" ]; then 
+if [ "${workspace_name}" == "" ]; then
 
   select workspace_name in "CANCEL" ${MENU}; do
 
@@ -43,7 +43,7 @@ if [ "${workspace_name}" == "" ]; then
       break;
     fi
   done
-  
+
   [ "${workspace_name}" == "CANCEL" ] && { echo "You chose to cancel"; return 0; }
   [ "${workspace_name}" == "" ] && { echo "You chose an invalid option"; return 0; }
 
@@ -63,5 +63,4 @@ source $environment/setup.bash
 
 
 # finish
-echo complete. 
-
+echo complete.
