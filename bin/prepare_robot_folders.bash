@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usb/bin/env sh
 #
 # author  Ralf Kohlhaas <kohlhaas@fzi.de>
 # date    2015-01-23
@@ -16,15 +16,10 @@
 # ==================================================
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CHECKOUT_DIR=$( readlink -e $SCRIPT_DIR/../checkout )
-
-# add ~/bin to PATH
-export PATH=$SCRIPT_DIR:$PATH
-
-# add an alias that sources the choose_environment.bash
-alias ce='source '$SCRIPT_DIR'/choose_environment.bash'
-
-# delete the .cmake folder since it is not working with mutliple workspaces
-rm -rf $HOME/.cmake/packages/*
+SOURCE_ENDING=bash
+source $SCRIPT_DIR/prepare_robot_folders.sh
 
 source $SCRIPT_DIR/bash_completion.sh
+
+# add an alias that sources the choose_environment.bash
+alias ce='source '$SCRIPT_DIR'/choose_environment.sh'

@@ -16,9 +16,11 @@
 #   Default Variables
 # ==================================================
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-CHECKOUT_DIR=$( readlink -e $SCRIPT_DIR/../checkout )
-
+if [ -z ${SCRIPT_DIR+x} ]; then
+    echo "SCRIPT_DIR is unset. Please source the prepare_robot_folders script first."
+else
+    exit
+fi
 
 # ==================================================
 #   Base configuration
@@ -48,7 +50,7 @@ project_dir_=$CHECKOUT_DIR/$1
 #   Sanity checks
 # ==================================================
 if [ -z $1 ]; then
-    echo "Usage: ${BASH_SOURCE[0]} <project_name>"
+    echo "Usage: $0 <project_name>"
     exit -1
 fi
 
@@ -65,7 +67,7 @@ fi
 mkdir $project_dir_
 
 echo "Copying project setup script"
-cp $template_dir_/setup.bash $project_dir_/setup.bash
+cp $template_dir_/setup.sh $project_dir_/setup.sh
 
 if [ $create_ic_workspace_ = true ]; then
     echo "Creating IcWorkspace"
@@ -77,7 +79,7 @@ fi
 
 if [ $create_ros_workspace_ = true ]; then
     echo "Creating ROS workspace"
-    source "/opt/ros/$ros_distro_/setup.bash"
+    source "/opt/ros/$ros_distro_/setup.$SOURCE_ENDING"
     cd $project_dir_ && mkdir -p "$ros_workspace_dir_name_/src" && cd $ros_workspace_dir_name_/src && catkin_init_workspace .
     if [ ! -e "$project_dir_/$ros_workspace_dir_name_/src/CMakeLists.txt" ]; then
         echo "Something went wrong when creating the ROS workspace"
@@ -96,7 +98,7 @@ echo ""
 echo "# First of all, OPEN A NEW TERMINAL to keep this howto on the screen."
 echo ""
 echo "# Then, set appropriate environment variables and aliases for your project:"
-echo "  source $project_dir_/setup.bash"
+echo "  source $project_dir_/setup.$SOURCE_ENDING"
 echo ""
 echo "# This can also be done visually running ce (this also resets the console):"
 echo "  ce"
@@ -121,8 +123,8 @@ echo ""
 echo "# To configure ROS first manually move into the catkin_ws:"
 echo "  cd $project_dir_/catkin_ws"
 echo ""
-echo "# Then initialize the devel/setup.bash by running catkin_make"
-echo "  source /opt/ros/indigo/setup.bash"
+echo "# Then initialize the devel/setup.$SOURCE_ENDING by running catkin_make"
+echo "  source /opt/ros/indigo/setup.$SOURCE_ENDING"
 echo "  catkin_make"
 echo ""
 echo "# Afterwards a new ce will also register the ROS aliases:"
