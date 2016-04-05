@@ -27,7 +27,9 @@ else
   workspace_name="${1}"
 
   MENU=$(find ${checkout_dir}/* -maxdepth 1 -iname "setup.sh" -exec readlink -e {} \; | rev | cut -f 2 -d '/' | rev | xargs echo)
-  MENU=(${=MENU})
+  if [ "$SOURCE_ENDING" = "zsh" ]; then
+    MENU=(${=MENU})
+  fi
 
   if [ "${workspace_name}" = "shortlist" ]; then
     echo $MENU
