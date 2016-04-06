@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/bin/sh
 
 ###############################################################
 #
@@ -26,7 +26,7 @@ else
   test -e ${checkout_dir} || { echo "Checkout Directory: ${checkout_dir} does not exist"; exit 0; }
   workspace_name="${1}"
 
-  MENU=$(find ${checkout_dir}/* -maxdepth 1 -iname "setup.sh" -exec readlink -e {} \; | rev | cut -f 2 -d '/' | rev | xargs echo)
+  MENU=$(find ${checkout_dir} -maxdepth 2 -iname "setup.sh" -exec readlink -e {} \; | rev | cut -f 2 -d '/' | rev | xargs echo)
   if [ "$ROB_FOLDERS_SOURCE_ENDING" = "zsh" ]; then
     MENU=(${=MENU})
   fi
@@ -36,12 +36,11 @@ else
     exit
   fi
 
-  reset
+ # do we really need this?
+ # reset
 
 
   if [ "${workspace_name}" = "" ]; then
-    old_cols=$COLUMNS
-    export COLUMNS=1
     select workspace_name in CANCEL $MENU; do
 
       if [ "${workspace_name}" = "" ]; then
@@ -50,8 +49,6 @@ else
         break;
       fi
     done
-
-    export COLUMNS=$old_cols
 
     [ "${workspace_name}" = "CANCEL" ] && { echo "You chose to cancel"; return 0; }
     [ "${workspace_name}" = "" ] && { echo "You chose an invalid option"; return 0; }

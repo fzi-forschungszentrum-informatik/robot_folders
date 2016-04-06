@@ -23,7 +23,7 @@ else
   ic_dir=$project_dir/ic_workspace
   if [ -f $ic_dir/CMakeLists.txt ]
   then
-    echo configuring ICL workspace inside $ic_dir ...
+    echo "configuring ICL workspace inside $ic_dir ..."
 
     export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
     export PYTHONPATH=$ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
@@ -32,7 +32,8 @@ else
     export CMAKE_PREFIX_PATH=$ic_dir/export
     export IC_MAKER_DIR=$ic_dir/icmaker
 
-    export LC_ALL=C
+    # Deactivated because it tends to screw up the zsh cursor
+    # export LC_ALL=C
 
     alias cdic="cd $ic_dir"
 
@@ -63,7 +64,7 @@ else
 
 
   else
-    echo no ICL workspace found inside $ic_dir.
+    echo "no ICL workspace found inside $ic_dir."
   fi
 
 
@@ -72,13 +73,13 @@ else
   catkin_dir=$project_dir/catkin_ws
   if [ -f $catkin_dir/devel/setup.$ROB_FOLDERS_SOURCE_ENDING ]
   then
-    echo configuring ROS workspace via $catkin_dir/devel/setup.$ROB_FOLDERS_SOURCE_ENDING ...
+    echo "configuring ROS workspace via $catkin_dir/devel/setup.$ROB_FOLDERS_SOURCE_ENDING ..."
 
     source $catkin_dir/devel/setup.$ROB_FOLDERS_SOURCE_ENDING
     alias cdros="cd $catkin_dir"
     alias makeros="(cd $catkin_dir && catkin_make)"
   else
-    echo no setup.$ROB_FOLDERS_SOURCE_ENDING for the ROS workspace found: $catkin_dir/devel/setup.$ROB_FOLDERS_SOURCE_ENDING. Run catkin_make inside $catkin_dir to create the devel/setup.$ROB_FOLDERS_SOURCE_ENDING.
+    echo "no setup.$ROB_FOLDERS_SOURCE_ENDING for the ROS workspace found: $catkin_dir/devel/setup.$ROB_FOLDERS_SOURCE_ENDING. Run catkin_make inside $catkin_dir to create the devel/setup.$ROB_FOLDERS_SOURCE_ENDING."
   fi
 
   # git shortcuts
