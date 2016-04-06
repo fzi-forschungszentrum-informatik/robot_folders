@@ -39,8 +39,8 @@ else
     # qtcreatoric will start the qtcreator and tries to load a
     # session matching the name of the project
     alias qtcreatoric="(cd $ic_dir/.. && qtcreator .)"
-
-
+    alias kdevsession="kdevelop -s ${ROB_FOLDERS_PROJECT_NAME}"
+    
     # add makeic according to build environment
 
     # ninja

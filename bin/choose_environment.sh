@@ -63,6 +63,7 @@ else
   fi
 
   environment=$( readlink -e $checkout_dir/$workspace_name)
+  export ROB_FOLDERS_PROJECT_NAME=${workspace_name}
   echo Switching to environment: $environment
 
 
