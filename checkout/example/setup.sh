@@ -12,14 +12,15 @@
 #
 ###############################################################
 
-if [ -z ${SCRIPT_DIR+x} ]; then
-  echo "SCRIPT_DIR is unset. Please source the prepare_robot_folders script first."
+if [ -z ${ROB_FOLDERS_SCRIPT_DIR+x} ]; then
+  echo "ROB_FOLDERS_SCRIPT_DIR is unset. Please source the prepare_robot_folders script first."
 else
-  alias cdhome="cd $SCRIPT_DIR"
+  alias cdhome="cd $ROB_FOLDERS_SCRIPT_DIR"
 
-  checkout_dir=$SCRIPT_DIR/../checkout/$workspace_name
+  # enviroment comes from chose_environment.sh
+  project_dir=$environment
   # Run ic_workspace initialization if available
-  ic_dir=$checkout_dir/ic_workspace
+  ic_dir=$project_dir/ic_workspace
   if [ -f $ic_dir/CMakeLists.txt ]
   then
     echo configuring ICL workspace inside $ic_dir ...
@@ -68,16 +69,16 @@ else
 
   # Run ROS initialization if available
   # We run the setup.sh in the catkin_ws folder. Afterwards we can run rosrun, roslaunch etc. with the files in it.
-  catkin_dir=$checkout_dir/catkin_ws
-  if [ -f $catkin_dir/devel/setup.$SOURCE_ENDING ]
+  catkin_dir=$project_dir/catkin_ws
+  if [ -f $catkin_dir/devel/setup.$ROB_FOLDERS_SOURCE_ENDING ]
   then
-    echo configuring ROS workspace via $catkin_dir/devel/setup.$SOURCE_ENDING ...
+    echo configuring ROS workspace via $catkin_dir/devel/setup.$ROB_FOLDERS_SOURCE_ENDING ...
 
-    source $catkin_dir/devel/setup.$SOURCE_ENDING
+    source $catkin_dir/devel/setup.$ROB_FOLDERS_SOURCE_ENDING
     alias cdros="cd $catkin_dir"
     alias makeros="(cd $catkin_dir && catkin_make)"
   else
-    echo no setup.$SOURCE_ENDING for the ROS workspace found: $catkin_dir/devel/setup.$SOURCE_ENDING. Run catkin_make inside $catkin_dir to create the devel/setup.$SOURCE_ENDING.
+    echo no setup.$ROB_FOLDERS_SOURCE_ENDING for the ROS workspace found: $catkin_dir/devel/setup.$ROB_FOLDERS_SOURCE_ENDING. Run catkin_make inside $catkin_dir to create the devel/setup.$ROB_FOLDERS_SOURCE_ENDING.
   fi
 
   # git shortcuts

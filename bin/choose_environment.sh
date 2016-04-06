@@ -19,15 +19,15 @@
 
 # set -e
 
-if [ -z ${SCRIPT_DIR+x} ]; then
-    echo "SCRIPT_DIR is unset. Please source the prepare_robot_folders script first."
+if [ -z ${ROB_FOLDERS_SCRIPT_DIR+x} ]; then
+    echo "ROB_FOLDERS_SCRIPT_DIR is unset. Please source the prepare_robot_folders script first."
 else
-  checkout_dir=$( readlink -e $SCRIPT_DIR/../checkout )
+  checkout_dir=$( readlink -e $ROB_FOLDERS_SCRIPT_DIR/../checkout )
   test -e ${checkout_dir} || { echo "Checkout Directory: ${checkout_dir} does not exist"; exit 0; }
   workspace_name="${1}"
 
   MENU=$(find ${checkout_dir}/* -maxdepth 1 -iname "setup.sh" -exec readlink -e {} \; | rev | cut -f 2 -d '/' | rev | xargs echo)
-  if [ "$SOURCE_ENDING" = "zsh" ]; then
+  if [ "$ROB_FOLDERS_SOURCE_ENDING" = "zsh" ]; then
     MENU=(${=MENU})
   fi
 
@@ -66,7 +66,7 @@ else
   echo Switching to environment: $environment
 
 
-  echo Running $environment/setup.sh ...
+  echo "Running $environment/setup.sh ..."
   test -e $environment/setup.sh || { echo "$environment/setup.sh does not exist!"; return 0; }
   source $environment/setup.sh
 

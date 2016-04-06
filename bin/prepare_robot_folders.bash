@@ -15,11 +15,11 @@
 #   Default Variables
 # ==================================================
 
-SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-SOURCE_ENDING=bash
-source $SCRIPT_DIR/prepare_robot_folders.sh
+export ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+export ROB_FOLDERS_SOURCE_ENDING=bash
+source $ROB_FOLDERS_SCRIPT_DIR/prepare_robot_folders.sh
 
-source $SCRIPT_DIR/bash_completion.sh
+source $ROB_FOLDERS_SCRIPT_DIR/bash_completion.sh
 
 # add an alias that sources the choose_environment.bash
-alias ce='source '$SCRIPT_DIR'/choose_environment.sh'
+alias ce='source '$ROB_FOLDERS_SCRIPT_DIR'/choose_environment.sh'

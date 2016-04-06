@@ -11,16 +11,34 @@
 #  - ROS workspace
 #----------------------------------------------------------------------
 
+# A POSIX variable
+OPTIND=1         # Reset in case getopts has been used previously in the shell.
+
+usage () {
+  cat <<EOF
+    usage: $0 options <project_name>
+
+    This script will create a new workspace and checkout a basic ic_workspace
+    and catkin_workspace.
+
+    OPTIONS:
+    -h  show this message
+    -i <true/false> explicitly enable / disable ic_workspace
+    -r <true/false> explicitly enable / disable ros_workspace
+    -n use ninja for building catkin workspace
+EOF
+}
 
 # ==================================================
 #   Default Variables
 # ==================================================
 
-if [ -z ${SCRIPT_DIR+x} ]; then
-    echo "SCRIPT_DIR is unset. Please source the prepare_robot_folders script first."
-else
+if [ -z ${ROB_FOLDERS_SCRIPT_DIR+x} ]; then
+    echo "ROB_FOLDERS_SCRIPT_DIR is unset. Please source the prepare_robot_folders script first."
     exit
 fi
+
+CHECKOUT_DIR=$( readlink -e $ROB_FOLDERS_SCRIPT_DIR/../checkout )
 
 # ==================================================
 #   Base configuration
@@ -43,8 +61,34 @@ ros_workspace_dir_name_="catkin_ws"
 
 # Where to copy script template(s) from
 template_dir_="$CHECKOUT_DIR/example"
+use_ninja=''
+
+# ==================================================
+#   Parse commandline arguments
+# ==================================================
+while getopts "h?i:r:n" opt; do
+  case "$opt" in
+   h\?)
+     usage
+     exit 0
+     ;;
+   i)  create_ic_workspace_=$OPTARG
+     ;;
+   r)  create_ros_workspace_=$OPTARG
+     ;;
+   n) use_ninja="--use-ninja"
+     echo "Using ninja for catkin_make"
+     ;;
+  esac
+done
+
+echo "Use ic_workspace: $create_ic_workspace_"
+echo "Use ros_workspace: $create_ros_workspace_"
+
+shift $((OPTIND-1))
 
 project_dir_=$CHECKOUT_DIR/$1
+
 
 # ==================================================
 #   Sanity checks
@@ -79,8 +123,10 @@ fi
 
 if [ $create_ros_workspace_ = true ]; then
     echo "Creating ROS workspace"
-    source "/opt/ros/$ros_distro_/setup.$SOURCE_ENDING"
+    source "/opt/ros/$ros_distro_/setup.bash"
     cd $project_dir_ && mkdir -p "$ros_workspace_dir_name_/src" && cd $ros_workspace_dir_name_/src && catkin_init_workspace .
+    echo "executing catkin_make $use_ninja"
+    cd $project_dir_/$ros_workspace_dir_name_ && catkin_make $use_ninja
     if [ ! -e "$project_dir_/$ros_workspace_dir_name_/src/CMakeLists.txt" ]; then
         echo "Something went wrong when creating the ROS workspace"
     fi
@@ -98,7 +144,7 @@ echo ""
 echo "# First of all, OPEN A NEW TERMINAL to keep this howto on the screen."
 echo ""
 echo "# Then, set appropriate environment variables and aliases for your project:"
-echo "  source $project_dir_/setup.$SOURCE_ENDING"
+echo "  source $project_dir_/setup.$ROB_FOLDERS_SOURCE_ENDING"
 echo ""
 echo "# This can also be done visually running ce (this also resets the console):"
 echo "  ce"
@@ -123,8 +169,8 @@ echo ""
 echo "# To configure ROS first manually move into the catkin_ws:"
 echo "  cd $project_dir_/catkin_ws"
 echo ""
-echo "# Then initialize the devel/setup.$SOURCE_ENDING by running catkin_make"
-echo "  source /opt/ros/indigo/setup.$SOURCE_ENDING"
+echo "# Then initialize the devel/setup.$ROB_FOLDERS_SOURCE_ENDING by running catkin_make"
+echo "  source /opt/ros/indigo/setup.$ROB_FOLDERS_SOURCE_ENDING"
 echo "  catkin_make"
 echo ""
 echo "# Afterwards a new ce will also register the ROS aliases:"
