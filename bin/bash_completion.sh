@@ -2,7 +2,7 @@
 
 _script()
 {
-  _script_commands=$(choose_environment.bash shortlist)
+  _script_commands=$(choose_environment.sh shortlist)
 
   local cur prev
   COMPREPLY=()
