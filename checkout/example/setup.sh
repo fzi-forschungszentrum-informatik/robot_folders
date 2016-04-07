@@ -15,10 +15,11 @@
 if [ -z ${ROB_FOLDERS_SCRIPT_DIR+x} ]; then
   echo "ROB_FOLDERS_SCRIPT_DIR is unset. Please source the prepare_robot_folders script first."
 else
-  alias cdhome="cd $ROB_FOLDERS_SCRIPT_DIR"
 
   # enviroment comes from chose_environment.sh
   project_dir=$environment
+  alias cdhome="cd $project_dir"
+
   # Run ic_workspace initialization if available
   ic_dir=$project_dir/ic_workspace
   if [ -f $ic_dir/CMakeLists.txt ]
