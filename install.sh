@@ -56,8 +56,6 @@ then
 else
     echo "You chose manual setup."
     manual_setup_instructions
-    echo "If you are a zsh user, you should have bashcompinit enabled in your .zshrc before sourcing the completion file:"
-    echo "    autoload -U bashcompinit && bashcompinit"
 fi
 
 
