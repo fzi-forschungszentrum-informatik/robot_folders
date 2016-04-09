@@ -1,12 +1,15 @@
 #!/bin/bash
 
+# Get the base directory where the install script is located
+ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
 function manual_setup_instructions
 {
-    echo "Add $(pwd)/venv/bin to the BACK of your path."
-    echo "    export PATH=\$PATH:$(pwd)/venv/bin"
+    echo "Add ${ROB_FOLDERS_SCRIPT_DIR}/venv/bin to the BACK of your path."
+    echo "    export PATH=\$PATH:${ROB_FOLDERS_SCRIPT_DIR}/venv/bin"
     echo
     echo "For bash completion (what you definitely want)."
-    echo "    source $(pwd)/fzrob-complete.sh"
+    echo "    source ${ROB_FOLDERS_SCRIPT_DIR}/fzrob-complete.sh"
     echo
     echo "If you are a zsh user, you should have bashcompinit enabled in your .zshrc before sourcing the completion file:"
     echo "    autoload -U bashcompinit && bashcompinit"
@@ -15,8 +18,8 @@ function manual_setup_instructions
 shell_setup ()
 {
     echo "# robot_folders setup" >> $1
-    echo "export PATH=\$PATH:$(pwd)/venv/bin" >> $1
-    echo "source $(pwd)/fzrob-complete.sh" >> $1
+    echo "export PATH=\$PATH:${ROB_FOLDERS_SCRIPT_DIR}/venv/bin" >> $1
+    echo "source ${ROB_FOLDERS_SCRIPT_DIR}/fzrob-complete.sh" >> $1
 }
 
 function install
@@ -34,6 +37,8 @@ function install
 
 
 install
+
+mkdir -p ${ROB_FOLDERS_SCRIPT_DIR}/checkout
 
 read -p "Do you want me to perform the .bashrc setup automatically? [Y/n] " -r do_setup
 
