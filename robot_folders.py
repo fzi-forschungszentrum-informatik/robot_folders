@@ -85,8 +85,11 @@ def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
         click.echo("Creating catkin_workspace")
         installed_ros_distros = os.listdir("/opt/ros")
         click.echo("Available ROS distributions: {}".format(installed_ros_distros))
-        ros_distro = click.prompt('Which ROS distribution would you like to use?',
-                                  type=click.Choice(installed_ros_distros), default=installed_ros_distros[0])
+        ros_distro = installed_ros_distros[0]
+        if len(installed_ros_distros) > 1:
+            ros_distro = click.prompt('Which ROS distribution would you like to use?',
+                                      type=click.Choice(installed_ros_distros), default=installed_ros_distros[0])
+        click.echo("Using ROS distribution \'{}\'".format(ros_distro))
         ros_global_dir = "/opt/ros/{}".format(ros_distro)
         copy_cmake_lists = click.prompt(("Would you like to copy the top-level CMakeLists.txt to the catkin"
                                         " src directory instead of using a symlink?"
