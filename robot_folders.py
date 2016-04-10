@@ -7,15 +7,21 @@ def cli():
     """A simple command line tool."""
 
 @cli.command('add_environment', short_help='Add a new environment')
-@click.option('--no_ic', is_flag=True, default=False, help='Will not create an ic_workspace.')
-@click.option('--no_catkin', is_flag=True, default=False, help='Will not create a catkin_workspace.')
-@click.option('--no_mca2', is_flag=True, default=False, help='Will not create an mca2_workspace.')
+@click.option('--create_ic', is_flag=True, default=True,
+              prompt="Would you like to create an ic_workspace?",
+              help='Create an ic_workspace?')
+@click.option('--create_catkin', is_flag=True, default=True,
+              prompt="Would you like to create a catkin_workspace?",
+              help='Will not create a catkin_workspace.')
+@click.option('--create_mca2', is_flag=True, default=False,
+              prompt="Would you like to create an mca2_workspace?",
+              help='Will not create an mca2_workspace.')
+
 @click.option('--use_ninja', is_flag=True, default=False,
               help='Use ninja as build system instead of linux makefiles.')
-@click.option('--ros_distro', default="indigo", help='ROS distribution that should be used')
 @click.argument('env_name')
 #@click.option('-m', '--mca2_workspace', default=False, help='Create an mac2_workspace.')
-def add_environment(no_ic, no_catkin, no_mca2, use_ninja, ros_distro, env_name):
+def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
     """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_workspace."""
     # TODO:
     #     - Add support for building in no_backup
@@ -48,9 +54,7 @@ def add_environment(no_ic, no_catkin, no_mca2, use_ninja, ros_distro, env_name):
 
 
     # Check if we should create an ic workspace and create one if desired
-    if no_ic:
-        click.echo("Requested to not create an IC Workspace")
-    else:
+    if create_ic:
         click.echo("Creating ic_workspace")
 
         try:
@@ -72,27 +76,35 @@ def add_environment(no_ic, no_catkin, no_mca2, use_ninja, ros_distro, env_name):
             click.echo("An error occurred while creating the ic_workspace. Exiting now")
             return
 
+    else:
+        click.echo("Requested to not create an IC Workspace")
+
 
     # Check if we should create a catkin workspace and create one if desired
-    if no_catkin:
-        click.echo("Requested to not create a catkin_workspace")
-    else:
+    if create_catkin:
         click.echo("Creating catkin_workspace")
+        installed_ros_distros = os.listdir("/opt/ros")
+        click.echo("Available ROS distributions: {}".format(installed_ros_distros))
+        ros_distro = click.prompt('Which ROS distribution would you like to use?',
+                                  type=click.Choice(installed_ros_distros), default=installed_ros_distros[0])
+        ros_global_dir = "/opt/ros/{}".format(ros_distro)
         os.mkdir(catkin_directory)
         os.mkdir(os.path.join(catkin_directory, "src"))
 
-        cama_command = "source /opt/ros/{}/setup.bash && catkin_make {}".format(ros_distro, cama_flags)
+        cama_command = "source {}/setup.bash && catkin_make {}".format(ros_global_dir, cama_flags)
 
         process = subprocess.Popen(["bash", "-c", cama_command],
                                    cwd=catkin_directory)
         process.wait()
 
+    else:
+        click.echo("Requested to not create a catkin_workspace")
+
+
 
 
     # Check if we should create an mca2 workspace and create one if desired
-    if no_mca2:
-        click.echo("Requested to not create an mca2 workspace")
-    else:
+    if create_mca2:
         click.echo("Creating mca2_workspace")
 
         try:
@@ -117,6 +129,8 @@ def add_environment(no_ic, no_catkin, no_mca2, use_ninja, ros_distro, env_name):
             click.echo(e.output)
             click.echo("An error occurred while creating the ic_workspace. Exiting now")
             return
+    else:
+        click.echo("Requested to not create an mca2 workspace")
 
 
         click.echo("Initial workspace setup completed")
