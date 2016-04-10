@@ -88,6 +88,13 @@ def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
         ros_distro = click.prompt('Which ROS distribution would you like to use?',
                                   type=click.Choice(installed_ros_distros), default=installed_ros_distros[0])
         ros_global_dir = "/opt/ros/{}".format(ros_distro)
+        copy_cmake_lists = click.prompt(("Would you like to copy the top-level CMakeLists.txt to the catkin"
+                                        " src directory instead of using a symlink?"
+                                        " (This is incredibly useful when using the QtCreator.)"),
+                                        type=bool,
+                                        default=True)
+
+
         os.mkdir(catkin_directory)
         os.mkdir(os.path.join(catkin_directory, "src"))
 
@@ -97,6 +104,15 @@ def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
                                    cwd=catkin_directory)
         process.wait()
 
+        if copy_cmake_lists:
+            try:
+                subprocess.check_call(["rm", "{}/src/CMakeLists.txt".format(catkin_directory)])
+                subprocess.check_call(["cp",
+                                       "{}/share/catkin/cmake/toplevel.cmake".format(ros_global_dir),
+                                       "{}/src/CMakeLists.txt".format(catkin_directory)])
+            except subprocess.CalledProcessError as e:
+                click.echo(e.output)
+                click.echo("An error occurred while copying the CMakeLists.txt to the catkin source directory")
     else:
         click.echo("Requested to not create a catkin_workspace")
 
