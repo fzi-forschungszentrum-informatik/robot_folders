@@ -87,7 +87,6 @@ def add_environment(no_ic, no_catkin, no_mca2, use_ninja, ros_distro, env_name):
                                    cwd=catkin_directory)
         process.wait()
 
-    click.echo("Initial workspace setup completed")
 
 
     # Check if we should create an mca2 workspace and create one if desired
@@ -118,6 +117,12 @@ def add_environment(no_ic, no_catkin, no_mca2, use_ninja, ros_distro, env_name):
             click.echo(e.output)
             click.echo("An error occurred while creating the ic_workspace. Exiting now")
             return
+
+
+        click.echo("Initial workspace setup completed")
+
+
+
 
 
 @cli.command('delete', short_help='delete the repo')
