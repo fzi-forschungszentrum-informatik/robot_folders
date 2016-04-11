@@ -2,6 +2,12 @@ import click
 import os
 import subprocess
 
+from yaml import load as yaml_load, dump as yaml_dump
+try:
+    from yaml import CLoader as Loader, CDumper, Dumper
+except ImportError:
+    from yaml import Loader, Dumper
+
 @click.group()
 def cli():
     """A simple command line tool."""
@@ -19,9 +25,10 @@ def cli():
 
 @click.option('--use_ninja', is_flag=True, default=False,
               help='Use ninja as build system instead of linux makefiles.')
-@click.argument('env_name')
+@click.argument('env_name', nargs=1)
+@click.argument('config_file', nargs=1)
 #@click.option('-m', '--mca2_workspace', default=False, help='Create an mac2_workspace.')
-def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
+def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name, config_file):
     """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_workspace."""
     # TODO:
     #     - Add support for building in no_backup
@@ -29,11 +36,21 @@ def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
 
     base_dir = os.path.dirname(os.path.realpath(__file__))
     ic_repo_url = "git://idsgit.fzi.de/core/ic_workspace.git"
+    ic_packages = ""
     ic_cmake_flags = ""
     cama_flags = ""
+    catkin_rosinstall = ""
     mca_repo_url = "git://idsgit.fzi.de/mca2/mca2.git"
     mca_cmake_flags = ""
+    mca_additional_repos = ""
 
+    if config_file:
+        yaml_stream = file(config_file, 'r')
+        data = yaml_load(yaml_stream, Loader=Loader)
+
+        ic_packages = ' '.join(data['ic_workspace']['packages'])
+        catkin_rosinstall = data['catkin_workspace']['rosinstall']
+        mca_additional_repos = data['mca_workspace']
 
     if use_ninja:
         sep = " "
@@ -66,7 +83,7 @@ def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
         try:
             subprocess.check_call(["git", "clone", ic_repo_url, ic_directory])
 
-            process = subprocess.Popen(["./IcWorkspace.py", "grab", "base"],
+            process = subprocess.Popen(["./IcWorkspace.py", "grab", ic_packages],
                                        cwd=ic_directory)
             process.wait()
 
@@ -105,7 +122,16 @@ def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
 
 
         os.mkdir(catkin_directory)
-        os.mkdir(os.path.join(catkin_directory, "src"))
+        if catkin_rosinstall == "":
+            os.mkdir(os.path.join(catkin_directory, "src"))
+        else:
+            # Dump the rosinstall to a file and use wstool for getting the packages
+            rosinstall_filename = '/tmp/rob_folders_rosinstall'
+            rosinstall_file_handle = file(rosinstall_filename, 'w')
+            yaml_dump(catkin_rosinstall, rosinstall_file_handle)
+            process = subprocess.Popen(["wstool", "init", "src", rosinstall_filename],
+                                   cwd=catkin_directory)
+            process.wait()
 
         cama_command = "source {}/setup.bash && catkin_make {}".format(ros_global_dir, cama_flags)
 
@@ -143,6 +169,15 @@ def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
                                        cwd=mca_directory)
             process.wait()
 
+            for project in mca_additional_repos['projects']:
+                click.echo("Project: {}".format(project))
+                projects_dir = os.path.join(mca_directory, 'projects', project['git']['local-name'])
+                subprocess.check_call(["git", "clone", project['git']['uri'], projects_dir])
+            for library in mca_additional_repos['libraries']:
+                libraries_dir = os.path.join(mca_directory, 'libraries', library['git']['local-name'])
+                subprocess.check_call(["git", "clone", library['git']['uri'], libraries_dir])
+
+            # TODO: Do correct building here
             mca_build_dir = os.path.join(mca_directory, "build")
             os.mkdir(mca_build_dir)
             mca_cmake_cmd = "cmake .. {}".format(mca_cmake_flags)
