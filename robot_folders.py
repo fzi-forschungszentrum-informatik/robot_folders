@@ -2,6 +2,9 @@ import click
 import os
 import subprocess
 
+def get_base_dir():
+    return os.path.dirname(os.path.realpath(__file__))
+
 @click.group()
 def cli():
     """A simple command line tool."""
@@ -27,7 +30,7 @@ def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
     #     - Add support for building in no_backup
     #     - Make building optional
 
-    base_dir = os.path.dirname(os.path.realpath(__file__))
+    base_dir = get_base_dir()
     ic_repo_url = "git://idsgit.fzi.de/core/ic_workspace.git"
     ic_cmake_flags = ""
     cama_flags = ""
@@ -162,10 +165,41 @@ def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
 def delete():
     """Deletes the repository."""
 
+class EnvironmentChoice(click.Command):
+    def invoke(self, ctx):
+        click.echo('Changed active environment to < %s >!' % self.name)
+        pass
 
+class EnvironmentChooser(click.MultiCommand):
+    def get_current_evironments(self):
+        checkout_folder = os.path.join(get_base_dir(), 'checkout')
+        # TODO possibly check whether the directory contains actual workspace
+        return [dir for dir in os.listdir(checkout_folder) if os.path.isdir(os.path.join(checkout_folder, dir))]
 
+    def list_commands(self, ctx):
+        return self.get_current_evironments()
 
-
+    def get_command(self, ctx, name):
+        # return empty command with the correct name
+        # TODO improve logging for invalid environments
+        if name in self.get_current_evironments():
+            cmd = EnvironmentChoice(name=name, add_help_option=False)
+            return cmd
+        else:
+            click.echo('No environment with name < %s > found.' % name)
+            return None
+    
+      
+@cli.command('change_environment', cls=EnvironmentChooser, short_help='Add a new environment', invoke_without_command=True)
+@click.pass_context
+def change_environment(ctx):
+    """Changes the global environment to the specified one. All environment-specific commands are then executed relative to that environment. \
+       Only one environment can be active at a time."""
+    if ctx.invoked_subcommand is None:
+        click.echo('No environment specified. Please choose one of the available environments!')
+    else:
+        pass
+    # print(env_name)
 
 
 @cli.command()
