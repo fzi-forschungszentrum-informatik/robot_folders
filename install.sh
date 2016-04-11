@@ -28,6 +28,7 @@ function install
     virtualenv venv
     . venv/bin/activate
     pip install Click
+    pip install PyYaml
 
     echo "Installing robot_folders"
     pip install --editable .
