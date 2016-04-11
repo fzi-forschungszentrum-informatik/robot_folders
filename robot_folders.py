@@ -52,6 +52,12 @@ def add_environment(create_ic, create_catkin, create_mca2, use_ninja, env_name):
     catkin_directory = os.path.join(base_dir, "checkout", env_name, "catkin_workspace")
     mca_directory = os.path.join(base_dir, "checkout", env_name, "mca2_workspace")
 
+    env_source_file = open(os.path.join(base_dir, "checkout", env_name, "source_local.sh"), 'w')
+
+
+    env_source_file.write("#This file is for custom source commands in this environment.\n")
+    env_source_file.close()
+
 
     # Check if we should create an ic workspace and create one if desired
     if create_ic:
