@@ -6,6 +6,7 @@ setup(
     py_modules=['robot_folders'],
     install_requires=[
         'Click',
+        'PyYaml'
     ],
     entry_points='''
         [console_scripts]
