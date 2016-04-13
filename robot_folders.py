@@ -30,8 +30,6 @@ def cli():
 #@click.option('-m', '--mca2_workspace', default=False, help='Create an mac2_workspace.')
 def add_environment(generator, env_name, config_file, no_build, no_cmake):
     """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_workspace."""
-    # TODO:
-    #     - Add support for building in no_backup
 
     base_dir = get_base_dir()
     build_base_dir = os.path.join(base_dir, "checkout")

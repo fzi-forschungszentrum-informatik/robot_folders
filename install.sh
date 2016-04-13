@@ -3,24 +3,18 @@
 # Get the base directory where the install script is located
 ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
+SOURCE_CMD="source ${ROB_FOLDERS_SCRIPT_DIR}/fzrob_sources.sh"
+
 function manual_setup_instructions
 {
-    echo "Add ${ROB_FOLDERS_SCRIPT_DIR}/venv/bin to the BACK of your path."
-    echo "    export PATH=\$PATH:${ROB_FOLDERS_SCRIPT_DIR}/venv/bin"
-    echo
-    echo "For bash completion (what you definitely want)."
-    echo "    source ${ROB_FOLDERS_SCRIPT_DIR}/fzrob-complete.sh"
-    echo
-    echo "If you are a zsh user, you should have bashcompinit enabled in your .zshrc before sourcing the completion file:"
-    echo "    autoload -U bashcompinit && bashcompinit"
+    echo "Simply add ${SOURCE_CMD} in your .bashrc or zshrc respectively"
 }
 
 shell_setup ()
 {
-    SOURCE_CMD="source ${ROB_FOLDERS_SCRIPT_DIR}/fzrob_sources.sh"
     # if the command hasn't been added already
     if ! grep -q "$SOURCE_CMD" $1;
-    then 
+    then
         echo "# robot_folders setup" >> $1
         echo $SOURCE_CMD >> $1
     fi
@@ -56,7 +50,7 @@ then
         echo "Added necessary parts to .bashrc"
     elif [[ $shell_type == zsh ]]; then
         shell_setup "$HOME/.zshrc"
-        echo "Added necessary parts to .zshrc." 
+        echo "Added necessary parts to .zshrc."
     else
         echo "Could not determine your shell type. Please perform manual setup:"
         manual_setup_instructions
