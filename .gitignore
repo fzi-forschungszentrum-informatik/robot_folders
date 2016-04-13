@@ -3,3 +3,4 @@
 venv
 checkout
 *.pyc
+robot_folders.egg-info/requires.txt
