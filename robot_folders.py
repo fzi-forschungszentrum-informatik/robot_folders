@@ -13,6 +13,19 @@ except ImportError:
 def get_base_dir():
     return os.path.dirname(os.path.realpath(__file__))
 
+def get_active_env():
+    env_file = os.path.join(get_base_dir(), 'checkout', '') + '.cur_env'
+    if os.path.isfile(env_file):
+        with open(env_file, 'r') as file:
+            return file.read().rstrip()
+    else:
+        return None
+
+def get_active_env_path():
+    if get_active_env() == None:
+        return None
+    return os.path.join(get_base_dir(), 'checkout', get_active_env())
+
 @click.group()
 def cli():
     """A simple command line tool."""
@@ -297,17 +310,65 @@ def add_environment(generator, env_name, config_file, no_build, no_cmake):
         click.echo("Initial workspace setup completed")
 
 
+@cli.command('active_environment')
+def active_environment():
+    """Prints out the current environment."""
+    click.echo("Active environment: {}".format(get_active_env()))
 
+
+class WorkspaceChooser(click.MultiCommand):
+    def get_workspaces(self):
+        checkout_folder = os.path.join(get_base_dir(), 'checkout')
+        # TODO possibly check whether the directory contains actual workspace
+        return [dir for dir in os.listdir(checkout_folder) if os.path.isdir(os.path.join(checkout_folder, dir))]
+
+    def list_commands(self, ctx):
+        if get_active_env_path() == None:
+            return []
+        workspaces = [dir for dir in os.listdir(get_active_env_path())]
+        cmds = []
+        if 'ic_workspace' in workspaces:
+            cmds.append('ic')
+        if 'mca_workspace' in workspaces:
+            cmds.append('mca')
+        if 'catkin_workspace' in workspaces:
+            cmds.append('ros')
+            
+        return cmds
+    
+    def format_commands(self, ctx, formatter):
+        return 'ic, ros'
+        pass
+
+    def get_command(self, ctx, name):
+        click.echo(ctx.params)
+        return self
+
+
+@cli.command('make', cls=WorkspaceChooser, invoke_without_command=True)
+@click.pass_context
+def make(ctx):
+    """Changes the global environment to the specified one. All environment-specific commands are then executed relative to that environment. \
+       Only one environment can be active at a time."""
+    click.echo('call!')
+    click.echo(ctx.params)
+    click.echo(ctx.invoked_subcommand)
+    exit(0)
+    if ctx.invoked_subcommand is None:
+        click.echo("make called without argument")
 
 
 @cli.command('delete', short_help='delete the repo')
 def delete():
     """Deletes the repository."""
+    pass
 
 class EnvironmentChoice(click.Command):
     def invoke(self, ctx):
         click.echo('Changed active environment to < %s >!' % self.name)
-        pass
+        
+        with open( os.path.join(get_base_dir(), 'checkout', '') + '.cur_env', 'w') as file:
+            file.write("{}".format(self.name)) 
 
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
