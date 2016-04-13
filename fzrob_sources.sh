@@ -1,12 +1,18 @@
-#!/bin/bash
 
-# Get the base directory where the install script is located
-ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
-# autoload bashcompinit if using zsh 
+# zsh
 if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ];
 then
+# Get the base directory where the install script is located
+  ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${(%):-%N}" )" && pwd )"
+# autoload bashcompinit if using zsh 
   autoload -U bashcompinit && bashcompinit
+fi
+
+# bash
+if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ];
+then
+# Get the base directory where the install script is located
+  ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 fi
 
 # robot_folders setup
