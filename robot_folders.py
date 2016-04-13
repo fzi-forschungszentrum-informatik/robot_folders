@@ -37,6 +37,7 @@ def add_environment(generator, env_name, config_file, no_build, no_cmake):
     build_base_dir = os.path.join(base_dir, "checkout")
     ic_repo_url = "git://idsgit.fzi.de/core/ic_workspace.git"
     ic_packages = "base"
+    ic_package_versions = {}
     ic_cmake_flags = ""
     cama_flags = ""
     catkin_rosinstall = ""
@@ -80,6 +81,7 @@ def add_environment(generator, env_name, config_file, no_build, no_cmake):
             if data['ic_workspace'] is not None and 'packages' in data['ic_workspace']:
                 if data['ic_workspace']['packages'] is not None:
                     ic_packages = ' '.join(data['ic_workspace']['packages'])
+                    ic_package_versions = data['ic_workspace']['package_versions']
 
 
         if 'catkin_workspace' in data:
@@ -158,6 +160,17 @@ def add_environment(generator, env_name, config_file, no_build, no_cmake):
             process = subprocess.Popen(["./IcWorkspace.py", "grab", ic_packages],
                                        cwd=ic_directory)
             process.wait()
+
+            for package in ic_package_versions.keys():
+                if package in ic_packages:
+                    click.echo("Checking out version {} of package {}".format(ic_package_versions[package], package))
+                    package_dir = os.path.join(ic_directory, "packages", package)
+                    click.echo("Package_dir: {}".format(package_dir))
+                    process = subprocess.Popen(["git", "checkout", ic_package_versions[package]],
+                                                cwd=package_dir)
+                    process.wait()
+                else:
+                    click.echo('Version for package {} given, however, package is not listed in environment!'.format(package))
 
             os.makedirs(ic_build_directory)
             local_build_dir_name = os.path.join(ic_directory, "build")

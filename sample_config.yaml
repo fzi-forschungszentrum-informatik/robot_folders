@@ -4,7 +4,9 @@
 # the according section completely.
 ic_workspace:
   packages:
-    - icl_perception
+    - icl_hardware
+  package_versions:
+    icl_hardware: canopen_schunk
 catkin_workspace:
   rosinstall:
     - git:
