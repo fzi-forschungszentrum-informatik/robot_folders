@@ -17,9 +17,13 @@ function manual_setup_instructions
 
 shell_setup ()
 {
-    echo "# robot_folders setup" >> $1
-    echo "export PATH=\$PATH:${ROB_FOLDERS_SCRIPT_DIR}/venv/bin" >> $1
-    echo "source ${ROB_FOLDERS_SCRIPT_DIR}/fzrob-complete.sh" >> $1
+    SOURCE_CMD="source ${ROB_FOLDERS_SCRIPT_DIR}/fzrob_sources.sh"
+    # if the command hasn't been added already
+    if ! grep -q "$SOURCE_CMD" $1;
+    then 
+        echo "# robot_folders setup" >> $1
+        echo $SOURCE_CMD >> $1
+    fi
 }
 
 function install
