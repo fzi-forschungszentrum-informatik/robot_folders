@@ -56,9 +56,7 @@ then
         echo "Added necessary parts to .bashrc"
     elif [[ $shell_type == zsh ]]; then
         shell_setup "$HOME/.zshrc"
-        echo "Added necessary parts to .zshrc. Have you loaded bashcompinit? Otherwise add"
-        echo "    autoload -U bashcompinit && bashcompinit"
-        echo "before the just inserted lines"
+        echo "Added necessary parts to .zshrc." 
     else
         echo "Could not determine your shell type. Please perform manual setup:"
         manual_setup_instructions
