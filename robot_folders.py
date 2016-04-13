@@ -1,6 +1,7 @@
 import click
 import os
 import subprocess
+import getpass
 
 from yaml import load as yaml_load, dump as yaml_dump
 
@@ -21,15 +22,19 @@ def cli():
               default='ninja',
               help='Which generator should be used in this environment? Defaults to ninja.')
 @click.option('--config_file', help='Create an environment from a given config file.')
+@click.option('--no_build', is_flag=True, default=False,
+              help='Do not perform an initial build. A cmake run will be performed anyway. For catkin workspaces, a full catkin_make will be performed afterwards.')
+@click.option('--no_cmake', is_flag=True, default=False,
+              help='Only checkout the repositories. The build process has to be done manually afterwards. Please be aware, that sourcing such an environment is not directly possible.')
 @click.argument('env_name', nargs=1)
 #@click.option('-m', '--mca2_workspace', default=False, help='Create an mac2_workspace.')
-def add_environment(generator, env_name, config_file):
+def add_environment(generator, env_name, config_file, no_build, no_cmake):
     """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_workspace."""
     # TODO:
     #     - Add support for building in no_backup
-    #     - Make building optional
 
     base_dir = get_base_dir()
+    build_base_dir = os.path.join(base_dir, "checkout")
     ic_repo_url = "git://idsgit.fzi.de/core/ic_workspace.git"
     ic_packages = "base"
     ic_cmake_flags = ""
@@ -43,6 +48,26 @@ def add_environment(generator, env_name, config_file):
     create_ic = False
     create_catkin = False
     create_mca = False
+
+
+    # If we are on a workstation or when no_backup is mounted like on a workstation offer to build in no_backup
+    has_nobackup = False
+    try:
+        if os.path.isdir('/disk/no_backup'):
+            has_nobackup = True
+    except subprocess.CalledProcessError as e:
+        pass
+
+    if has_nobackup:
+        if not (no_cmake):
+            build_dir_choice = click.prompt("Which folder should I use as a base for creating the build tree?\nType 'local' for building inside the local robot_folders tree.\nType 'no_backup' (or simply press enter) for building in the no_backup space (should be used on workstations).\n",
+                                            type=click.Choice(['no_backup', 'local']),
+                                            default='no_backup')
+            if build_dir_choice == 'no_backup':
+                username = getpass.getuser()
+                build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
+
+
 
     if config_file:
         yaml_stream = file(config_file, 'r')
@@ -108,8 +133,13 @@ def add_environment(generator, env_name, config_file):
     click.echo("Creating environment with name \"{}\"".format(env_name))
     os.mkdir("{}/checkout/{}".format(base_dir, env_name))
     ic_directory = os.path.join(base_dir, "checkout", env_name, "ic_workspace")
+    ic_build_directory = os.path.join(build_base_dir, env_name,  "ic_workspace", "build")
     catkin_directory = os.path.join(base_dir, "checkout", env_name, "catkin_workspace")
+    catkin_build_directory = os.path.join(build_base_dir, env_name, "catkin_workspace", "build")
+
     mca_directory = os.path.join(base_dir, "checkout", env_name, "mca_workspace")
+    mca_build_directory = os.path.join(build_base_dir, env_name, "mca_workspace", "build")
+
 
     env_source_file = open(os.path.join(base_dir, "checkout", env_name, "source_local.sh"), 'w')
 
@@ -129,15 +159,19 @@ def add_environment(generator, env_name, config_file):
                                        cwd=ic_directory)
             process.wait()
 
-            ic_build_dir = os.path.join(ic_directory, "build")
-            os.mkdir(ic_build_dir)
-            ic_cmake_cmd = "cmake .. {}".format(ic_cmake_flags)
-            process = subprocess.Popen(["bash", "-c", ic_cmake_cmd],
-                                       cwd=ic_build_dir)
-            process.wait()
-            process = subprocess.Popen(["bash", "-c", build_cmd],
-                                       cwd=ic_build_dir)
-            process.wait()
+            os.makedirs(ic_build_directory)
+            local_build_dir_name = os.path.join(ic_directory, "build")
+            if local_build_dir_name != ic_build_directory:
+                os.symlink(ic_build_directory, local_build_dir_name)
+            if not no_cmake:
+                ic_cmake_cmd = "cmake {} {}".format(ic_directory, ic_cmake_flags)
+                process = subprocess.Popen(["bash", "-c", ic_cmake_cmd],
+                                           cwd=ic_build_directory)
+                process.wait()
+                if not no_build:
+                    process = subprocess.Popen(["bash", "-c", build_cmd],
+                                               cwd=ic_build_directory)
+                    process.wait()
 
         except subprocess.CalledProcessError as e:
             click.echo(e.output)
@@ -164,11 +198,23 @@ def add_environment(generator, env_name, config_file):
                                    cwd=catkin_directory)
             process.wait()
 
-        cama_command = "source {}/setup.bash && catkin_make {}".format(ros_global_dir, cama_flags)
+        os.makedirs(catkin_build_directory)
+        local_build_dir_name = os.path.join(catkin_directory, "build")
+        (catkin_devel_base_dir, _) = os.path.split(catkin_build_directory)
+        catkin_devel_directory = os.path.join(catkin_devel_base_dir, "devel")
+        local_devel_dir_name = os.path.join(catkin_directory, "devel")
+        click.echo("devel_dir: {}".format(catkin_devel_directory))
+        if local_build_dir_name != catkin_build_directory:
+            os.symlink(catkin_build_directory, local_build_dir_name)
+            os.makedirs(catkin_devel_directory)
+            os.symlink(catkin_devel_directory, local_devel_dir_name)
+        # Perform catkin_make only if neither of no_cmake and no_build is declared
+        if not (no_cmake or no_build):
+            cama_command = "source {}/setup.bash && catkin_make {}".format(ros_global_dir, cama_flags)
 
-        process = subprocess.Popen(["bash", "-c", cama_command],
-                                   cwd=catkin_directory)
-        process.wait()
+            process = subprocess.Popen(["bash", "-c", cama_command],
+                                       cwd=catkin_directory)
+            process.wait()
 
         if copy_cmake_lists:
             try:
@@ -215,16 +261,19 @@ def add_environment(generator, env_name, config_file):
                                                  library['git']['local-name'])
                     subprocess.check_call(["git", "clone", library['git']['uri'], libraries_dir])
 
-            # TODO: Do correct building here
-            mca_build_dir = os.path.join(mca_directory, "build")
-            os.mkdir(mca_build_dir)
-            mca_cmake_cmd = "cmake .. {}".format(mca_cmake_flags)
-            process = subprocess.Popen(["bash", "-c", mca_cmake_cmd],
-                                       cwd=mca_build_dir)
-            process.wait()
-            process = subprocess.Popen(["bash", "-c", build_cmd],
-                                       cwd=mca_build_dir)
-            process.wait()
+            os.makedirs(mca_build_directory)
+            local_build_dir_name = os.path.join(mca_directory, "build")
+            if local_build_dir_name != mca_build_directory:
+                os.symlink(mca_build_directory, local_build_dir_name)
+            if not no_cmake:
+                mca_cmake_cmd = "cmake {} {}".format(mca_directory, mca_cmake_flags)
+                process = subprocess.Popen(["bash", "-c", mca_cmake_cmd],
+                                           cwd=mca_build_directory)
+                if not no_build:
+                    process.wait()
+                    process = subprocess.Popen(["bash", "-c", build_cmd],
+                                               cwd=mca_build_directory)
+                    process.wait()
 
         except subprocess.CalledProcessError as e:
             click.echo(e.output)
