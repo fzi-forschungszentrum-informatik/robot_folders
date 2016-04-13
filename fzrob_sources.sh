@@ -4,7 +4,7 @@ if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ];
 then
 # Get the base directory where the install script is located
   ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${(%):-%N}" )" && pwd )"
-# autoload bashcompinit if using zsh 
+# autoload bashcompinit if using zsh
   autoload -U bashcompinit && bashcompinit
 fi
 
