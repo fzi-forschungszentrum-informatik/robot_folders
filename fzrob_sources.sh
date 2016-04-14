@@ -17,4 +17,7 @@ fi
 
 # robot_folders setup
 export PATH=$PATH:${ROB_FOLDERS_SCRIPT_DIR}/venv/bin
+
+# sourcing alias
+alias fzsource="source ${ROB_FOLDERS_SCRIPT_DIR}/checkout/.source_cur_env"
 source ${ROB_FOLDERS_SCRIPT_DIR}/fzrob-complete.sh

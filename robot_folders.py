@@ -333,9 +333,9 @@ class WorkspaceChooser(click.MultiCommand):
             cmds.append('mca')
         if 'catkin_workspace' in workspaces:
             cmds.append('ros')
-            
+
         return cmds
-    
+
     def format_commands(self, ctx, formatter):
         return 'ic, ros'
         pass
@@ -365,10 +365,19 @@ def delete():
 
 class EnvironmentChoice(click.Command):
     def invoke(self, ctx):
-        click.echo('Changed active environment to < %s >!' % self.name)
-        
         with open( os.path.join(get_base_dir(), 'checkout', '') + '.cur_env', 'w') as file:
-            file.write("{}".format(self.name)) 
+            file.write("{}".format(self.name))
+
+        with open( os.path.join(get_base_dir(), 'checkout', '.source_cur_env'), 'w') as file:
+            main_source = os.path.join(get_base_dir(), 'source_environment.sh')
+            env_dir = os.path.join(get_base_dir(), 'checkout', self.name)
+            file.write("source {} {}".format(main_source, env_dir))
+
+
+        click.echo('Changed active environment to < {} >!\n\
+To be able to use source commands such as for example \
+roslaunch and mca commands, type \'fzsource\''.format(self.name))
+
 
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
