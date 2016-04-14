@@ -30,6 +30,24 @@ def get_active_env_path():
 def cli():
     """A simple command line tool."""
 
+# NOTE: Sourcing this way only works inside the python session and it's children.
+def source_ic_workspace(env_name):
+    ic_dir = os.path.join(get_base_dir(), "checkout", env_name, "ic_workspace")
+    click.echo("Sourcing ic_workspace for environment {}".format(env_name))
+    lib_path = os.path.join(ic_dir, "export", "lib")
+    os.environ['LD_LIBRARY_PATH'] = os.pathsep.join([lib_path, os.environ['LD_LIBRARY_PATH']])
+    python_path = os.path.join(ic_dir, "export", "lib", "python2.7", "site_packages")
+    os.environ['PYTHONPATH'] = os.pathsep.join([python_path, os.environ.get('PYTHONPATH', '')])
+    path = os.path.join(ic_dir, "export", "bin")
+    os.environ['PATH'] = os.pathsep.join([path, os.environ['PATH']])
+    qml_import_path = os.path.join(ic_dir, "export", "plugins", "qml")
+    os.environ['QML_IMPORT_PATH'] = os.pathsep.join([qml_import_path, os.environ.get('QML_IMPORT_PATH', '')])
+    os.environ['CMAKE_PREFIX_PATH'] = os.path.join(ic_dir, "export")
+    os.environ['IC_MAKER_DIR'] = os.path.join(ic_dir, "icmaker")
+
+    subprocess.call("export", shell=True)
+
+
 @cli.command('add_environment', short_help='Add a new environment')
 @click.option('--generator', type=click.Choice(['ninja', 'makefiles']),
               default='ninja',
@@ -55,7 +73,7 @@ def add_environment(generator, env_name, config_file, no_build, no_cmake):
     mca_repo_url = "git://idsgit.fzi.de/mca2/mca2.git"
     mca_cmake_flags = ""
     mca_additional_repos = ""
-    build_cmd = "make"
+    build_cmd = "make install"
 
     create_ic = False
     create_catkin = False
@@ -136,7 +154,7 @@ def add_environment(generator, env_name, config_file, no_build, no_cmake):
         ic_cmake_flags = sep.join([ic_cmake_flags, "-GNinja"])
         cama_flags = sep.join([cama_flags, "--use-ninja"])
         mca_cmake_flags = sep.join([mca_cmake_flags, "-GNinja"])
-        build_cmd = "ninja"
+        build_cmd = "ninja  install"
 
 
     if os.path.exists("{}/checkout/{}".format(base_dir, env_name)):
@@ -196,6 +214,7 @@ def add_environment(generator, env_name, config_file, no_build, no_cmake):
                     process = subprocess.Popen(["bash", "-c", build_cmd],
                                                cwd=ic_build_directory)
                     process.wait()
+                    source_ic_workspace(env_name)
 
         except subprocess.CalledProcessError as e:
             click.echo(e.output)
