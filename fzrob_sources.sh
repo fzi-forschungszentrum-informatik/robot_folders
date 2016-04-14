@@ -20,4 +20,12 @@ export PATH=$PATH:${ROB_FOLDERS_SCRIPT_DIR}/venv/bin
 
 # sourcing alias
 alias fzsource="source ${ROB_FOLDERS_SCRIPT_DIR}/checkout/.source_cur_env"
-source ${ROB_FOLDERS_SCRIPT_DIR}/fzrob-complete.sh
+source ${ROB_FOLDERS_SCRIPT_DIR}/rob_folders-complete.sh
+
+fzrob()
+{
+    rob_folders $@
+    if [ $1 = "change_environment" ]; then
+        fzsource
+    fi
+}

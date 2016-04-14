@@ -393,11 +393,6 @@ class EnvironmentChoice(click.Command):
             file.write("source {} {}".format(main_source, env_dir))
 
 
-        click.echo('Changed active environment to < {} >!\n\
-To be able to use source commands such as for example \
-roslaunch and mca commands, type \'fzsource\''.format(self.name))
-
-
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
         checkout_folder = os.path.join(get_base_dir(), 'checkout')

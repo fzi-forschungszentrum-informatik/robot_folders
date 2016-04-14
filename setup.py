@@ -10,6 +10,6 @@ setup(
     ],
     entry_points='''
         [console_scripts]
-        fzrob=robot_folders:cli
+        rob_folders=robot_folders:cli
     ''',
 )
