@@ -1,6 +1,7 @@
 import click
 import os
-from global_functions import get_base_dir, get_active_env_path
+from helpers.directory_helpers import get_base_dir, get_active_env_path
+
 
 class WorkspaceChooser(click.MultiCommand):
     def get_workspaces(self):

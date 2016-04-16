@@ -1,5 +1,5 @@
 import click
-from global_functions import get_active_env
+from helpers.directory_helpers import get_active_env
 
 @click.command()
 def cli():

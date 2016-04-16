@@ -1,7 +1,7 @@
 import click
 import os
 
-from global_functions import get_base_dir
+from helpers.directory_helpers import get_base_dir
 
 class EnvironmentChoice(click.Command):
     def invoke(self, ctx):

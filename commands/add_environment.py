@@ -3,7 +3,7 @@ import os
 import subprocess
 import getpass
 
-from global_functions import get_base_dir
+from helpers.directory_helpers import get_base_dir
 
 from yaml import load as yaml_load, dump as yaml_dump
 
