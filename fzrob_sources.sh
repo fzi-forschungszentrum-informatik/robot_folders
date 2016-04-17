@@ -19,13 +19,20 @@ fi
 export PATH=$PATH:${ROB_FOLDERS_SCRIPT_DIR}/venv/bin
 
 # sourcing alias
-alias fzsource="source ${ROB_FOLDERS_SCRIPT_DIR}/checkout/.source_cur_env"
 source ${ROB_FOLDERS_SCRIPT_DIR}/rob_folders-complete.sh
 
 fzrob()
 {
-    rob_folders $@
-    if [ $1 = "change_environment" ]; then
-        fzsource
+    # if we want to cd to a directory, we need to capture the output
+    if [ $1 = "cd" ]; then
+        output=$(rob_folders $@)
+        echo $output
+        cd_target=$(echo $output | grep ^cd | tail -n 1 | sed s/cd\ //)
+        cd ${cd_target}
+    else
+        rob_folders $@
+        if [ $1 = "change_environment" ]; then
+            source ${ROB_FOLDERS_SCRIPT_DIR}/checkout/.source_cur_env
+        fi
     fi
 }
