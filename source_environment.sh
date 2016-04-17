@@ -46,4 +46,14 @@ then
     fi
 fi
 
+# source mca environment
+mca_dir=$environment_dir/mca_workspace
+if [ -d $mca_dir ]
+then
+    pushd . &> /dev/null
+    cd $mca_dir/build
+    source script/mcasetenv
+    popd . &> /dev/null
+fi
+
 echo "Environment setup done, You now have a sourced environment"
