@@ -21,7 +21,7 @@ export PATH=$PATH:${ROB_FOLDERS_SCRIPT_DIR}/venv/bin
 # sourcing alias
 source ${ROB_FOLDERS_SCRIPT_DIR}/rob_folders-complete.sh
 
-fzrob()
+fzirob()
 {
     # if we want to cd to a directory, we need to capture the output
     if [ $1 = "cd" ]; then

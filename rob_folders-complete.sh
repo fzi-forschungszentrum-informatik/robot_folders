@@ -5,5 +5,5 @@ _rob_folders_completion() {
     return 0
 }
 
-complete -F _rob_folders_completion -o default fzrob;
+complete -F _rob_folders_completion -o default fzirob;
 complete -F _rob_folders_completion -o default rob_folders;
