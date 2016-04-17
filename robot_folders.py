@@ -32,10 +32,13 @@ class RobotFolders(click.MultiCommand):
     def get_command(self, ctx, name):
         ns = {}
         fn = os.path.join(plugin_folder, name + '.py')
-        with open(fn) as f:
-            code = compile(f.read(), fn, 'exec')
-            eval(code, ns, ns)
-        return ns['cli']
+        if os.path.isfile(fn):
+            with open(fn) as f:
+                code = compile(f.read(), fn, 'exec')
+                eval(code, ns, ns)
+                return ns['cli']
+        else:
+            return None
 
 cli = RobotFolders(help='This tool helps you managing different robot environments. '
                         'Use tab-completion for combining commands or type --help on each level '
