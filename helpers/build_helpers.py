@@ -44,7 +44,7 @@ class CatkinBuilder(Builder):
 
 # TODO: We could support building of single projects? Unfortunately, I don't know
 #       much about mca. (mauch: 20160417)
-class McaBuilder(click.Command):
+class McaBuilder(Builder):
     def invoke(self, ctx):
         build_dir = os.path.join(get_active_env_path(), 'mca_workspace', 'build')
         click.echo("Building mca_workspace in {}".format(build_dir))
