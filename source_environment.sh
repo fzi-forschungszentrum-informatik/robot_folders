@@ -36,11 +36,14 @@ fi
 # Run ROS initialization if available
 # We run the setup.sh in the catkin_ws folder. Afterwards we can run rosrun, roslaunch etc. with the files in it.
 catkin_dir=$environment_dir/catkin_workspace
-if [ -f $catkin_dir/devel/setup.$shell_type ]
+if [ -d $catkin_dir ]
 then
-  source $catkin_dir/devel/setup.$shell_type
-else
-  echo "no setup.$shell_type for the ROS workspace found: $catkin_dir/devel/setup.$shell_type. Run catkin_make inside $catkin_dir to create the devel/setup.$shell_type."
+    if [ -f $catkin_dir/devel/setup.$shell_type ]
+    then
+        source $catkin_dir/devel/setup.$shell_type
+    else
+        echo "no setup.$shell_type for the ROS workspace found: $catkin_dir/devel/setup.$shell_type. Run catkin_make inside $catkin_dir to create the devel/setup.$shell_type."
+    fi
 fi
 
 echo "Environment setup done, You now have a sourced environment"
