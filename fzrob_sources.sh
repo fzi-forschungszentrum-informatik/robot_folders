@@ -31,7 +31,7 @@ fzirob()
         cd ${cd_target}
     else
         rob_folders $@
-        if [ $1 = "change_environment" ]; then
+        if [ $1 = "change_environment" ] || [ $1 = "source_active_environment" ]; then
             source ${ROB_FOLDERS_SCRIPT_DIR}/checkout/.source_cur_env
         fi
     fi
