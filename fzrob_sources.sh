@@ -3,7 +3,7 @@
 if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ];
 then
 # Get the base directory where the install script is located
-  ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${(%):-%N}" )" && pwd )"
+  export ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${(%):-%N}" )" && pwd )"
 # autoload bashcompinit if using zsh
   autoload -U bashcompinit && bashcompinit
 fi
@@ -12,7 +12,7 @@ fi
 if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ];
 then
 # Get the base directory where the install script is located
-  ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  export ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 fi
 
 # robot_folders setup
@@ -32,7 +32,8 @@ fzirob()
     else
         rob_folders $@
         if [ $1 = "change_environment" ] || [ $1 = "source_active_environment" ]; then
-            source ${ROB_FOLDERS_SCRIPT_DIR}/checkout/.source_cur_env
+            export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_SCRIPT_DIR}/checkout/.cur_env)
+            source ${ROB_FOLDERS_SCRIPT_DIR}/source_environment.sh
         fi
     fi
 }

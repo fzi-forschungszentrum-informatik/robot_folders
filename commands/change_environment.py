@@ -8,11 +8,6 @@ class EnvironmentChoice(click.Command):
         with open( os.path.join(get_base_dir(), 'checkout', '') + '.cur_env', 'w') as file:
             file.write("{}".format(self.name))
 
-        with open( os.path.join(get_base_dir(), 'checkout', '.source_cur_env'), 'w') as file:
-            main_source = os.path.join(get_base_dir(), 'source_environment.sh')
-            env_dir = os.path.join(get_base_dir(), 'checkout', self.name)
-            file.write("source {} {}".format(main_source, env_dir))
-
 
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
