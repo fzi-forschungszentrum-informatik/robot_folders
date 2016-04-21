@@ -21,6 +21,18 @@ export PATH=$PATH:${ROB_FOLDERS_SCRIPT_DIR}/venv/bin
 # sourcing alias
 source ${ROB_FOLDERS_SCRIPT_DIR}/rob_folders-complete.sh
 
+# define some legacy aliases from old robot_folders
+alias ce="fzirob change_environment"
+alias cdros="fzirob cd ros"
+alias cdic="fzirob cd ic"
+alias cdmca="fzirob cd mca"
+alias cdhome="fzirob cd"
+alias makeic="fzirob make ic"
+alias makeros="fzirob make ros"
+
+# define some other useful aliases
+alias cs="fzirob source_most_recent_env"
+
 fzirob()
 {
     # if we want to cd to a directory, we need to capture the output
