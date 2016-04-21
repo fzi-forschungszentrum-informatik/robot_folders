@@ -1,7 +1,7 @@
 import click
 import os
 from helpers.workspace_chooser import WorkspaceChooser
-from helpers.directory_helpers import get_active_env_path
+from helpers.directory_helpers import *
 
 class CdChooser(WorkspaceChooser):
     def get_command(self, ctx, name):
@@ -17,6 +17,9 @@ class CdChooser(WorkspaceChooser):
             click.echo('Did not find a workspace with the key < {} >.'.format(name))
             return None
 
+        if get_active_env() == None:
+            click.echo("No active environment found. Using most recently activated \
+environment '{}'".format(get_last_activated_env()))
         click.echo("cd {}".format(target_dir))
         return self
 
@@ -28,5 +31,8 @@ def cli(ctx):
     """
 
     if ctx.invoked_subcommand is None and ctx.parent.invoked_subcommand == 'cd':
+        if get_active_env() == None:
+            click.echo("No active environment found. Using most recently activated \
+environment '{}'".format(get_last_activated_env()))
         click.echo("cd {}".format(get_active_env_path()))
     return

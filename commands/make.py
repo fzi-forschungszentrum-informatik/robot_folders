@@ -2,6 +2,7 @@ import click
 import os
 from helpers.workspace_chooser import WorkspaceChooser
 import helpers.build_helpers as build
+from helpers.directory_helpers import get_active_env
 
 class BuildChooser(WorkspaceChooser):
     def get_command(self, ctx, name):
@@ -27,6 +28,12 @@ def cli(ctx):
 the workspaces by adding the respective arg. Use tab completion to see which \
 workspaces are present.
     """
+
+    if get_active_env() == None:
+        click.echo("Currently, there is no sourced environment. Please source one \
+before calling the make function.")
+        return
+
     if ctx.invoked_subcommand is None and ctx.parent.invoked_subcommand == 'make':
         click.echo("make called without argument. Building everything")
 
