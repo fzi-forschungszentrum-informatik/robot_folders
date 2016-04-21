@@ -31,7 +31,7 @@ fzirob()
         cd ${cd_target}
     else
         rob_folders $@
-        if [ $1 = "change_environment" ] || [ $1 = "source_active_environment" ]; then
+        if [ $1 = "change_environment" ] || [ $1 = "source_most_recent_env" ]; then
             export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_SCRIPT_DIR}/checkout/.cur_env)
             source ${ROB_FOLDERS_SCRIPT_DIR}/source_environment.sh
         fi
