@@ -33,6 +33,11 @@ alias makeros="fzirob make ros"
 # define some other useful aliases
 alias cs="fzirob source_most_recent_env"
 
+env_aliases()
+{
+    alias kdevsession="kdevelop -s ${ROB_FOLDERS_ACTIVE_ENV}"
+}
+
 fzirob()
 {
     # if we want to cd to a directory, we need to capture the output
@@ -46,6 +51,8 @@ fzirob()
         if [ $1 = "change_environment" ] || [ $1 = "source_most_recent_env" ]; then
             export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_SCRIPT_DIR}/checkout/.cur_env)
             source ${ROB_FOLDERS_SCRIPT_DIR}/source_environment.sh
+            # declare environment-specific aliases
+            env_aliases
         fi
     fi
 }
