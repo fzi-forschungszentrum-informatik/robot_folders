@@ -22,7 +22,7 @@ def source_ic_workspace(env_name):
     python_path = os.path.join(ic_dir, "export", "lib", "python2.7", "site_packages")
     os.environ['PYTHONPATH'] = os.pathsep.join([python_path, os.getenv('PYTHONPATH', '')])
     path = os.path.join(ic_dir, "export", "bin")
-    os.environ['PATH'] = os.pathsep.join([path, os.getenv['PATH']])
+    os.environ['PATH'] = os.pathsep.join([path, os.getenv('PATH')])
     qml_import_path = os.path.join(ic_dir, "export", "plugins", "qml")
     os.environ['QML_IMPORT_PATH'] = os.pathsep.join([qml_import_path, os.getenv('QML_IMPORT_PATH', '')])
     os.environ['CMAKE_PREFIX_PATH'] = os.path.join(ic_dir, "export")
