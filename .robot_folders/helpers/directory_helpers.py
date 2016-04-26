@@ -2,7 +2,7 @@ import os
 
 def get_base_dir():
     helpers_path = os.path.dirname(os.path.realpath(__file__))
-    return os.path.realpath(os.path.join(helpers_path, '..'))
+    return os.path.realpath(os.path.join(helpers_path, '../..'))
 
 def get_last_activated_env():
     env_file = os.path.join(get_base_dir(), 'checkout', '') + '.cur_env'

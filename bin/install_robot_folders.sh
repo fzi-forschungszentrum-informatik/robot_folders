@@ -1,9 +1,10 @@
 #!/bin/bash
 
 # Get the base directory where the install script is located
-ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 
-SOURCE_CMD="source ${ROB_FOLDERS_SCRIPT_DIR}/fzrob_sources.sh"
+
+SOURCE_CMD="source ${ROB_FOLDERS_BASE_DIR}/bin/fzirob_source.sh"
 
 function manual_setup_instructions
 {
@@ -23,6 +24,7 @@ shell_setup ()
 function install
 {
     echo "Creating virtual environment..."
+    pushd $ROB_FOLDERS_BASE_DIR/.robot_folders
     virtualenv venv
     . venv/bin/activate
     pip install Click
@@ -30,6 +32,7 @@ function install
 
     echo "Installing robot_folders"
     pip install --editable .
+    popd
 }
 
 
@@ -37,7 +40,7 @@ function install
 
 install
 
-mkdir -p ${ROB_FOLDERS_SCRIPT_DIR}/checkout
+mkdir -p ${ROB_FOLDERS_BASE_DIR}/checkout
 
 read -p "Do you want me to perform the .bashrc setup automatically? [Y/n] " -r do_setup
 

@@ -16,8 +16,7 @@
 
 if [ -n "`$SHELL -c 'echo ${ROB_FOLDERS_ACTIVE_ENV}'`" ];
 then
-    environment_dir=$ROB_FOLDERS_SCRIPT_DIR/checkout/${ROB_FOLDERS_ACTIVE_ENV}
-
+    environment_dir="$ROB_FOLDERS_SCRIPT_DIR/../checkout/${ROB_FOLDERS_ACTIVE_ENV}"
     if [ -d $environment_dir ]; then
 
         shell_type="bash"

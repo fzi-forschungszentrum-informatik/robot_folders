@@ -1,7 +1,0 @@
-robot_folders.py
-robot_folders.egg-info/PKG-INFO
-robot_folders.egg-info/SOURCES.txt
-robot_folders.egg-info/dependency_links.txt
-robot_folders.egg-info/entry_points.txt
-robot_folders.egg-info/requires.txt
-robot_folders.egg-info/top_level.txt

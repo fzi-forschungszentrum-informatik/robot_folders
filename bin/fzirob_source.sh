@@ -15,8 +15,7 @@ then
   export ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 fi
 
-# robot_folders setup
-export PATH=$PATH:${ROB_FOLDERS_SCRIPT_DIR}/venv/bin
+export PATH=$PATH:${ROB_FOLDERS_SCRIPT_DIR}/../.robot_folders/venv/bin
 
 # sourcing alias
 source ${ROB_FOLDERS_SCRIPT_DIR}/rob_folders-complete.sh
@@ -49,7 +48,7 @@ fzirob()
     else
         rob_folders $@
         if [ $1 = "change_environment" ] || [ $1 = "source_most_recent_env" ]; then
-            export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_SCRIPT_DIR}/checkout/.cur_env)
+            export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_SCRIPT_DIR}/../checkout/.cur_env)
             source ${ROB_FOLDERS_SCRIPT_DIR}/source_environment.sh
             # declare environment-specific aliases
             env_aliases
