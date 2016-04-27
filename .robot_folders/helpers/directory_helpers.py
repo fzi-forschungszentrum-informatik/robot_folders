@@ -1,4 +1,5 @@
 import os
+import errno
 
 def get_base_dir():
     base_dir = os.environ['ROB_FOLDERS_BASE_DIR']
@@ -30,3 +31,14 @@ def get_active_env_path():
     if active_env == None:
         active_env = get_last_activated_env()
     return os.path.join(get_base_dir(), 'checkout', active_env)
+
+
+def mkdir_p(path):
+    """Checks whether a directory exists, otherwise it will be created."""
+    try:
+        os.makedirs(path)
+    except OSError as exc:
+        if exc.errno == errno.EEXIST and os.path.isdir(path):
+            pass
+        else:
+            raise

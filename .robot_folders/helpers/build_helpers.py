@@ -1,9 +1,10 @@
 import click
 import os
-from helpers.directory_helpers import get_active_env_path
+from helpers.directory_helpers import get_active_env_path, mkdir_p
 import subprocess
 
 class Builder(click.Command):
+    build_dir = 'build'
     def get_build_command(self, build_dir):
         # default: make -j1
         build_cmd = "make"
@@ -14,14 +15,30 @@ class Builder(click.Command):
 
         return build_cmd
 
+    def check_previous_build(self):
+        mkdir_p(self.build_dir)
+        cmake_cache_file = os.path.join(self.build_dir, 'CMakeCache.txt')
+        if not os.path.isfile(cmake_cache_file):
+            click.echo("Could not find cmake build inside {}. Have you performed "
+                       "an initial build? If not, please call 'cmake ..' inside {}.".format(
+                       self.build_dir, self.build_dir))
+            process = subprocess.Popen(["bash", "-c", "cmake .."],
+                                               cwd=self.build_dir)
+            process.wait()
+        return True
+
+
 class IcBuilder(Builder):
     def invoke(self, ctx):
-        build_dir = os.path.join(get_active_env_path(), 'ic_workspace', 'build')
-        click.echo("Building ic_workspace in {}".format(build_dir))
-        build_cmd = " ".join([self.get_build_command(build_dir), "install"])
-        process = subprocess.Popen(["bash", "-c", build_cmd],
-                                               cwd=build_dir)
-        process.wait()
+        self.build_dir = os.path.join(get_active_env_path(), 'ic_workspace', 'build')
+        if self.check_previous_build():
+            click.echo("Building ic_workspace in {}".format(self.build_dir))
+            build_cmd = " ".join([self.get_build_command(self.build_dir), "install"])
+            process = subprocess.Popen(["bash", "-c", build_cmd],
+                                               cwd=self.build_dir)
+            process.wait()
+        else:
+            pass
 
 class CatkinBuilder(Builder):
     def get_build_command(self, catkin_dir):
@@ -46,10 +63,11 @@ class CatkinBuilder(Builder):
 #       much about mca. (mauch: 20160417)
 class McaBuilder(Builder):
     def invoke(self, ctx):
-        build_dir = os.path.join(get_active_env_path(), 'mca_workspace', 'build')
-        click.echo("Building mca_workspace in {}".format(build_dir))
-        build_cmd = " ".join([self.get_build_command(build_dir), "install"])
+        self.build_dir = os.path.join(get_active_env_path(), 'mca_workspace', 'build')
+        if self.check_previous_build():
+            click.echo("Building mca_workspace in {}".format(self.build_dir))
+            build_cmd = " ".join([self.get_build_command(self.build_dir), "install"])
 
-        process = subprocess.Popen(["bash", "-c", build_cmd],
-                                               cwd=build_dir)
-        process.wait()
+            process = subprocess.Popen(["bash", "-c", build_cmd],
+                                       cwd=self.build_dir)
+            process.wait()
