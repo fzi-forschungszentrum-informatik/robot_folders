@@ -9,9 +9,13 @@ class Builder(click.Command):
         # default: make -j1
         build_cmd = "make"
 
-        # ninja
-        if os.path.isfile(os.path.join(build_dir, "build.ninja")):
-            build_cmd="ninja"
+        cmake_cache_file = os.path.join(self.build_dir, 'CMakeCache.txt')
+        search_str = 'CMAKE_MAKE_PROGRAM:FILEPATH='
+        for line in open(cmake_cache_file):
+            start = line.find(search_str)
+            if start > -1:
+                # remove any trailing chars like newlines
+                build_cmd = line[start+len(search_str):].rstrip()
 
         return build_cmd
 
@@ -44,15 +48,24 @@ class CatkinBuilder(Builder):
     def get_build_command(self, catkin_dir):
         # default: make
         build_cmd = "catkin_make"
+        mkdir_p(self.build_dir)
 
-        # ninja
-        if os.path.isfile(os.path.join(catkin_dir, "build", "build.ninja")):
-            build_cmd="catkin_make --use-ninja"
+
+        cmake_cache_file = os.path.join(catkin_dir, 'build', 'CMakeCache.txt')
+        search_str = 'CMAKE_MAKE_PROGRAM:FILEPATH='
+        if os.path.isfile(cmake_cache_file):
+            for line in open(cmake_cache_file):
+                start = line.find(search_str)
+                if start > -1:
+                    # remove any trailing chars like newlines
+                    if "ninja" in line:
+                        build_cmd="catkin_make --use-ninja"
 
         return build_cmd
 
     def invoke(self, ctx):
         catkin_dir = os.path.join(get_active_env_path(), 'catkin_workspace')
+        self.build_dir = os.path.join(catkin_dir, 'build')
         click.echo("Building catkin_workspace in {}".format(catkin_dir))
         build_cmd = self.get_build_command(catkin_dir)
         process = subprocess.Popen(["bash", "-c", build_cmd],
