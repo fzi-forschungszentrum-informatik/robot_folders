@@ -35,7 +35,7 @@ then
           export PYTHONPATH=$ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
           export PATH=$ic_dir/export/bin:${PATH}
           export QML_IMPORT_PATH=$ic_dir/export/plugins/qml:$QML_IMPORT_PATH
-          export CMAKE_PREFIX_PATH=$ic_dir/export
+          export CMAKE_PREFIX_PATH=$ic_dir/export:$CMAKE_PREFIX_PATH
           export IC_MAKER_DIR=$ic_dir/icmaker
         fi
 
