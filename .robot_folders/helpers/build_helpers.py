@@ -18,7 +18,7 @@ class IcBuilder(Builder):
     def invoke(self, ctx):
         build_dir = os.path.join(get_active_env_path(), 'ic_workspace', 'build')
         click.echo("Building ic_workspace in {}".format(build_dir))
-        build_cmd = self.get_build_command(build_dir)
+        build_cmd = " ".join([self.get_build_command(build_dir), "install"])
         process = subprocess.Popen(["bash", "-c", build_cmd],
                                                cwd=build_dir)
         process.wait()
@@ -48,7 +48,8 @@ class McaBuilder(Builder):
     def invoke(self, ctx):
         build_dir = os.path.join(get_active_env_path(), 'mca_workspace', 'build')
         click.echo("Building mca_workspace in {}".format(build_dir))
-        build_cmd = self.get_build_command(build_dir)
+        build_cmd = " ".join([self.get_build_command(build_dir), "install"])
+
         process = subprocess.Popen(["bash", "-c", build_cmd],
                                                cwd=build_dir)
         process.wait()
