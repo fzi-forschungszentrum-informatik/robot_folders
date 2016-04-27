@@ -16,6 +16,8 @@
 
 if [ -n "`$SHELL -c 'echo ${ROB_FOLDERS_ACTIVE_ENV}'`" ];
 then
+    # Remove the packages cache from cmake as this creates problems with multiple envs
+    rm -rf $HOME/.cmake/packages/
     environment_dir="$ROB_FOLDERS_BASE_DIR/checkout/${ROB_FOLDERS_ACTIVE_ENV}"
     if [ -d $environment_dir ]; then
 
