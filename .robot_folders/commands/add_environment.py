@@ -24,11 +24,10 @@ def source_ic_workspace(env_name):
     os.environ['PATH'] = os.pathsep.join([path, os.getenv('PATH')])
     qml_import_path = os.path.join(ic_dir, "export", "plugins", "qml")
     os.environ['QML_IMPORT_PATH'] = os.pathsep.join([qml_import_path, os.getenv('QML_IMPORT_PATH', '')])
-    os.environ['CMAKE_PREFIX_PATH'] = os.path.join(ic_dir, "export")
+    os.environ['CMAKE_PREFIX_PATH'] = os.pathsep.join([os.path.join(ic_dir, "export"), os.getenv('CMAKE_PREFIX_PATH')])
     os.environ['IC_MAKER_DIR'] = os.path.join(ic_dir, "icmaker")
 
     subprocess.call("export", shell=True)
-
 
 
 @click.command(short_help='Add a new environment')
