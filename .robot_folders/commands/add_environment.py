@@ -4,6 +4,7 @@ import subprocess
 import getpass
 
 from helpers.directory_helpers import get_base_dir
+import helpers.build_helpers as build
 
 from yaml import load as yaml_load, dump as yaml_dump
 
@@ -36,12 +37,10 @@ def source_ic_workspace(env_name):
               help='Which generator should be used in this environment? Defaults to ninja.')
 @click.option('--config_file', help='Create an environment from a given config file.')
 @click.option('--no_build', is_flag=True, default=False,
-              help='Do not perform an initial build. A cmake run will be performed anyway. For catkin workspaces, a full catkin_make will be performed afterwards.')
-@click.option('--no_cmake', is_flag=True, default=False,
-              help='Only checkout the repositories. The build process has to be done manually afterwards. Please be aware, that sourcing such an environment is not directly possible.')
+              help='Do not perform an initial build.')
 @click.argument('env_name', nargs=1)
 #@click.option('-m', '--mca2_workspace', default=False, help='Create an mac2_workspace.')
-def cli(generator, env_name, config_file, no_build, no_cmake):
+def cli(generator, env_name, config_file, no_build):
     """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_workspace."""
 
     base_dir = get_base_dir()
@@ -55,7 +54,6 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
     mca_repo_url = "git://idsgit.fzi.de/mca2/mca2.git"
     mca_cmake_flags = ""
     mca_additional_repos = ""
-    build_cmd = "make install"
 
     create_ic = False
     create_catkin = False
@@ -71,16 +69,17 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
         pass
 
     if has_nobackup:
-        if not (no_cmake):
-            build_dir_choice = click.prompt("Which folder should I use as a base for creating the build tree?\nType 'local' for building inside the local robot_folders tree.\nType 'no_backup' (or simply press enter) for building in the no_backup space (should be used on workstations).\n",
+        build_dir_choice = click.prompt("Which folder should I use as a base for creating the build tree?\nType 'local' for building inside the local robot_folders tree.\nType 'no_backup' (or simply press enter) for building in the no_backup space (should be used on workstations).\n",
                                             type=click.Choice(['no_backup', 'local']),
                                             default='no_backup')
-            if build_dir_choice == 'no_backup':
-                username = getpass.getuser()
-                build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
+        if build_dir_choice == 'no_backup':
+            username = getpass.getuser()
+            build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
 
 
 
+    # If we have a config file check which packages should be fetched.
+    # Otherwise ask which empty workspaces should be created
     if config_file:
         yaml_stream = file(config_file, 'r')
         data = yaml_load(yaml_stream, Loader=Loader)
@@ -127,6 +126,15 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
                                         default=True)
 
 
+    if os.path.exists("{}/checkout/{}".format(base_dir, env_name)):
+        click.echo("An environment with the name \"{}\" already exists. Exiting now.".format(env_name))
+        return
+
+
+
+    # Asking the use is done. Let's get to work
+
+
 
 
 
@@ -139,24 +147,20 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
         build_cmd = "ninja  install"
 
 
-    if os.path.exists("{}/checkout/{}".format(base_dir, env_name)):
-        click.echo("An environment with the name \"{}\" already exists. Exiting now.".format(env_name))
-        return
 
+    # Set all necessary paths for the environments.
     click.echo("Creating environment with name \"{}\"".format(env_name))
     os.mkdir("{}/checkout/{}".format(base_dir, env_name))
     ic_directory = os.path.join(base_dir, "checkout", env_name, "ic_workspace")
     ic_build_directory = os.path.join(build_base_dir, env_name,  "ic_workspace", "build")
     catkin_directory = os.path.join(base_dir, "checkout", env_name, "catkin_workspace")
     catkin_build_directory = os.path.join(build_base_dir, env_name, "catkin_workspace", "build")
-
     mca_directory = os.path.join(base_dir, "checkout", env_name, "mca_workspace")
     mca_build_directory = os.path.join(build_base_dir, env_name, "mca_workspace", "build")
 
 
+    # Add a custom source file to the environment. Custom source commands go in here.
     env_source_file = open(os.path.join(base_dir, "checkout", env_name, "source_local.sh"), 'w')
-
-
     env_source_file.write("#This file is for custom source commands in this environment.\n")
     env_source_file.close()
 
@@ -167,7 +171,6 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
 
         try:
             subprocess.check_call(["git", "clone", ic_repo_url, ic_directory])
-
             process = subprocess.Popen(["./IcWorkspace.py", "grab", ic_packages],
                                        cwd=ic_directory)
             process.wait()
@@ -184,20 +187,11 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
                     click.echo('Version for package {} given, however, package is not listed in environment!'.format(package))
 
             os.makedirs(ic_build_directory)
+
+            # Check if we need a symlink to the build directory and create it
             local_build_dir_name = os.path.join(ic_directory, "build")
             if local_build_dir_name != ic_build_directory:
                 os.symlink(ic_build_directory, local_build_dir_name)
-            if not no_cmake:
-                # this is needed for the make command, which checks for this file to determine the build type
-                ic_cmake_cmd = "cmake {} {}".format(ic_directory, ic_cmake_flags)
-                process = subprocess.Popen(["bash", "-c", ic_cmake_cmd],
-                                           cwd=ic_build_directory)
-                process.wait()
-                if not no_build:
-                    process = subprocess.Popen(["bash", "-c", build_cmd],
-                                               cwd=ic_build_directory)
-                    process.wait()
-                    source_ic_workspace(env_name)
 
         except subprocess.CalledProcessError as e:
             click.echo(e.output)
@@ -213,17 +207,7 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
         click.echo("Creating catkin_workspace")
 
         os.mkdir(catkin_directory)
-        if catkin_rosinstall == "":
-            os.mkdir(os.path.join(catkin_directory, "src"))
-        else:
-            # Dump the rosinstall to a file and use wstool for getting the packages
-            rosinstall_filename = '/tmp/rob_folders_rosinstall'
-            rosinstall_file_handle = file(rosinstall_filename, 'w')
-            yaml_dump(catkin_rosinstall, rosinstall_file_handle)
-            process = subprocess.Popen(["wstool", "init", "src", rosinstall_filename],
-                                   cwd=catkin_directory)
-            process.wait()
-
+        os.mkdir(os.path.join(catkin_directory, "src"))
         os.makedirs(catkin_build_directory)
         local_build_dir_name = os.path.join(catkin_directory, "build")
         (catkin_devel_base_dir, _) = os.path.split(catkin_build_directory)
@@ -234,14 +218,23 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
             os.symlink(catkin_build_directory, local_build_dir_name)
             os.makedirs(catkin_devel_directory)
             os.symlink(catkin_devel_directory, local_devel_dir_name)
-        # Perform catkin_make only if neither of no_cmake and no_build is declared
-        if not (no_cmake or no_build):
-            # this is needed for the make command, which checks for this file to determine the build type
-            cama_command = "source {}/setup.bash && catkin_make {}".format(ros_global_dir, cama_flags)
+        cama_command = "source {}/setup.bash && catkin_make {}".format(ros_global_dir, cama_flags)
+        process = subprocess.Popen(["bash", "-c", cama_command],
+                                   cwd=catkin_directory)
+        process.wait()
 
-            process = subprocess.Popen(["bash", "-c", cama_command],
-                                       cwd=catkin_directory)
+
+        # copy packages
+        if catkin_rosinstall != "":
+            # Dump the rosinstall to a file and use wstool for getting the packages
+            rosinstall_filename = '/tmp/rob_folders_rosinstall'
+            rosinstall_file_handle = file(rosinstall_filename, 'w')
+            yaml_dump(catkin_rosinstall, rosinstall_file_handle)
+            process = subprocess.Popen(["wstool", "init", "src", rosinstall_filename],
+                                   cwd=catkin_directory)
             process.wait()
+            os.remove(rosinstall_filename)
+
 
         if copy_cmake_lists:
             try:
@@ -292,23 +285,27 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
             local_build_dir_name = os.path.join(mca_directory, "build")
             if local_build_dir_name != mca_build_directory:
                 os.symlink(mca_build_directory, local_build_dir_name)
-            if not no_cmake:
-                # this is needed for the make command, which checks for this file to determine the build type
-                mca_cmake_cmd = "cmake {} {}".format(mca_directory, mca_cmake_flags)
-                process = subprocess.Popen(["bash", "-c", mca_cmake_cmd],
-                                           cwd=mca_build_directory)
-                if not no_build:
-                    process.wait()
-                    process = subprocess.Popen(["bash", "-c", build_cmd],
-                                               cwd=mca_build_directory)
-                    process.wait()
 
         except subprocess.CalledProcessError as e:
             click.echo(e.output)
-            click.echo("An error occurred while creating the ic_workspace. Exiting now")
+            click.echo("An error occurred while creating the mca_workspace. Exiting now")
             return
     else:
         click.echo("Requested to not create an mca workspace")
 
 
-        click.echo("Initial workspace setup completed")
+    # let's build if requested
+    os.environ['ROB_FOLDERS_ACTIVE_ENV'] = env_name
+    if not no_build:
+        if create_ic:
+            ic_builder = build.IcBuilder(name="ic_builder", add_help_option=False)
+            ic_builder.invoke(None)
+            source_ic_workspace(env_name)
+        if create_catkin:
+            ros_builder = build.CatkinBuilder(name="ros_builder", add_help_option=False)
+            ros_builder.invoke(None)
+        if create_mca:
+            mca_builder = build.McaBuilder(name="mca_builder", add_help_option=False)
+            mca_builder.invoke(None)
+
+    click.echo("Initial workspace setup completed")
