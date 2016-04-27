@@ -4,7 +4,6 @@ import subprocess
 import getpass
 
 from helpers.directory_helpers import get_base_dir
-from helpers.file_helpers import touch
 
 from yaml import load as yaml_load, dump as yaml_dump
 
@@ -191,8 +190,6 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
                 os.symlink(ic_build_directory, local_build_dir_name)
             if not no_cmake:
                 # this is needed for the make command, which checks for this file to determine the build type
-                if generator == 'ninja':
-                    touch(os.path.join(ic_build_directory, "build.ninja"))
                 ic_cmake_cmd = "cmake {} {}".format(ic_directory, ic_cmake_flags)
                 process = subprocess.Popen(["bash", "-c", ic_cmake_cmd],
                                            cwd=ic_build_directory)
@@ -241,9 +238,6 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
         # Perform catkin_make only if neither of no_cmake and no_build is declared
         if not (no_cmake or no_build):
             # this is needed for the make command, which checks for this file to determine the build type
-            if generator == 'ninja':
-                touch(os.path.join(catkin_build_directory, "build.ninja"))
-
             cama_command = "source {}/setup.bash && catkin_make {}".format(ros_global_dir, cama_flags)
 
             process = subprocess.Popen(["bash", "-c", cama_command],
@@ -301,8 +295,6 @@ def cli(generator, env_name, config_file, no_build, no_cmake):
                 os.symlink(mca_build_directory, local_build_dir_name)
             if not no_cmake:
                 # this is needed for the make command, which checks for this file to determine the build type
-                if generator == 'ninja':
-                    touch(os.path.join(ic_build_directory, "build.ninja"))
                 mca_cmake_cmd = "cmake {} {}".format(mca_directory, mca_cmake_flags)
                 process = subprocess.Popen(["bash", "-c", mca_cmake_cmd],
                                            cwd=mca_build_directory)
