@@ -12,7 +12,7 @@ fi
 if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ];
 then
 # Get the base directory where the install script is located
-  export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 fi
 
 export PATH=$PATH:${ROB_FOLDERS_BASE_DIR}/.robot_folders/venv/bin
@@ -49,7 +49,7 @@ fzirob()
         rob_folders $@
         if [ $1 = "change_environment" ] || [ $1 = "source_most_recent_env" ]; then
             export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_BASE_DIR}/checkout/.cur_env)
-            source ${ROB_FOLDERS_BASE_DIR}/source_environment.sh
+            source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
             # declare environment-specific aliases
             env_aliases
         fi
