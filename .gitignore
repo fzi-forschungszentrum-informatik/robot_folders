@@ -1,6 +1,5 @@
 *~
-venv
+.robot_folders/venv
 checkout
 *.pyc
-robot_folders.egg-info/requires.txt
-robot_folders.egg-info/entry_points.txt
+robot_folders.egg-info

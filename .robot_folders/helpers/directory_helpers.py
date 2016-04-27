@@ -1,8 +1,8 @@
 import os
 
 def get_base_dir():
-    helpers_path = os.path.dirname(os.path.realpath(__file__))
-    return os.path.realpath(os.path.join(helpers_path, '../..'))
+    base_dir = os.environ['ROB_FOLDERS_BASE_DIR']
+    return os.path.realpath(base_dir)
 
 def get_last_activated_env():
     env_file = os.path.join(get_base_dir(), 'checkout', '') + '.cur_env'

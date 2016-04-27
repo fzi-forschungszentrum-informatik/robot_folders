@@ -3,7 +3,7 @@
 if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ];
 then
 # Get the base directory where the install script is located
-  export ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${(%):-%N}" )" && pwd )"
+  export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${(%):-%N}" )/.." && pwd )"
 # autoload bashcompinit if using zsh
   autoload -U bashcompinit && bashcompinit
 fi
@@ -12,13 +12,13 @@ fi
 if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ];
 then
 # Get the base directory where the install script is located
-  export ROB_FOLDERS_SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+  export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 fi
 
-export PATH=$PATH:${ROB_FOLDERS_SCRIPT_DIR}/../.robot_folders/venv/bin
+export PATH=$PATH:${ROB_FOLDERS_BASE_DIR}/.robot_folders/venv/bin
 
 # sourcing alias
-source ${ROB_FOLDERS_SCRIPT_DIR}/rob_folders-complete.sh
+source ${ROB_FOLDERS_BASE_DIR}/bin/rob_folders-complete.sh
 
 # define some legacy aliases from old robot_folders
 alias ce="fzirob change_environment"
@@ -48,8 +48,8 @@ fzirob()
     else
         rob_folders $@
         if [ $1 = "change_environment" ] || [ $1 = "source_most_recent_env" ]; then
-            export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_SCRIPT_DIR}/../checkout/.cur_env)
-            source ${ROB_FOLDERS_SCRIPT_DIR}/source_environment.sh
+            export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_BASE_DIR}/checkout/.cur_env)
+            source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
             # declare environment-specific aliases
             env_aliases
         fi
