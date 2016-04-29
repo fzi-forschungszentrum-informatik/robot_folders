@@ -48,6 +48,7 @@ def cli(generator, env_name, config_file, no_build):
     ic_repo_url = "git://idsgit.fzi.de/core/ic_workspace.git"
     ic_packages = "base"
     ic_package_versions = {}
+    ic_grab_flags = []
     ic_cmake_flags = ""
     cama_flags = ""
     catkin_rosinstall = ""
@@ -91,7 +92,11 @@ def cli(generator, env_name, config_file, no_build):
             if data['ic_workspace'] is not None and 'packages' in data['ic_workspace']:
                 if data['ic_workspace']['packages'] is not None:
                     ic_packages = ' '.join(data['ic_workspace']['packages'])
-                    ic_package_versions = data['ic_workspace']['package_versions']
+                    if 'package_versions' in data['ic_workspace'] and data['ic_workspace']['package_versions'] is not None:
+                        ic_package_versions = data['ic_workspace']['package_versions']
+                    if 'flags' in data['ic_workspace'] and data['ic_workspace']['flags'] is not None:
+                        for flag in data['ic_workspace']['flags']:
+                            ic_grab_flags.append("--" + flag)
 
 
         if 'catkin_workspace' in data:
@@ -132,7 +137,7 @@ def cli(generator, env_name, config_file, no_build):
 
 
 
-    # Asking the use is done. Let's get to work
+    # Asking the user is done. Let's get to work
 
 
 
@@ -171,8 +176,9 @@ def cli(generator, env_name, config_file, no_build):
 
         try:
             subprocess.check_call(["git", "clone", ic_repo_url, ic_directory])
-            process = subprocess.Popen(["./IcWorkspace.py", "grab", ic_packages],
-                                       cwd=ic_directory)
+            grab_command = ["./IcWorkspace.py", "grab", ic_packages]
+            grab_command.extend(ic_grab_flags)
+            process = subprocess.Popen(grab_command, cwd=ic_directory)
             process.wait()
 
             for package in ic_package_versions.keys():

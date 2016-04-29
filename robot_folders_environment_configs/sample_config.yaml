@@ -7,6 +7,8 @@ ic_workspace:
     - icl_hardware
   package_versions:
     icl_hardware: canopen_schunk
+  flags:
+    - anon
 catkin_workspace:
   rosinstall:
     - git:
