@@ -73,7 +73,6 @@ class CatkinBuilder(Builder):
         build_cmd = "catkin_make"
         mkdir_p(self.build_dir)
 
-
         cmake_cache_file = os.path.join(catkin_dir, 'build', 'CMakeCache.txt')
         search_str = 'CMAKE_MAKE_PROGRAM:FILEPATH='
         if os.path.isfile(cmake_cache_file):
@@ -83,6 +82,10 @@ class CatkinBuilder(Builder):
                     # remove any trailing chars like newlines
                     if "ninja" in line:
                         build_cmd="catkin_make --use-ninja"
+        else:
+            generator = userconfig.config.get('generator', 'make')
+            if generator == "ninja":
+                build_cmd="catkin_make --use-ninja"
 
         return build_cmd
 
@@ -90,6 +93,7 @@ class CatkinBuilder(Builder):
         catkin_dir = os.path.join(get_active_env_path(), 'catkin_workspace')
         self.build_dir = os.path.join(catkin_dir, 'build')
         click.echo("Building catkin_workspace in {}".format(catkin_dir))
+        self.check_previous_build(catkin_dir)
         build_cmd = self.get_build_command(catkin_dir)
         process = subprocess.Popen(["bash", "-c", build_cmd],
                                                cwd=catkin_dir)
