@@ -1,6 +1,6 @@
 
 # zsh
-if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ];
+if [ -n "${ZSH_VERSION+1}" ];
 then
 # Get the base directory where the install script is located
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${(%):-%N}" )/.." && pwd )"
@@ -9,7 +9,7 @@ then
 fi
 
 # bash
-if [ -n "`$SHELL -c 'echo $BASH_VERSION'`" ];
+if [ -n "${BASH_VERSION+1}" ];
 then
 # Get the base directory where the install script is located
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
