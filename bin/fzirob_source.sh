@@ -43,7 +43,7 @@ fzirob()
     if [ $1 = "cd" ]; then
         output=$(rob_folders $@)
         echo $output
-        cd_target=$(echo $output | grep ^cd | tail -n 1 | sed s/cd\ //)
+        cd_target=$(echo $output | grep "^cd" | tail -n 1 | sed s/cd\ //)
         cd ${cd_target}
     else
         rob_folders $@

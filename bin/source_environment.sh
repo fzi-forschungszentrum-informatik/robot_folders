@@ -14,7 +14,7 @@
 
 # enviroment comes from chose_environment.sh
 
-if [ -n "`$SHELL -c 'echo ${ROB_FOLDERS_ACTIVE_ENV}'`" ];
+if [ -n "${ROB_FOLDERS_ACTIVE_ENV+1}" ];
 then
     # Remove the packages cache from cmake as this creates problems with multiple envs
     rm -rf $HOME/.cmake/packages/
@@ -22,7 +22,7 @@ then
     if [ -d $environment_dir ]; then
 
         shell_type="bash"
-        if [ -n "`$SHELL -c 'echo $ZSH_VERSION'`" ];
+        if [ -n "{$ZSH_VERSION+1}" ];
         then
             shell_type="zsh"
         fi
