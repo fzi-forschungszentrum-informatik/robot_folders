@@ -5,6 +5,12 @@ from helpers.directory_helpers import *
 
 class CdChooser(WorkspaceChooser):
     def get_command(self, ctx, name):
+        env = get_active_env()
+        if env == None:
+            click.echo("No active environment found. Using most recently activated \
+environment '{}'".format(get_last_activated_env()))
+            env = get_last_activated_env()
+
         target_dir = get_active_env_path()
         if name in self.list_commands(ctx):
             if name == 'ic':
@@ -14,12 +20,9 @@ class CdChooser(WorkspaceChooser):
             elif name == 'mca':
                 target_dir = os.path.join(target_dir, 'mca_workspace')
         else:
-            click.echo('Did not find a workspace with the key < {} >.'.format(name))
-            return None
+            click.echo('Did not find a workspace with the key < {} > inside current environment < {} >.'.format(name, env))
+            return self
 
-        if get_active_env() == None:
-            click.echo("No active environment found. Using most recently activated \
-environment '{}'".format(get_last_activated_env()))
         click.echo("cd {}".format(target_dir))
         return self
 
