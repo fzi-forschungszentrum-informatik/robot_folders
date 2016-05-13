@@ -22,7 +22,7 @@ then
     if [ -d $environment_dir ]; then
 
         shell_type="bash"
-        if [ -n "{$ZSH_VERSION+1}" ];
+        if [ -n "${ZSH_VERSION+1}" ];
         then
             shell_type="zsh"
         fi
