@@ -35,6 +35,7 @@ alias cs="fzirob source_most_recent_env"
 env_aliases()
 {
     alias kdevsession="kdevelop -s ${ROB_FOLDERS_ACTIVE_ENV}"
+    alias qtcreatoric="fzirob cd ic && qtcreator ."
 }
 
 fzirob()
