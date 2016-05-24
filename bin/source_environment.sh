@@ -62,7 +62,7 @@ then
             popd . &> /dev/null
         fi
 
-    echo "Environment setup for '${ROB_FOLDERS_ACTIVE_ENV}' done. You now have a sourced environment"
+    echo "Environment setup for '${ROB_FOLDERS_ACTIVE_ENV}' done. You now have a sourced environment."
 
     else
         echo "No environment with the given name found!"
