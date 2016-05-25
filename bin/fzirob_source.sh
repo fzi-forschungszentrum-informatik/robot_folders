@@ -1,8 +1,6 @@
 # zsh
 if [ -n "${ZSH_VERSION+1}" ];
 then
-  # prevent settings affect outer scope
-  emulate -LR zsh
   # Get the base directory where the install script is located
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${(%):-%N}" )/.." && pwd )"
   # autoload bashcompinit if using zsh
