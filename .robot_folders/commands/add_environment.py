@@ -211,11 +211,6 @@ def cli(env_name, config_file, no_build):
         ros_builder = build.CatkinBuilder(name="ros_builder", add_help_option=False)
         ros_builder.invoke(None)
 
-#         cama_command = "source {}/setup.bash && catkin_make {}".format(ros_global_dir, cama_flags)
-#         process = subprocess.Popen(["bash", "-c", cama_command],
-#                                    cwd=catkin_directory)
-#         process.wait()
-
 
         # copy packages
         if catkin_rosinstall != "":
