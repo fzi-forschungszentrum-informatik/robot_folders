@@ -32,15 +32,12 @@ def source_ic_workspace(env_name):
 
 
 @click.command(short_help='Add a new environment')
-@click.option('--generator', type=click.Choice(['ninja', 'makefiles']),
-              default='ninja',
-              help='Which generator should be used in this environment? Defaults to ninja.')
 @click.option('--config_file', help='Create an environment from a given config file.')
 @click.option('--no_build', is_flag=True, default=False,
               help='Do not perform an initial build.')
 @click.argument('env_name', nargs=1)
 #@click.option('-m', '--mca2_workspace', default=False, help='Create an mac2_workspace.')
-def cli(generator, env_name, config_file, no_build):
+def cli(env_name, config_file, no_build):
     """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_workspace."""
 
     base_dir = get_base_dir()
@@ -139,20 +136,6 @@ def cli(generator, env_name, config_file, no_build):
 
     # Asking the user is done. Let's get to work
 
-
-
-
-
-
-    if generator == 'ninja':
-        sep = " "
-        ic_cmake_flags = sep.join([ic_cmake_flags, "-GNinja"])
-        cama_flags = sep.join([cama_flags, "--use-ninja"])
-        mca_cmake_flags = sep.join([mca_cmake_flags, "-GNinja"])
-        build_cmd = "ninja  install"
-
-
-
     # Set all necessary paths for the environments.
     click.echo("Creating environment with name \"{}\"".format(env_name))
     os.mkdir("{}/checkout/{}".format(base_dir, env_name))
@@ -224,10 +207,14 @@ def cli(generator, env_name, config_file, no_build):
             os.symlink(catkin_build_directory, local_build_dir_name)
             os.makedirs(catkin_devel_directory)
             os.symlink(catkin_devel_directory, local_devel_dir_name)
-        cama_command = "source {}/setup.bash && catkin_make {}".format(ros_global_dir, cama_flags)
-        process = subprocess.Popen(["bash", "-c", cama_command],
-                                   cwd=catkin_directory)
-        process.wait()
+
+        ros_builder = build.CatkinBuilder(name="ros_builder", add_help_option=False)
+        ros_builder.invoke(None)
+
+#         cama_command = "source {}/setup.bash && catkin_make {}".format(ros_global_dir, cama_flags)
+#         process = subprocess.Popen(["bash", "-c", cama_command],
+#                                    cwd=catkin_directory)
+#         process.wait()
 
 
         # copy packages
