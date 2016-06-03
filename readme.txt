@@ -17,5 +17,9 @@ for using robot_folders is 'fzirob'. Type
 to get an overview over all available commands.
 
 If you used the old bash-based robot folders before, you might be happy to know
-that many of the old aliases exist here, as well. To see a list of available 
+that many of the old aliases exist here, as well. To see a list of available
 aliases you can have a look at bin/fzirob_source.sh
+
+
+By default make will be used to build your workspaces. You can change your
+default build system and other settings in .robot_folders/userconfig.py
