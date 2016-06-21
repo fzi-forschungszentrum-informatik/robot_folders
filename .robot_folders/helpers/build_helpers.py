@@ -82,7 +82,7 @@ class IcBuilder(Builder):
         process.wait()
 
 class CatkinBuilder(Builder):
-    def get_build_command(self, catkin_dir):
+    def get_build_command(self, catkin_dir, ros_distro):
         # default: make
         build_cmd = "catkin_make"
         mkdir_p(self.build_dir)
@@ -101,14 +101,21 @@ class CatkinBuilder(Builder):
             if generator == "ninja":
                 build_cmd="catkin_make --use-ninja"
 
+        ros_global_dir = "/opt/ros/{}".format(ros_distro)
+
+        if os.path.isdir(ros_global_dir):
+            build_cmd_with_source = "source {}/setup.bash && {}"\
+                                    .format(ros_global_dir, build_cmd)
+            build_cmd = build_cmd_with_source
         return build_cmd
 
     def invoke(self, ctx):
         catkin_dir = os.path.join(get_active_env_path(), 'catkin_workspace')
         self.build_dir = os.path.join(catkin_dir, 'build')
         click.echo("Building catkin_workspace in {}".format(catkin_dir))
-        self.check_previous_build(catkin_dir)
-        build_cmd = self.get_build_command(catkin_dir)
+
+        # We abuse the name to code the ros distribution if we're building for the first time.
+        build_cmd = self.get_build_command(catkin_dir, self.name)
         process = subprocess.Popen(["bash", "-c", build_cmd],
                                                cwd=catkin_dir)
         process.wait()

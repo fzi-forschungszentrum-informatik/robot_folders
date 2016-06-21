@@ -53,6 +53,8 @@ def cli(env_name, config_file, no_build):
     mca_cmake_flags = ""
     mca_additional_repos = ""
 
+    os.environ['ROB_FOLDERS_ACTIVE_ENV'] = env_name
+
     create_ic = False
     create_catkin = False
     create_mca = False
@@ -208,7 +210,10 @@ def cli(env_name, config_file, no_build):
             os.makedirs(catkin_devel_directory)
             os.symlink(catkin_devel_directory, local_devel_dir_name)
 
-        ros_builder = build.CatkinBuilder(name="ros_builder", add_help_option=False)
+        # We abuse the name parameter to code the ros distribution
+        # if we're building for the first time.
+        ros_builder = build.CatkinBuilder(name=ros_distro,
+                                          add_help_option=False)
         ros_builder.invoke(None)
 
 
