@@ -295,7 +295,7 @@ def cli(env_name, config_file, no_build):
             ic_builder.invoke(None)
             source_ic_workspace(env_name)
         if create_catkin:
-            ros_builder = build.CatkinBuilder(name="ros_builder", add_help_option=False)
+            ros_builder = build.CatkinBuilder(name=ros_distro, add_help_option=False)
             ros_builder.invoke(None)
         if create_mca:
             mca_builder = build.McaBuilder(name="mca_builder", add_help_option=False)
