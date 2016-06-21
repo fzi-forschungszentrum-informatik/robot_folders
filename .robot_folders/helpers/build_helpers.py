@@ -1,8 +1,10 @@
 import click
 import os
-from helpers.directory_helpers import get_active_env_path, mkdir_p
 import userconfig
 import subprocess
+
+from helpers.directory_helpers import get_active_env_path, mkdir_p
+from helpers.which import which
 
 def get_cmake_flags():
     """Reads the configuration for default cmake flags"""
@@ -13,6 +15,12 @@ def get_cmake_flags():
     if generator == 'ninja':
         cmake_flags = " ".join([cmake_flags, "-GNinja"])
 
+    if which(generator) is None:
+        click.echo("WARNING: Generator '{}' was requested. However, "
+                   "that generator seems not to be installed. "
+                   "Will fallback to make instead."
+                   .format(generator))
+        cmake_flags = ''
     return cmake_flags
 
 
@@ -35,6 +43,12 @@ class Builder(click.Command):
         else:
             build_cmd = userconfig.config.get('generator', 'make')
 
+        if which(build_cmd) is None:
+            click.echo("WARNING: Generator '{}' was requested. However, "
+                       "that generator seems not to be installed. "
+                       "Will fallback to make instead."
+                       .format(build_cmd))
+            build_cmd = 'make'
 
         if 'make' in build_cmd:
             if not '-j' in build_cmd:
