@@ -39,19 +39,23 @@ env_aliases()
 
 fzirob()
 {
-    # if we want to cd to a directory, we need to capture the output
-    if [ $1 = "cd" ]; then
-        output=$(rob_folders $@)
-        echo $output
-        cd_target=$(echo $output | grep "^cd" | tail -n 1 | sed s/cd\ //)
-        cd ${cd_target}
+    if [ $# -ge 1 ]; then
+      # if we want to cd to a directory, we need to capture the output
+      if [ $1 = "cd" ]; then
+          output=$(rob_folders $@)
+          echo $output
+          cd_target=$(echo $output | grep "^cd" | tail -n 1 | sed s/cd\ //)
+          cd ${cd_target}
+      else
+          rob_folders $@
+          if [ $1 = "change_environment" ] || [ $1 = "source_most_recent_env" ]; then
+              export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_BASE_DIR}/checkout/.cur_env)
+              source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
+              # declare environment-specific aliases
+              env_aliases
+          fi
+      fi
     else
-        rob_folders $@
-        if [ $1 = "change_environment" ] || [ $1 = "source_most_recent_env" ]; then
-            export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_BASE_DIR}/checkout/.cur_env)
-            source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
-            # declare environment-specific aliases
-            env_aliases
-        fi
+      rob_folders --help
     fi
 }
