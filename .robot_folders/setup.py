@@ -6,7 +6,8 @@ setup(
     py_modules=['robot_folders'],
     install_requires=[
         'Click',
-        'PyYaml'
+        'PyYaml',
+        'vcstools'
     ],
     entry_points='''
         [console_scripts]
