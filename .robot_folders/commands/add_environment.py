@@ -32,6 +32,8 @@ def source_ic_workspace(env_name):
 
     subprocess.call("export", shell=True)
 
+    ic_rosinstall = None
+
 
 def create_ic_ws(ic_directory,
                  build_directory,
