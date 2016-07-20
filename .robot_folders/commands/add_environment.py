@@ -32,8 +32,6 @@ def source_ic_workspace(env_name):
 
     subprocess.call("export", shell=True)
 
-    ic_rosinstall = None
-
 
 def create_ic_ws(ic_directory,
                  build_directory,
@@ -112,6 +110,7 @@ def cli(env_name, config_file, no_build):
     ic_package_versions = {}
     ic_grab_flags = []
     ic_cmake_flags = ""
+    ic_rosinstall = None
     cama_flags = ""
     catkin_rosinstall = ""
     mca_repo_url = "git://idsgit.fzi.de/mca2/mca2.git"
