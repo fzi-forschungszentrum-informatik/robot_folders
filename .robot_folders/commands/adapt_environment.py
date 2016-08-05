@@ -15,6 +15,7 @@ from helpers.directory_helpers import get_base_dir
 
 global_remove_flag = False
 
+
 class EnvironmentAdapter(click.Command):
     def invoke(self, ctx):
         env_dir = os.path.join(get_base_dir(), 'checkout', self.name)
@@ -32,14 +33,17 @@ class EnvironmentAdapter(click.Command):
             click.echo("Adapting IC workspace")
             self.rosinstall = dict()
             self.parse_folder(ic_pkg_dir)
-            ic_rosinstall, ic_packages, ic_package_versions, ic_flags = self.parse_ic_workspace_config()
+            ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
+                self.parse_ic_workspace_config()
             if ic_rosinstall:
-                self.adapt_rosinstall(ic_rosinstall, ic_pkg_dir, workspace_dir=ic_dir,
-                        is_ic=True, ic_grab_flags=ic_flags)
+                self.adapt_rosinstall(ic_rosinstall,
+                                      ic_pkg_dir,
+                                      workspace_dir=ic_dir,
+                                      is_ic=True,
+                                      ic_grab_flags=ic_flags)
             elif ic_packages:
                 #TODO: compare the ic_dir_packages (with their versions) with the yaml_ic_rosinstall
                 pass
-
 
         if os.path.isdir(catkin_src_dir):
             click.echo("Adapting catkin workspace")
@@ -65,8 +69,12 @@ class EnvironmentAdapter(click.Command):
                 self.rosinstall = dict()
                 #TODO: compare parsed folder with yaml_data and adapt the ws accordingly
 
-    def adapt_rosinstall(self, config_rosinstall, packages_dir, workspace_dir="", is_ic=False,
-            ic_grab_flags=None):
+    def adapt_rosinstall(self,
+                         config_rosinstall,
+                         packages_dir,
+                         workspace_dir="",
+                         is_ic=False,
+                         ic_grab_flags=None):
         for repo in config_rosinstall:
             local_version_exists = False
             version_update_required = True
@@ -82,8 +90,17 @@ class EnvironmentAdapter(click.Command):
                 local_repo = self.rosinstall[local_name]
                 if version == local_repo["git"]["version"]:
                     version_update_required = False
+                else:
+                    click.echo("Package '{}' version differs from local version. "
+                               "Going to checkout config file version.".format(local_name))
                 if uri == local_repo["git"]["uri"]:
                     uri_update_required = False
+                else:
+                    click.echo("Package '{}' uri differs from local version. "
+                               "Going to set config file uri.".format(local_name))
+            else:
+                click.echo("Package '{}' does not exist in local structure. "
+                           "Going to download.".format(local_name))
 
             # Create repo if it does not exist yet.
             if not local_version_exists:
@@ -112,11 +129,9 @@ class EnvironmentAdapter(click.Command):
                 process.wait()
                 #TODO: add further git commands and/or some fancy output, if necessary
 
-
         if global_remove_flag:
             #TODO: remove the local directories that are not in the config_rosinstall
             pass
-
 
     def parse_yaml_data(self, yaml_config):
         yaml_stream = file(yaml_config, "r")
@@ -131,7 +146,7 @@ class EnvironmentAdapter(click.Command):
                 git_dir = os.path.join(subfolder_abs, '.git')
                 local_name = os.path.join(prefix, subfolder)
                 if os.path.isdir(git_dir):
-                    click.echo(local_name)
+                    click.echo("Found '{}' in local folder structure.".format(local_name))
                     entry = self.create_rosinstall_entry(subfolder_abs, local_name)
                     self.rosinstall[local_name] = entry
                 self.parse_folder(subfolder_abs, local_name)
@@ -168,7 +183,6 @@ class EnvironmentAdapter(click.Command):
                 for flag in self.yaml_data['ic_workspace']['flags']:
                     ic_grab_flags.append("--" + flag)
 
-
         return ic_rosinstall, ic_packages, ic_package_versions, ic_grab_flags
 
     def parse_ros_workspace_config(self):
@@ -178,7 +192,6 @@ class EnvironmentAdapter(click.Command):
                 ros_rosinstall = self.yaml_data["catkin_workspace"]["rosinstall"]
 
         return ros_rosinstall
-
 
 
 class EnvironmentChooser(click.MultiCommand):
@@ -203,8 +216,10 @@ class EnvironmentChooser(click.MultiCommand):
 @click.command(cls=EnvironmentChooser,
                short_help='Adapt an environment to a config file',
                invoke_without_command=True)
-@click.option("--remove_repositories", is_flag=True, default=False,
-        help="Remove repositories not mentioned by the config file.")
+@click.option("--remove_repositories",
+              is_flag=True,
+              default=False,
+              help="Remove repositories not mentioned by the config file.")
 @click.pass_context
 def cli(ctx, remove_repositories):
     """Adapts an environment to a config file.
