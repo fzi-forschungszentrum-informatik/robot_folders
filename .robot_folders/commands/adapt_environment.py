@@ -43,7 +43,8 @@ class EnvironmentAdapter(click.Command):
                                       ic_grab_flags=ic_flags)
             elif ic_packages:
                 #TODO: compare the ic_dir_packages (with their versions) with the yaml_ic_rosinstall
-                pass
+                click.echo('Sorry! Currently, the package list format is not supported for'
+                           ' adapting environments. Please use the rosinstall notation.')
 
         if os.path.isdir(catkin_src_dir):
             click.echo("Adapting catkin workspace")
