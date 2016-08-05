@@ -105,6 +105,9 @@ class EnvironmentAdapter(click.Command):
 
             # Checkout the version specified
             if version_update_required:
+                process = subprocess.Popen(["git", "fetch"], cwd=package_dir)
+                process.wait()
+                #TODO: somehow decide wether to checkout the version from origin or local...
                 process = subprocess.Popen(["git", "checkout", version], cwd=package_dir)
                 process.wait()
                 #TODO: add further git commands and/or some fancy output, if necessary
