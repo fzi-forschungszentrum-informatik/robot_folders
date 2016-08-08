@@ -80,16 +80,37 @@ class EnvironmentAdapter(click.Command):
             local_version_exists = False
             version_update_required = True
             uri_update_required = True
-            local_name = repo["git"]["local-name"]
-            uri = repo["git"]["uri"]
-            version = repo["git"]["version"]
+            local_name = ''
+            uri = ''
+            version = ''
+
+            if 'local-name' in repo['git']:
+                local_name = repo["git"]["local-name"]
+            else:
+                click.echo("No local-name given for package '{}'. "
+                           "Skipping package".format(repo["git"]))
+                continue
             package_dir = os.path.join(packages_dir, local_name)
+
+            if 'version' in repo['git']:
+                version = repo["git"]["version"]
+            else:
+                click.echo("WARNING: No version tag given for package '{}'. "
+                           "The local version will be kept or the master "
+                           "version will be checked out for new package".format(local_name))
+
+            if 'uri' in repo['git']:
+                uri = repo["git"]["uri"]
+            else:
+                click.echo("WARNING: No uri given for package '{}'. "
+                           "Skipping package".format(local_name))
+                continue
 
             # compare the repos' versions and uris
             if local_name in self.rosinstall.keys():
                 local_version_exists = True
                 local_repo = self.rosinstall[local_name]
-                if version == local_repo["git"]["version"]:
+                if version == '' or version == local_repo["git"]["version"]:
                     version_update_required = False
                 else:
                     click.echo("Package '{}' version differs from local version. "
@@ -99,6 +120,7 @@ class EnvironmentAdapter(click.Command):
                 else:
                     click.echo("Package '{}' uri differs from local version. "
                                "Going to set config file uri.".format(local_name))
+
             else:
                 click.echo("Package '{}' does not exist in local structure. "
                            "Going to download.".format(local_name))
