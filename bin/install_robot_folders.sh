@@ -51,25 +51,28 @@ install
 
 mkdir -p ${ROB_FOLDERS_BASE_DIR}/checkout
 
-read -p "Do you want me to perform the .bashrc setup automatically? [Y/n] " -r do_setup
+# perform shell setup, if not done previously
+if [ "$1" != "-q"  ]; then
+  read -p "Do you want me to perform the .bashrc setup automatically? [Y/n] " -r do_setup
 
-if [[ "$do_setup" =~ ^[Yy]?$ ]]
-then
+  if [[ "$do_setup" =~ ^[Yy]?$ ]]
+  then
     read -p "Which shell are you running? Press enter for default bash: [bash/zsh] " -r shell_type
     # if running bash
     if [[ $shell_type == "bash" || $shell_type == "" ]]; then
-        shell_setup "$HOME/.bashrc"
-        echo "Added necessary parts to .bashrc"
+      shell_setup "$HOME/.bashrc"
+      echo "Added necessary parts to .bashrc"
     elif [[ $shell_type == zsh ]]; then
-        shell_setup "$HOME/.zshrc"
-        echo "Added necessary parts to .zshrc."
+      shell_setup "$HOME/.zshrc"
+      echo "Added necessary parts to .zshrc."
     else
-        echo "Could not determine your shell type. Please perform manual setup:"
+      echo "Could not determine your shell type. Please perform manual setup:"
         manual_setup_instructions
     fi
-else
+  else
     echo "You chose manual setup."
     manual_setup_instructions
+  fi
 fi
 
 
