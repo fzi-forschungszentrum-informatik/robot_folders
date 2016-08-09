@@ -1,0 +1,17 @@
+#!/usr/bin/env bash
+
+# git hook to run a command after `git pull` if a specified file was changed
+# Run `chmod +x post-merge` to make it executable then put it into `.git/hooks/`.
+
+changed_files="$(git diff-tree -r --name-only --no-commit-id ORIG_HEAD HEAD)"
+
+check_run() {
+  echo "$changed_files" | grep --quiet "$1" && eval "$2"
+
+}
+
+echo "========================================================="
+echo "  Checking whether we must run the install script again  "
+echo "========================================================="
+check_run .robot_folders/setup.py "bin/install_robot_folders.sh -q"
+

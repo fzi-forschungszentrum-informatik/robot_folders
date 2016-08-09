@@ -21,6 +21,17 @@ shell_setup ()
     fi
 }
 
+hook_symlinks ()
+{
+  echo "Creating hook symlinks"
+  pushd $ROB_FOLDERS_BASE_DIR
+  for file in $(ls git_hooks); do
+    echo "ln -s -f git_hooks/$file .git/hooks/$file" 
+    ln -s -f git_hooks/$file .git/hooks/$file
+  done
+  popd
+}
+
 function install
 {
     echo "Creating virtual environment..."
@@ -74,6 +85,8 @@ if [ "$1" != "-q"  ]; then
     manual_setup_instructions
   fi
 fi
+
+hook_symlinks
 
 
 # deactivate the virtual env again
