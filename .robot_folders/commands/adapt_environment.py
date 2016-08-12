@@ -175,12 +175,20 @@ class EnvironmentAdapter(click.Command):
                 self.parse_folder(subfolder_abs, local_name)
 
     def create_rosinstall_entry(self, repo_path, local_name):
+        #TODO: combine this with the identical method in scrape
         client = vcstools.git.GitClient(repo_path)
         repo = dict()
         repo['git'] = dict()
         repo['git']['local-name'] = local_name
         repo['git']['uri'] = client.get_url()
-        repo['git']['version'] = client.get_current_version_label()
+
+        # If a tag is checked out (or the HEAD is detached for other reasons),
+        # the current version label returns <detached>.
+        # In that case we will use the SHA-ID of the checked out commit.
+        version = client.get_current_version_label()
+        if version == "<detached>":
+            version = client.get_version()
+        repo['git']['version'] = version
         return repo
 
     def parse_ic_workspace_config(self):
