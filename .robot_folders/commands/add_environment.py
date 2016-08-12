@@ -83,6 +83,11 @@ def create_ic_ws(ic_directory,
             return False
 
     else:
+        # It is necessary to grab the base packages.
+        grab_command = ["./IcWorkspace.py", "grab", "base"]
+        process = subprocess.Popen(grab_command, cwd=ic_directory)
+        process.wait()
+
         # Dump the rosinstall to a file and use wstool for getting the packages
         rosinstall_filename = '/tmp/rob_folders_rosinstall'
         rosinstall_file_handle = file(rosinstall_filename, 'w')
@@ -169,6 +174,12 @@ def cli(env_name, config_file, no_build):
 
             if 'packages' in data['ic_workspace']:
                 ic_packages = ' '.join(data['ic_workspace']['packages'])
+                # if the base package is not specified in the config_file, add it nevertheless.
+                #TODO: alternatively only print the warning
+                if "base" not in ic_packages:
+                    ic_packages = "base " + ic_packages
+                    click.echo("The base-package for the ic_workspace has not been specified in the"
+                               " configuration. It will be added regardless.")
                 if 'package_versions' in data['ic_workspace'] and data['ic_workspace']['package_versions'] is not None:
                     ic_package_versions = data['ic_workspace']['package_versions']
                 if 'flags' in data['ic_workspace'] and data['ic_workspace']['flags'] is not None:
