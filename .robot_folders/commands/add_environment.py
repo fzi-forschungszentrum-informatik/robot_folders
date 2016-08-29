@@ -289,6 +289,19 @@ def cli(env_name, config_file, no_build):
         try:
             subprocess.check_call(["git", "clone", mca_repo_url, mca_directory])
 
+            if 'libraries' in mca_additional_repos and mca_additional_repos['libraries'] is not None:
+                for library in mca_additional_repos['libraries']:
+                    libraries_dir = os.path.join(mca_directory,
+                                                 'libraries',
+                                                 library['git']['local-name'])
+                    subprocess.check_call(["git", "clone", library['git']['uri'], libraries_dir])
+                    if 'version' in library['git']:
+                        package_version = library['git']['version']
+                        click.echo("Checking out version {} of package {}".format(package_version, library['git']['local-name']))
+                        process = subprocess.Popen(["git", "checkout", package_version],
+                                                    cwd=libraries_dir)
+                        process.wait()
+
             if 'projects' in mca_additional_repos and mca_additional_repos['projects'] is not None:
                 for project in mca_additional_repos['projects']:
                     click.echo("Project: {}".format(project))
@@ -296,13 +309,12 @@ def cli(env_name, config_file, no_build):
                                                 'projects',
                                                 project['git']['local-name'])
                     subprocess.check_call(["git", "clone", project['git']['uri'], projects_dir])
-
-            if 'libraries' in mca_additional_repos and mca_additional_repos['libraries'] is not None:
-                for library in mca_additional_repos['libraries']:
-                    libraries_dir = os.path.join(mca_directory,
-                                                 'libraries',
-                                                 library['git']['local-name'])
-                    subprocess.check_call(["git", "clone", library['git']['uri'], libraries_dir])
+                    if 'version' in project['git']:
+                        package_version = project['git']['version']
+                        click.echo("Checking out version {} of package {}".format(package_version, project['git']['local-name']))
+                        process = subprocess.Popen(["git", "checkout", package_version],
+                                                    cwd=projects_dir)
+                        process.wait()
 
             if 'tools' in mca_additional_repos and mca_additional_repos['tools'] is not None:
                 for tool in mca_additional_repos['tools']:
@@ -310,6 +322,12 @@ def cli(env_name, config_file, no_build):
                                              'tools',
                                              tool['git']['local-name'])
                     subprocess.check_call(["git", "clone", tool['git']['uri'], tools_dir])
+                    if 'version' in tool['git']:
+                        package_version = tool['git']['version']
+                        click.echo("Checking out version {} of package {}".format(package_version, tool['git']['local-name']))
+                        process = subprocess.Popen(["git", "checkout", package_version],
+                                                    cwd=tools_dir)
+                        process.wait()
 
             process = subprocess.Popen(["script/git_clone_base.py"],
                                        cwd=mca_directory)
