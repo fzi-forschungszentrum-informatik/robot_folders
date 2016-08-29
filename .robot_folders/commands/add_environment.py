@@ -39,7 +39,7 @@ def create_ic_ws(ic_directory,
                  package_versions=None,
                  grab_flags=None,
                  rosinstall=None):
-    ic_repo_url = "git://idsgit.fzi.de/core/ic_workspace.git"
+    ic_repo_url = "git@ids-git.fzi.de:core/ic_workspace.git"
 
     if packages is None and rosinstall is None:
         click.error('Either packages or rosinstall must be declared, none was given!')
@@ -118,7 +118,7 @@ def cli(env_name, config_file, no_build):
     ic_rosinstall = None
     cama_flags = ""
     catkin_rosinstall = ""
-    mca_repo_url = "git://idsgit.fzi.de/mca2/mca2.git"
+    mca_repo_url = "git@ids-git.fzi.de:mca2/mca2.git"
     mca_cmake_flags = ""
     mca_additional_repos = ""
 
