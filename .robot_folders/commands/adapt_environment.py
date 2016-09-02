@@ -1,6 +1,5 @@
 import click
 import os
-import vcstools
 import subprocess
 
 from yaml import load as yaml_load, dump as yaml_dump, safe_dump as yaml_safe_dump
@@ -12,6 +11,7 @@ except ImportError:
 
 from helpers.directory_helpers import get_base_dir
 #TODO: update imports: delete unused ones, etc.
+from helpers.repository_helpers import create_rosinstall_entry
 
 global_remove_flag = False
 
@@ -170,26 +170,9 @@ class EnvironmentAdapter(click.Command):
                 local_name = os.path.join(prefix, subfolder)
                 if os.path.isdir(git_dir):
                     click.echo("Found '{}' in local folder structure.".format(local_name))
-                    entry = self.create_rosinstall_entry(subfolder_abs, local_name)
+                    entry = create_rosinstall_entry(subfolder_abs, local_name)
                     self.rosinstall[local_name] = entry
                 self.parse_folder(subfolder_abs, local_name)
-
-    def create_rosinstall_entry(self, repo_path, local_name):
-        #TODO: combine this with the identical method in scrape
-        client = vcstools.git.GitClient(repo_path)
-        repo = dict()
-        repo['git'] = dict()
-        repo['git']['local-name'] = local_name
-        repo['git']['uri'] = client.get_url()
-
-        # If a tag is checked out (or the HEAD is detached for other reasons),
-        # the current version label returns <detached>.
-        # In that case we will use the SHA-ID of the checked out commit.
-        version = client.get_current_version_label()
-        if version == "<detached>":
-            version = client.get_version()
-        repo['git']['version'] = version
-        return repo
 
     def parse_ic_workspace_config(self):
         ic_rosinstall = None
