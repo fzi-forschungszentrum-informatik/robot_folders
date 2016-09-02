@@ -2,15 +2,14 @@ import click
 import os
 import subprocess
 
-from yaml import load as yaml_load, dump as yaml_dump, safe_dump as yaml_safe_dump
+from yaml import load as yaml_load
 
 try:
-    from yaml import CLoader as Loader, CDumper, Dumper
+    from yaml import CLoader as Loader
 except ImportError:
-    from yaml import Loader, Dumper
+    from yaml import Loader
 
 from helpers.directory_helpers import get_base_dir
-#TODO: update imports: delete unused ones, etc.
 from helpers.repository_helpers import create_rosinstall_entry
 
 global_remove_flag = False
