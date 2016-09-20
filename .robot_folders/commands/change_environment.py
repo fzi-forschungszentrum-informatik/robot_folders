@@ -1,7 +1,7 @@
 import click
 import os
 
-from helpers.directory_helpers import get_base_dir
+from helpers.directory_helpers import get_base_dir, get_last_activated_env
 
 class EnvironmentChoice(click.Command):
     def invoke(self, ctx):
@@ -35,7 +35,7 @@ def cli(ctx):
     """Changes the global environment to the specified one. All environment-specific commands are then executed relative to that environment. \
        Only one environment can be active at a time."""
     if ctx.invoked_subcommand is None:
-        click.echo('No environment specified. Please choose one of the available environments!')
+        click.echo("No environment specified. Sourcing the most recent active environment: {}".format(get_last_activated_env()))
     else:
         pass
     # print(env_name)
