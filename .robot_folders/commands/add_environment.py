@@ -88,6 +88,11 @@ def create_ic_ws(ic_directory,
             process.wait()
             os.remove(rosinstall_filename)
 
+            # It is necessary to grab the base packages to get an icmaker
+            grab_command = ["./IcWorkspace.py", "grab", "base"]
+            process = subprocess.Popen(grab_command, cwd=ic_directory)
+            process.wait()
+
         except subprocess.CalledProcessError as e:
             click.echo(e.output)
             click.echo("An error occurred while creating the ic_workspace. Exiting now")
