@@ -70,12 +70,6 @@ def create_ic_ws(ic_directory,
                     else:
                         click.echo('Version for package {} given, however, package is not listed in environment!'.format(package))
 
-            os.makedirs(build_directory)
-
-            # Check if we need a symlink to the build directory and create it
-            local_build_dir_name = os.path.join(ic_directory, "build")
-            if local_build_dir_name != build_directory:
-                os.symlink(build_directory, local_build_dir_name)
 
         except subprocess.CalledProcessError as e:
             click.echo(e.output)
@@ -83,19 +77,29 @@ def create_ic_ws(ic_directory,
             return False
 
     else:
-        # It is necessary to grab the base packages.
-        grab_command = ["./IcWorkspace.py", "grab", "base"]
-        process = subprocess.Popen(grab_command, cwd=ic_directory)
-        process.wait()
-
+        # if a rosinstall is specified, no base-grabbing is required
         # Dump the rosinstall to a file and use wstool for getting the packages
         rosinstall_filename = '/tmp/rob_folders_rosinstall'
         rosinstall_file_handle = file(rosinstall_filename, 'w')
         yaml_dump(rosinstall, rosinstall_file_handle)
-        process = subprocess.Popen(["wstool", "init", "packages", rosinstall_filename],
-                                   cwd=ic_directory)
-        process.wait()
-        os.remove(rosinstall_filename)
+        try:
+            process = subprocess.Popen(["wstool", "init", "packages", rosinstall_filename],
+                                       cwd=ic_directory)
+            process.wait()
+            os.remove(rosinstall_filename)
+
+        except subprocess.CalledProcessError as e:
+            click.echo(e.output)
+            click.echo("An error occurred while creating the ic_workspace. Exiting now")
+            return False
+
+
+    os.makedirs(build_directory)
+
+    # Check if we need a symlink to the build directory and create it
+    local_build_dir_name = os.path.join(ic_directory, "build")
+    if local_build_dir_name != build_directory:
+        os.symlink(build_directory, local_build_dir_name)
 
     return True
 
