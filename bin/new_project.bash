@@ -69,7 +69,7 @@ cp $template_dir_/setup.bash $project_dir_/setup.bash
 
 if [ $create_ic_workspace_ = true ]; then
     echo "Creating IcWorkspace"
-    cd $project_dir_ && git clone git@ids-git.fzi.de:core/ic_workspace.git $ic_workspace_dir_name_ && cd $ic_workspace_dir_name_ && ./IcWorkspace.py grab base -a
+    cd $project_dir_ && git clone git@ids-git.fzi.de:core/ic_workspace.git $ic_workspace_dir_name_ && cd $ic_workspace_dir_name_ && ./IcWorkspace.py grab base
     if [ ! -e "$project_dir_/$ic_workspace_dir_name_/IcWorkspace.py" ]; then
         echo "Something went wrong when creating the IcWorkspace"
     fi
