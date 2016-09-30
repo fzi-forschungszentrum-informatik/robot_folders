@@ -43,9 +43,11 @@ fzirob()
       # if we want to cd to a directory, we need to capture the output
       if [ $1 = "cd" ]; then
           output=$(rob_folders $@)
-          echo $output
-          cd_target=$(echo $output | grep "^cd" | tail -n 1 | sed s/cd\ //)
-          cd ${cd_target}
+          echo "$output"
+          cd_target=$(echo "$output" | grep "^cd" | tail -n 1 | sed s/cd\ //)
+          if [ ! -z "${cd_target// }" ]; then
+              cd ${cd_target}
+          fi
       else
           rob_folders $@
           if [ $1 = "change_environment" ] || [ $1 = "source_most_recent_env" ]; then
