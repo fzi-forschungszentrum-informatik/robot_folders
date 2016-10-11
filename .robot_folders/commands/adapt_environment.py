@@ -10,6 +10,7 @@ except ImportError:
     from yaml import Loader
 
 from helpers.directory_helpers import get_base_dir
+from helpers.directory_helpers import get_checkout_dir
 from helpers.repository_helpers import create_rosinstall_entry
 
 global_remove_flag = False
@@ -17,7 +18,7 @@ global_remove_flag = False
 
 class EnvironmentAdapter(click.Command):
     def invoke(self, ctx):
-        env_dir = os.path.join(get_base_dir(), 'checkout', self.name)
+        env_dir = os.path.join(get_checkout_dir(), self.name)
         ic_dir = os.path.join(env_dir, "ic_workspace")
         mca_dir = os.path.join(env_dir, "mca_workspace")
         catkin_dir = os.path.join(env_dir, "catkin_workspace")
@@ -209,7 +210,7 @@ class EnvironmentAdapter(click.Command):
 
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
-        checkout_folder = os.path.join(get_base_dir(), 'checkout')
+        checkout_folder = get_checkout_dir()
         # TODO possibly check whether the directory contains actual workspace
         return [dir for dir in os.listdir(checkout_folder) if os.path.isdir(os.path.join(checkout_folder, dir))]
 

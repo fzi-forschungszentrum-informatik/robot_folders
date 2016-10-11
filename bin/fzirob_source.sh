@@ -51,7 +51,8 @@ fzirob()
       else
           rob_folders $@
           if [ $1 = "change_environment" ] || [ $1 = "source_most_recent_env" ]; then
-              export ROB_FOLDERS_ACTIVE_ENV=$(cat ${ROB_FOLDERS_BASE_DIR}/checkout/.cur_env)
+              checkout_dir=$(rob_folders get_checkout_base_dir)
+              export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
               source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
               # declare environment-specific aliases
               env_aliases

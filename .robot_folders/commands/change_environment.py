@@ -1,17 +1,17 @@
 import click
 import os
 
-from helpers.directory_helpers import get_base_dir, get_last_activated_env
+from helpers.directory_helpers import get_last_activated_env, get_checkout_dir
 
 class EnvironmentChoice(click.Command):
     def invoke(self, ctx):
-        with open( os.path.join(get_base_dir(), 'checkout', '') + '.cur_env', 'w') as file:
+        with open( os.path.join(get_checkout_dir(), '.cur_env'), 'w') as file:
             file.write("{}".format(self.name))
 
 
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
-        checkout_folder = os.path.join(get_base_dir(), 'checkout')
+        checkout_folder = get_checkout_dir()
         # TODO possibly check whether the directory contains actual workspace
         return [dir for dir in os.listdir(checkout_folder) if os.path.isdir(os.path.join(checkout_folder, dir))]
 

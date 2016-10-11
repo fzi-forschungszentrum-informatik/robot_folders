@@ -8,13 +8,13 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
-from helpers.directory_helpers import get_base_dir
+from helpers.directory_helpers import get_base_dir, get_checkout_dir
 from helpers.repository_helpers import create_rosinstall_entry
 
 
 class EnvironmentScraper(click.Command):
     def invoke(self, ctx):
-        env_dir = os.path.join(get_base_dir(), 'checkout', self.name)
+        env_dir = os.path.join(get_checkout_dir(), self.name)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
         catkin_src_dir = os.path.join(env_dir, 'catkin_workspace', 'src')
         mca_library_dir = os.path.join(env_dir, 'mca_workspace', 'libraries')
@@ -74,7 +74,7 @@ class EnvironmentScraper(click.Command):
 
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
-        checkout_folder = os.path.join(get_base_dir(), 'checkout')
+        checkout_folder = get_checkout_dir()
         # TODO possibly check whether the directory contains actual workspace
         return [dir for dir in os.listdir(checkout_folder) if os.path.isdir(os.path.join(checkout_folder, dir))]
 

@@ -18,7 +18,8 @@ if [ -n "${ROB_FOLDERS_ACTIVE_ENV+1}" ];
 then
     # Remove the packages cache from cmake as this creates problems with multiple envs
     rm -rf $HOME/.cmake/packages/
-    environment_dir="$ROB_FOLDERS_BASE_DIR/checkout/${ROB_FOLDERS_ACTIVE_ENV}"
+    checkout_dir=$(rob_folders get_checkout_base_dir)
+    environment_dir="${checkout_dir}/${ROB_FOLDERS_ACTIVE_ENV}"
     if [ -d $environment_dir ]; then
 
         shell_type="bash"
@@ -73,5 +74,5 @@ then
         echo "No environment with the given name found!"
     fi
 else
-    echo "Have not found any active environment. Please call the change_environment or source_active_environment command first!"
+    echo "Have not found any active environment. Please call the change_environment command first!"
 fi

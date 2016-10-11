@@ -4,6 +4,7 @@ import subprocess
 import getpass
 
 from helpers.directory_helpers import get_base_dir
+from helpers.directory_helpers import get_checkout_dir
 import helpers.build_helpers as build
 
 from yaml import load as yaml_load, dump as yaml_dump
@@ -17,7 +18,7 @@ except ImportError:
 
 # NOTE: Sourcing this way only works inside the python session and it's children.
 def source_ic_workspace(env_name):
-    ic_dir = os.path.join(get_base_dir(), "checkout", env_name, "ic_workspace")
+    ic_dir = os.path.join(get_checkout_dir(), env_name, "ic_workspace")
     click.echo("Sourcing ic_workspace for environment {}".format(env_name))
     lib_path = os.path.join(ic_dir, "export", "lib")
     os.environ['LD_LIBRARY_PATH'] = os.pathsep.join([lib_path, os.getenv('LD_LIBRARY_PATH', '')])
@@ -119,7 +120,7 @@ def cli(env_name, config_file, no_build):
     """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_workspace."""
 
     base_dir = get_base_dir()
-    build_base_dir = os.path.join(base_dir, "checkout")
+    build_base_dir = get_checkout_dir()
     ic_packages = "base"
     ic_package_versions = {}
     ic_grab_flags = []
@@ -153,18 +154,18 @@ def cli(env_name, config_file, no_build):
             username = getpass.getuser()
             build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
 
-    if os.path.exists("{}/checkout/{}".format(base_dir, env_name)):
+    if os.path.exists(os.path.join(get_checkout_dir(), env_name)):
         click.echo("An environment with the name \"{}\" already exists. Exiting now.".format(env_name))
         return
 
     # Set all necessary paths for the environments.
     click.echo("Creating environment with name \"{}\"".format(env_name))
-    os.mkdir("{}/checkout/{}".format(base_dir, env_name))
-    ic_directory = os.path.join(base_dir, "checkout", env_name, "ic_workspace")
+    os.mkdir(os.path.join(get_checkout_dir(), env_name))
+    ic_directory = os.path.join(get_checkout_dir(), env_name, "ic_workspace")
     ic_build_directory = os.path.join(build_base_dir, env_name,  "ic_workspace", "build")
-    catkin_directory = os.path.join(base_dir, "checkout", env_name, "catkin_workspace")
+    catkin_directory = os.path.join(get_checkout_dir(), env_name, "catkin_workspace")
     catkin_build_directory = os.path.join(build_base_dir, env_name, "catkin_workspace", "build")
-    mca_directory = os.path.join(base_dir, "checkout", env_name, "mca_workspace")
+    mca_directory = os.path.join(get_checkout_dir(), env_name, "mca_workspace")
     mca_build_directory = os.path.join(build_base_dir, env_name, "mca_workspace", "build")
 
     # If we have a config file check which packages should be fetched.
@@ -229,7 +230,7 @@ def cli(env_name, config_file, no_build):
                                          default=True)
 
     # Add a custom source file to the environment. Custom source commands go in here.
-    env_source_file = open(os.path.join(base_dir, "checkout", env_name, "source_local.sh"), 'w')
+    env_source_file = open(os.path.join(get_checkout_dir(), env_name, "source_local.sh"), 'w')
     env_source_file.write("#This file is for custom source commands in this environment.\n")
     env_source_file.close()
 
