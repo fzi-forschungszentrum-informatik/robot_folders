@@ -234,6 +234,10 @@ def cli(env_name, config_file, no_build):
     env_source_file.write("#This file is for custom source commands in this environment.\n")
     env_source_file.close()
 
+    os.symlink(os.path.join(get_base_dir(), "bin", "source_environment.sh"),
+               os.path.join(get_checkout_dir(), env_name, "source_envionment.sh"))
+
+
     # Now, we're done asking the user. Let's get to work
 
     if create_ic:
