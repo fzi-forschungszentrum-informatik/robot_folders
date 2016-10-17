@@ -7,7 +7,7 @@ ic_workspace:
     - icl_hardware
   package_versions:
     icl_hardware: canopen_schunk
-  flags: # add any icWorkspace flags here
+  flags: # add any IcWorkspace flags here
     - verbose
 catkin_workspace:
   rosinstall:
@@ -19,9 +19,9 @@ mca_workspace:
   projects:
     - git:
         local-name: mcap_kairo
-        uri: git://idsgit.fzi.de/mca2-autonomous-robots/mcap_kairo.git
+        uri: git@ids-git.fzi.de:mca2-autonomous-robots/mcap_kairo.git
 
 #  libraries:
 #    - git:
 #        local-name: driver_svh
-#        uri: git://idsgit.fzi.de/hardware-drivers/driver_svh.git
+#        uri: git@ids-git.fzi.de:hardware-drivers/driver_svh.git
