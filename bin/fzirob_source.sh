@@ -54,9 +54,12 @@ fzirob()
               checkout_dir=$(rob_folders get_checkout_base_dir)
               export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
               environment_dir="${checkout_dir}/${ROB_FOLDERS_ACTIVE_ENV}"
-              if [ -f ${environment_dir}/source_environment.sh ]
-              then
-                source ${environment_dir}/source_environment.sh
+              if [ -f ${environment_dir}/setup.sh ]; then
+                source ${environment_dir}/setup.sh
+              elif [ -f ${environment_dir}/setup.zsh ]; then
+                source ${environment_dir}/setup.zsh
+              elif [ -f ${environment_dir}/setup.bash ]; then
+                source ${environment_dir}/setup.bash
               else
                 source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
               fi
