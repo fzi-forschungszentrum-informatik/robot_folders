@@ -28,6 +28,17 @@ alias cdhome="fzirob cd"
 alias makeic="fzirob make ic"
 alias makeros="fzirob make ros"
 
+add_fzi_project()
+{
+  echo "DEPRECATED! DEPRECATED! DEPRECATED! DEPRECATED!"
+  echo "The use of this call is deprecated!!!"
+  echo "DEPRECATED! DEPRECATED! DEPRECATED! DEPRECATED!"
+  echo "Please use the command 'fzirob add_environment' in future"
+  echo "DEPRECATED! DEPRECATED! DEPRECATED! DEPRECATED!"
+  echo "Executing 'fzirob add_environment' now"
+  fzirob add_environment $@
+}
+
 # define some other useful aliases
 alias cs="fzirob source_most_recent_env"
 
