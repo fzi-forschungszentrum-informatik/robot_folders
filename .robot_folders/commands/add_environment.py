@@ -100,12 +100,19 @@ def create_ic_ws(ic_directory,
             return False
 
 
+    # Create the build and export directories
     os.makedirs(build_directory)
+    (export_base_dir, _) = os.path.split(build_directory)
+    export_directory = os.path.join(export_base_dir, "export")
+    os.makedirs(export_directory)
 
-    # Check if we need a symlink to the build directory and create it
+    # Check if we need symlinks to the build and export directories and create them
     local_build_dir_name = os.path.join(ic_directory, "build")
+    local_export_dir_name = os.path.join(ic_directory, "export")
     if local_build_dir_name != build_directory:
         os.symlink(build_directory, local_build_dir_name)
+    if local_export_dir_name != export_directory:
+        os.symlink(export_directory, local_export_dir_name)
 
     return True
 
