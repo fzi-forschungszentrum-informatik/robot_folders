@@ -261,18 +261,28 @@ def cli(env_name, config_file, no_build):
     if create_catkin:
         click.echo("Creating catkin_workspace")
 
+        # Create directories and symlinks, if necessary
         os.mkdir(catkin_directory)
         os.mkdir(os.path.join(catkin_directory, "src"))
         os.makedirs(catkin_build_directory)
+
         local_build_dir_name = os.path.join(catkin_directory, "build")
-        (catkin_devel_base_dir, _) = os.path.split(catkin_build_directory)
-        catkin_devel_directory = os.path.join(catkin_devel_base_dir, "devel")
+        (catkin_base_dir, _) = os.path.split(catkin_build_directory)
+
+        catkin_devel_directory = os.path.join(catkin_base_dir, "devel")
         local_devel_dir_name = os.path.join(catkin_directory, "devel")
         click.echo("devel_dir: {}".format(catkin_devel_directory))
+
+        catkin_install_directory = os.path.join(catkin_base_dir, "install")
+        local_install_dir_name = os.path.join(catkin_directory, "install")
+        click.echo("install_dir: {}".format(catkin_install_directory))
+
         if local_build_dir_name != catkin_build_directory:
             os.symlink(catkin_build_directory, local_build_dir_name)
             os.makedirs(catkin_devel_directory)
             os.symlink(catkin_devel_directory, local_devel_dir_name)
+            os.makedirs(catkin_install_directory)
+            os.symlink(catkin_install_directory, local_install_dir_name)
 
         # We abuse the name parameter to code the ros distribution
         # if we're building for the first time.
