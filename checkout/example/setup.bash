@@ -18,17 +18,36 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 alias cdhome="cd $SCRIPT_DIR"
 
+# get workspace name
+WORKSPACE_NAME=${SCRIPT_DIR##*/}
+
+# define if no_backup should be used as build destination
+USE_NOBACKUP=true
+
 # Run ic_workspace initialization if available
 ic_dir=$SCRIPT_DIR/ic_workspace
+
+if [ $USE_NOBACKUP = true ]
+then
+  build_ic_dir=/disk/no_backup/${USER}/$WORKSPACE_NAME/ic_workspace
+  echo using $build_ic_dir as build directory
+  if [ ! -d $build_ic_dir ]
+  then
+    echo $build_ic_dir not found
+  fi
+else
+  build_ic_dir=$ic_dir
+fi
+
 if [ -f $ic_dir/CMakeLists.txt ]
 then
   echo configuring ICL workspace inside $ic_dir ...
 
-  export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
-  export PYTHONPATH=$ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
-  export PATH=$ic_dir/export/bin:${PATH}
-  export QML_IMPORT_PATH=$ic_dir/export/plugins/qml:$QML_IMPORT_PATH
-  export CMAKE_PREFIX_PATH=$ic_dir/export
+  export LD_LIBRARY_PATH=$build_ic_dir/export/lib/:$LD_LIBRARY_PATH
+  export PYTHONPATH=$build_ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
+  export PATH=$build_ic_dir/export/bin:${PATH}
+  export QML_IMPORT_PATH=$build_ic_dir/export/plugins/qml:$QML_IMPORT_PATH
+  export CMAKE_PREFIX_PATH=$build_ic_dir/export
   export IC_MAKER_DIR=$ic_dir/icmaker
 
   export LC_ALL=C
@@ -43,15 +62,15 @@ then
   # add makeic according to build environment
 
   # ninja
-  if [ -f $ic_dir/build/build.ninja ]
+  if [ -f $build_ic_dir/build/build.ninja ]
   then
-    alias makeic="(cd $ic_dir/build && ninja install)"
+    alias makeic="(cd $build_ic_dir/build && ninja install)"
   fi
 
   # make
-  if [ -f $ic_dir/build/Makefile ]
+  if [ -f $build_ic_dir/build/Makefile ]
   then
-    alias makeic="(cd $ic_dir/build && make -j4 install)"
+    alias makeic="(cd $build_ic_dir/build && make -j4 install)"
   fi
 
   # git shortcuts
