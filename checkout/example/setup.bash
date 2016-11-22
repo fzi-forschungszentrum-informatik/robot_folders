@@ -22,7 +22,7 @@ alias cdhome="cd $SCRIPT_DIR"
 WORKSPACE_NAME=${SCRIPT_DIR##*/}
 
 # define if no_backup should be used as build destination
-USE_NOBACKUP=true
+USE_NOBACKUP=false
 
 # Run ic_workspace initialization if available
 ic_dir=$SCRIPT_DIR/ic_workspace
