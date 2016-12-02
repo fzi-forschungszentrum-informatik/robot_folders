@@ -77,7 +77,11 @@ if [ -d $environment_dir ]; then
   catkin_dir=$environment_dir/catkin_workspace
   if [ -d $catkin_dir ]
   then
-    if [ -f $catkin_dir/devel/setup.$shell_type ]
+    if [ -f $catkin_dir/devel_isolated/setup.$shell_type ]
+    then
+      source $catkin_dir/devel_isolated/setup.$shell_type
+      echo "Sourced catkin_workspace"
+    elif [ -f $catkin_dir/devel/setup.$shell_type ]
     then
       source $catkin_dir/devel/setup.$shell_type
 
