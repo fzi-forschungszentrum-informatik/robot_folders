@@ -49,6 +49,16 @@ def mkdir_p(path):
             raise
 
 
+def recursive_rmdir(path):
+    for i in os.listdir(path):
+        item = os.path.join(path, i)
+        if os.path.isdir(item):
+            recursive_rmdir(item)
+        else:
+            os.remove(item)
+    os.rmdir(path)
+
+
 def get_checkout_dir():
     checkout_config = userconfig.directories.get('checkout_dir', '')
     if checkout_config == '':

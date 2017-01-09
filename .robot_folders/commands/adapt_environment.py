@@ -11,6 +11,7 @@ except ImportError:
 
 from helpers.directory_helpers import get_base_dir
 from helpers.directory_helpers import get_checkout_dir
+from helpers.directory_helpers import recursive_rmdir
 from helpers.repository_helpers import create_rosinstall_entry
 
 global_remove_flag = False
@@ -152,9 +153,18 @@ class EnvironmentAdapter(click.Command):
                 process.wait()
                 #TODO: add further git commands and/or some fancy output, if necessary
 
-        if global_remove_flag:
-            #TODO: remove the local directories that are not in the config_rosinstall
-            pass
+        for repo in self.rosinstall:
+            if self.rosinstall[repo] not in config_rosinstall:
+                click.echo("Package '{}' found locally, but not in config.".format(repo))
+                local_name = self.rosinstall[repo]["git"]["local-name"]
+                package_dir = os.path.join(packages_dir, local_name)
+                if global_remove_flag:
+                    recursive_rmdir(package_dir)
+                    click.echo("Deleted '{}'".format(repo))
+                elif click.confirm('Do you want to delete it?'):
+
+                    recursive_rmdir(package_dir)
+                    click.echo("Deleted '{}'".format(repo))
 
     def parse_yaml_data(self, yaml_config):
         yaml_stream = file(yaml_config, "r")
@@ -233,7 +243,9 @@ class EnvironmentChooser(click.MultiCommand):
 @click.option("--remove_repositories",
               is_flag=True,
               default=False,
-              help="Remove repositories not mentioned by the config file.")
+              help=("Remove repositories not mentioned by the config file "
+                    "without confirmation. If not set, the user has to "
+                    "confirm each deletion."))
 @click.pass_context
 def cli(ctx, remove_repositories):
     """Adapts an environment to a config file.
