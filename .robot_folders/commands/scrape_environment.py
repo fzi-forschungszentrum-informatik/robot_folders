@@ -71,6 +71,8 @@ class EnvironmentScraper(click.Command):
                     self.rosinstall.append(entry)
                 self.parse_folder(subfolder_abs, local_name)
 
+        self.rosinstall = sorted(self.rosinstall, key=lambda k: k['git']['local-name'])
+
 
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
