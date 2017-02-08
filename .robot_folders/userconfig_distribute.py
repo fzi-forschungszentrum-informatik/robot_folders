@@ -1,6 +1,8 @@
 config = {
     "generator": "make",
-    "make_threads": 4
+    "make_threads": 4,
+    "install_ic": "True",
+    "install_catkin": "False"
 }
 
 directories = {

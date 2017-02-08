@@ -55,6 +55,9 @@ class Builder(click.Command):
                 num_threads = userconfig.config.get('make_threads', 2)
                 build_cmd = " ".join([build_cmd, '-j', str(num_threads)])
 
+        if self.should_install():
+            build_cmd = " ".join([build_cmd, "install"])
+
         return build_cmd
 
 
@@ -69,6 +72,20 @@ class Builder(click.Command):
                                        cwd=self.build_dir)
             process.wait()
 
+    def should_install(self):
+        """ Checks if the build command should be run with the install option."""
+        return eval(userconfig.config.get(self.get_install_key(),
+                                          str(self.get_install_default())))
+
+    def get_install_key(self):
+        """ Returns the userconfig key for the install command of this builder."""
+        return ''
+
+    def get_install_default(self):
+        """ Returns the default install behavior for this builder,
+        if none is provided by the user config"""
+        return False
+
 
 class IcBuilder(Builder):
     def invoke(self, ctx):
@@ -76,10 +93,15 @@ class IcBuilder(Builder):
         self.build_dir = os.path.realpath(os.path.join(ic_dir, 'build'))
         self.check_previous_build(ic_dir)
         click.echo("Building ic_workspace in {}".format(self.build_dir))
-        build_cmd = " ".join([self.get_build_command(), "install"])
-        process = subprocess.Popen(["bash", "-c", build_cmd],
-                                        cwd=self.build_dir)
+        process = subprocess.Popen(["bash", "-c", self.get_build_command()],
+                                   cwd=self.build_dir)
         process.wait()
+
+    def get_install_key(self):
+        return 'install_ic'
+
+    def get_install_default(self):
+        return True
 
 class CatkinBuilder(Builder):
     def get_build_command(self, catkin_dir, ros_distro):
@@ -107,6 +129,10 @@ class CatkinBuilder(Builder):
             build_cmd_with_source = "source {}/setup.bash && {}"\
                                     .format(ros_global_dir, build_cmd)
             build_cmd = build_cmd_with_source
+
+        if self.should_install():
+            build_cmd = " ".join([build_cmd, "install"])
+
         return build_cmd
 
     def invoke(self, ctx):
@@ -115,10 +141,13 @@ class CatkinBuilder(Builder):
         click.echo("Building catkin_workspace in {}".format(catkin_dir))
 
         # We abuse the name to code the ros distribution if we're building for the first time.
-        build_cmd = self.get_build_command(catkin_dir, self.name)
-        process = subprocess.Popen(["bash", "-c", build_cmd],
-                                               cwd=catkin_dir)
+        process = subprocess.Popen(["bash", "-c", self.get_build_command(catkin_dir, self.name)],
+                                   cwd=catkin_dir)
         process.wait()
+
+    def get_install_key(self):
+        return 'install_catkin'
+
 
 # TODO: We could support building of single projects? Unfortunately, I don't know
 #       much about mca. (mauch: 20160417)
@@ -128,7 +157,9 @@ class McaBuilder(Builder):
         self.build_dir = os.path.realpath(os.path.join(mca_dir, 'build'))
         self.check_previous_build(mca_dir)
         click.echo("Building ic_workspace in {}".format(self.build_dir))
-        build_cmd = " ".join([self.get_build_command(), "install"])
-        process = subprocess.Popen(["bash", "-c", build_cmd],
-                                        cwd=self.build_dir)
+        process = subprocess.Popen(["bash", "-c", self.get_build_command()],
+                                   cwd=self.build_dir)
         process.wait()
+
+    def get_install_default(self):
+        return True
