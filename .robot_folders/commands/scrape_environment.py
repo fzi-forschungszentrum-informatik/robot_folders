@@ -20,6 +20,7 @@ class EnvironmentScraper(click.Command):
         mca_library_dir = os.path.join(env_dir, 'mca_workspace', 'libraries')
         mca_project_dir = os.path.join(env_dir, 'mca_workspace', 'projects')
         mca_tool_dir = os.path.join(env_dir, 'mca_workspace', 'tools')
+        demos_dir = os.path.join(env_dir, 'demos')
         self.yaml_data = dict()
 
         if os.path.isdir(ic_pkg_dir):
@@ -54,6 +55,17 @@ class EnvironmentScraper(click.Command):
                 self.rosinstall = list()
                 self.parse_folder(mca_tool_dir)
                 self.yaml_data['mca_workspace']['tools'] = self.rosinstall
+
+        if os.path.isdir(demos_dir):
+            self.yaml_data['demos'] = dict()
+            script_list = [script_file for script_file in os.listdir(demos_dir) if
+                    os.path.isfile(os.path.join(demos_dir, script_file)) and os.access(os.path.join(demos_dir, script_file), os.X_OK)]
+            for script in script_list:
+                script_path = os.path.join(demos_dir, script)
+                with open(script_path, 'r') as f:
+                    # content = f.read()
+                    self.yaml_data['demos'][script] = f.read()
+                    f.close()
 
         yaml_stream = file(ctx.params['out_file'], 'w')
         yaml_safe_dump(self.yaml_data, stream=yaml_stream, encoding='utf-8', allow_unicode=True)

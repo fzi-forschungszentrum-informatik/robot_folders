@@ -1,5 +1,6 @@
 import click
 import os
+import stat
 import subprocess
 import getpass
 
@@ -168,6 +169,7 @@ def cli(env_name, config_file, no_build):
     # Set all necessary paths for the environments.
     click.echo("Creating environment with name \"{}\"".format(env_name))
     os.mkdir(os.path.join(get_checkout_dir(), env_name))
+    os.mkdir(os.path.join(get_checkout_dir(), env_name, 'demos'))
     ic_directory = os.path.join(get_checkout_dir(), env_name, "ic_workspace")
     ic_build_directory = os.path.join(build_base_dir, env_name,  "ic_workspace", "build")
     catkin_directory = os.path.join(get_checkout_dir(), env_name, "catkin_workspace")
@@ -215,6 +217,18 @@ def cli(env_name, config_file, no_build):
             create_mca = True
             if data['mca_workspace'] is not None:
                 mca_additional_repos = data['mca_workspace']
+
+        if 'demos' in data:
+            if data['demos'] is not None:
+                print ('Found the following demo scripts:')
+                for demo in data['demos']:
+                    print(demo)
+                    filename = os.path.join(get_checkout_dir(), env_name, 'demos', demo)
+                    with open(filename, mode='w') as f:
+                        f.write(data['demos'][demo])
+                        f.close()
+                    os.chmod(filename, 00755)
+
     else:
         create_ic = click.confirm("Would you like to create an ic_workspace?", default=True)
         create_catkin = click.confirm("Would you like to create a catkin_workspace?", default=True)

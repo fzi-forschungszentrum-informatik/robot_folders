@@ -16,8 +16,11 @@ class ScriptSelector(click.MultiCommand):
     def get_demo_binaries(self):
         demo_dir = os.path.join(get_active_env_path(), 'demos')
 
-        script_list = [file for file in os.listdir(demo_dir) if
-                os.path.isfile(os.path.join(demo_dir, file)) and os.access(os.path.join(demo_dir, file), os.X_OK)]
+        if not os.path.exists(demo_dir):
+            return list()
+
+        script_list = [script_file for script_file in os.listdir(demo_dir) if
+                os.path.isfile(os.path.join(demo_dir, script_file)) and os.access(os.path.join(demo_dir, script_file), os.X_OK)]
         return script_list
 
     def list_commands(self, ctx):

@@ -25,3 +25,11 @@ mca_workspace:
 #    - git:
 #        local-name: driver_svh
 #        uri: git@ids-git.fzi.de:hardware-drivers/driver_svh.git
+#
+
+# put any shell script under demos.
+# Use the 'script.ending: |' syntax to use multiline scripts
+demos:
+  test.sh: |
+    #!/bin/bash
+    echo "Hello world!"

@@ -13,6 +13,7 @@ from helpers.directory_helpers import get_base_dir
 from helpers.directory_helpers import get_checkout_dir
 from helpers.directory_helpers import recursive_rmdir
 from helpers.repository_helpers import create_rosinstall_entry
+from helpers.directory_helpers import mkdir_p
 
 global_remove_flag = False
 
@@ -28,6 +29,7 @@ class EnvironmentAdapter(click.Command):
         mca_library_dir = os.path.join(env_dir, 'mca_workspace', 'libraries')
         mca_project_dir = os.path.join(env_dir, 'mca_workspace', 'projects')
         mca_tool_dir = os.path.join(env_dir, 'mca_workspace', 'tools')
+        demos_dir = os.path.join(env_dir, 'demos')
         self.yaml_data = self.parse_yaml_data(ctx.params['in_file'])
 
         if os.path.isdir(ic_pkg_dir):
@@ -70,6 +72,19 @@ class EnvironmentAdapter(click.Command):
                 click.echo("Adapting mca tools")
                 self.rosinstall = dict()
                 #TODO: compare parsed folder with yaml_data and adapt the ws accordingly
+
+        click.echo('Looking for demo scripts')
+        mkdir_p(demos_dir)
+        scripts = self.parse_demo_scripts()
+        for script in scripts:
+            click.echo('Found {} in config. Will be overwritten if file exists'
+                       .format(script))
+            script_path = os.path.join(demos_dir, script)
+            with open(script_path, mode='w') as f:
+                f.write(scripts[script])
+                f.close()
+            os.chmod(script_path, 00755)
+
 
     def adapt_rosinstall(self,
                          config_rosinstall,
@@ -216,6 +231,13 @@ class EnvironmentAdapter(click.Command):
                 ros_rosinstall = self.yaml_data["catkin_workspace"]["rosinstall"]
 
         return ros_rosinstall
+
+    def parse_demo_scripts(self):
+        script_list = dict()
+        if 'demos' in self.yaml_data:
+            for script in self.yaml_data['demos']:
+                script_list[script] = self.yaml_data['demos'][script]
+        return script_list
 
 
 class EnvironmentChooser(click.MultiCommand):
