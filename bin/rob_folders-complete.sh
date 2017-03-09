@@ -12,7 +12,8 @@ complete -F _rob_folders_completion -o default rob_folders;
 if [ -n "${BASH_VERSION+1}" ];
 then
     _ce_completion() {
-        _envs=$(ls ${ROB_FOLDERS_BASE_DIR}/checkout)
+        checkout_dir=$(rob_folders get_checkout_base_dir)
+        _envs=$(ls ${checkout_dir})
         local cur prev
         COMPREPLY=()
         cur="${COMP_WORDS[COMP_CWORD]}"
