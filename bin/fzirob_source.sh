@@ -42,12 +42,16 @@ add_fzi_project()
 # define some other useful aliases
 alias cs="fzirob source_most_recent_env"
 
+
+# TODO doc
 env_aliases()
 {
     alias kdevsession="kdevelop -s ${ROB_FOLDERS_ACTIVE_ENV}"
     alias qtcreatoric="fzirob cd ic && cd .. && qtcreator ."
 }
 
+
+# TODO doc (why this at all?)
 fzirob()
 {
     if [ $# -ge 1 ]; then
