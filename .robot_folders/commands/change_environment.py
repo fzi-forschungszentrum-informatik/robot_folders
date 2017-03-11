@@ -35,7 +35,9 @@ def cli(ctx):
     """Changes the global environment to the specified one. All environment-specific commands are then executed relative to that environment. \
        Only one environment can be active at a time."""
     if ctx.invoked_subcommand is None:
-        click.echo("No environment specified. Sourcing the most recent active environment: {}".format(get_last_activated_env()))
+        env_name = get_last_activated_env()
+        if env_name is not None:
+            click.echo("No environment specified. Sourcing the most recent active environment: {}".format(env_name))
     else:
         pass
     # print(env_name)
