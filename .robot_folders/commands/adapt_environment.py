@@ -168,8 +168,10 @@ class EnvironmentAdapter(click.Command):
                 process.wait()
                 #TODO: add further git commands and/or some fancy output, if necessary
 
+        config_name_list = [d['git']['local-name'] for d in config_rosinstall]
+
         for repo in self.rosinstall:
-            if self.rosinstall[repo] not in config_rosinstall:
+            if repo not in config_name_list:
                 click.echo("Package '{}' found locally, but not in config.".format(repo))
                 local_name = self.rosinstall[repo]["git"]["local-name"]
                 package_dir = os.path.join(packages_dir, local_name)
