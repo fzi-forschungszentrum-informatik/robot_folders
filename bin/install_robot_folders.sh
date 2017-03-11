@@ -8,17 +8,17 @@ SOURCE_CMD="source ${ROB_FOLDERS_BASE_DIR}/bin/fzirob_source.sh"
 
 function manual_setup_instructions
 {
-    echo "Simply add ${SOURCE_CMD} in your .bashrc or zshrc respectively"
+  echo "Simply add ${SOURCE_CMD} in your .bashrc or zshrc respectively"
 }
 
 shell_setup ()
 {
-    # if the command hasn't been added already
-    if ! grep -q "$SOURCE_CMD" $1;
-    then
-        echo "# robot_folders setup" >> $1
-        echo $SOURCE_CMD >> $1
-    fi
+  # if the command hasn't been added already
+  if ! grep -q "$SOURCE_CMD" $1;
+  then
+    echo "# robot_folders setup" >> $1
+    echo $SOURCE_CMD >> $1
+  fi
 }
 
 hook_symlinks ()
@@ -34,25 +34,25 @@ hook_symlinks ()
 
 function install
 {
-    echo "Creating virtual environment..."
-    pushd $ROB_FOLDERS_BASE_DIR/.robot_folders
-    virtualenv venv
-    . venv/bin/activate
-    pip install Click
-    pip install PyYaml
+  echo "Creating virtual environment..."
+  pushd $ROB_FOLDERS_BASE_DIR/.robot_folders
+  virtualenv venv
+  . venv/bin/activate
+  pip install Click
+  pip install PyYaml
 
-    echo "Installing robot_folders"
-    pip install --editable .
+  echo "Installing robot_folders"
+  pip install --editable .
 
-    if [ -e "userconfig.py" ]
-    then
-        echo "userconfig.py already exists. Not overwriting."
-        echo "If this is not your first install, but an update, you might want to check for config updates, though."
-    else
-        cp userconfig_distribute.py userconfig.py
-    fi
+  if [ -e "userconfig.py" ]
+  then
+    echo "userconfig.py already exists. Not overwriting."
+    echo "If this is not your first install, but an update, you might want to check for config updates, though."
+  else
+    cp userconfig_distribute.py userconfig.py
+  fi
 
-    popd
+  popd
 }
 
 
@@ -78,7 +78,7 @@ if [ "$1" != "-q"  ]; then
       echo "Added necessary parts to .zshrc."
     else
       echo "Could not determine your shell type. Please perform manual setup:"
-        manual_setup_instructions
+      manual_setup_instructions
     fi
   else
     echo "You chose manual setup."
