@@ -40,7 +40,8 @@ def cli(ctx):
        ctx.parent.invoked_subcommand == 'cd':
         if get_active_env() is None:
             click.echo("No active environment found. Using most recently "
-                       "activated environment '{}'"
-                       .format(get_last_activated_env()))
-        click.echo("cd {}".format(get_active_env_path()))
+                       "activated environment")
+        active_env_path = get_active_env_path()
+        if active_env_path is not None:
+            click.echo("cd {}".format(active_env_path))
     return

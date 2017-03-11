@@ -34,7 +34,9 @@ def get_active_env():
 def get_active_env_path():
     active_env = get_active_env()
     if active_env is None:
-        active_env = get_last_activated_env()
+        active_env_fallback = get_last_activated_env()
+        if active_env_fallback is None:
+            return None
     return os.path.join(get_checkout_dir(), active_env)
 
 
