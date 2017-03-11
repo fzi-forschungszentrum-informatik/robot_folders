@@ -34,6 +34,14 @@ def source_ic_workspace(env_name):
 
     subprocess.call("export", shell=True)
 
+def create_demo_docs(demo_dir):
+    doc_filename = os.path.join(demo_dir, 'readme.txt')
+    with open(doc_filename, 'w') as file:
+        docstring = '''This folder can contain any executable files. These files can be run
+with the fzirob run command. When scraping an environment to a config file
+all demo scripts will be copied into the environment config, as well.'''
+        file.write(docstring)
+
 
 def create_ic_ws(ic_directory,
                  build_directory,
@@ -169,7 +177,9 @@ def cli(env_name, config_file, no_build):
     # Set all necessary paths for the environments.
     click.echo("Creating environment with name \"{}\"".format(env_name))
     os.mkdir(os.path.join(get_checkout_dir(), env_name))
-    os.mkdir(os.path.join(get_checkout_dir(), env_name, 'demos'))
+    demos_dir = os.path.join(get_checkout_dir(), env_name, 'demos')
+    os.mkdir(demos_dir)
+    create_demo_docs(demos_dir)
     ic_directory = os.path.join(get_checkout_dir(), env_name, "ic_workspace")
     ic_build_directory = os.path.join(build_base_dir, env_name,  "ic_workspace", "build")
     catkin_directory = os.path.join(get_checkout_dir(), env_name, "catkin_workspace")
