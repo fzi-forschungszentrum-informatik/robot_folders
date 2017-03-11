@@ -39,10 +39,6 @@ add_fzi_project()
   fzirob add_environment $@
 }
 
-# define some other useful aliases
-alias cs="fzirob source_most_recent_env"
-
-
 # These aliases are created after an environment is changed into.
 # They are environment-specific but are created for all environments.
 # Note: This is not done in the source_envoronment.sh script as the source
@@ -75,7 +71,7 @@ fzirob()
           fi
       else
           rob_folders $@
-          if [ $1 = "change_environment" ] || [ $1 = "source_most_recent_env" ]; then
+          if [ $1 = "change_environment" ]; then
               checkout_dir=$(rob_folders get_checkout_base_dir)
               export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
               environment_dir="${checkout_dir}/${ROB_FOLDERS_ACTIVE_ENV}"
