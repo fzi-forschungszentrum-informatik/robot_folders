@@ -15,7 +15,7 @@ from helpers.directory_helpers import recursive_rmdir
 from helpers.repository_helpers import create_rosinstall_entry
 from helpers.directory_helpers import mkdir_p
 
-global_remove_flag = False
+local_delete_policy_saved = False
 
 
 class EnvironmentAdapter(click.Command):
@@ -175,13 +175,15 @@ class EnvironmentAdapter(click.Command):
                 click.echo("Package '{}' found locally, but not in config.".format(repo))
                 local_name = self.rosinstall[repo]["git"]["local-name"]
                 package_dir = os.path.join(packages_dir, local_name)
-                if global_remove_flag:
+                if local_delete_policy_saved == 'delete_all':
                     recursive_rmdir(package_dir)
                     click.echo("Deleted '{}'".format(repo))
-                elif click.confirm('Do you want to delete it?'):
-
-                    recursive_rmdir(package_dir)
-                    click.echo("Deleted '{}'".format(repo))
+                elif local_delete_policy_saved == 'ask':
+                    if click.confirm('Do you want to delete it?'):
+                        recursive_rmdir(package_dir)
+                        click.echo("Deleted '{}'".format(repo))
+                elif local_delete_policy_saved == 'keep_all':
+                    click.echo("Keeping repository as all should be kept")
 
     def parse_yaml_data(self, yaml_config):
         yaml_stream = file(yaml_config, "r")
@@ -264,21 +266,21 @@ class EnvironmentChooser(click.MultiCommand):
 @click.command(cls=EnvironmentChooser,
                short_help='Adapt an environment to a config file',
                invoke_without_command=True)
-@click.option("--remove_repositories",
-              is_flag=True,
-              default=False,
-              help=("Remove repositories not mentioned by the config file "
-                    "without confirmation. If not set, the user has to "
-                    "confirm each deletion."))
+@click.option("--local_delete_policy",
+              type=click.Choice(['delete_all', 'keep_all', 'ask']),
+              default='ask',
+              help=('Defines whether repositories existing local, but not '
+                    'in the config file should be kept, deleted or the '
+                    'user should be asked. Asking is the default behavior.'))
 @click.pass_context
-def cli(ctx, remove_repositories):
+def cli(ctx, local_delete_policy):
     """Adapts an environment to a config file.
        New repositories will be added, versions/branches will be changed and
        deleted repositories will/may be removed.
     """
     #TODO: pass this somehow to the invoked multicommand-object instead of a global variable
-    global global_remove_flag
-    global_remove_flag = remove_repositories
+    global local_delete_policy_saved
+    local_delete_policy_saved = local_delete_policy
 
     if ctx.invoked_subcommand is None:
         click.echo('No environment specified. Please choose one '
