@@ -1,7 +1,8 @@
 import click
 import os
+import userconfig
 
-from helpers.directory_helpers import get_last_activated_env, get_checkout_dir
+from helpers.directory_helpers import get_last_activated_env, get_checkout_dir, get_catkin_dir
 
 class EnvironmentChoice(click.Command):
     def invoke(self, ctx):
@@ -12,8 +13,7 @@ class EnvironmentChoice(click.Command):
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
         checkout_folder = get_checkout_dir()
-        # TODO possibly check whether the directory contains actual workspace
-        return [dir for dir in os.listdir(checkout_folder) if os.path.isdir(os.path.join(checkout_folder, dir))]
+        return [dir for dir in os.listdir(checkout_folder) if self.is_fzirob_environment(checkout_folder, dir)]
 
     def list_commands(self, ctx):
         return self.get_current_evironments()
@@ -28,6 +28,29 @@ class EnvironmentChooser(click.MultiCommand):
             click.echo('No environment with name < %s > found.' % name)
             return None
 
+    def is_fzirob_environment(self, checkout_folder, dir):
+        is_environment = False
+
+        environment_folders = ['ic_workspace', 'mca_workspace']
+        environment_folders = environment_folders + userconfig.directories.get('catkin_names', ["catkin_workspace"])
+        environment_files = ['setup.bash', 'setup.zsh', 'setup.sh']
+
+        possible_env = os.path.join(checkout_folder, dir)
+        if os.path.isdir(possible_env):
+            # check folders for exlistance
+            for folder in environment_folders:
+                if os.path.isdir(os.path.join(possible_env, folder)):
+                    is_environment = True
+                    break
+            # check if folder was already found
+            if not is_environment:
+                # check files for existances
+                for file in environment_files:
+                    if os.path.exists(os.path.join(possible_env, file)):
+                        is_environment = True
+                        break
+
+        return is_environment
 
 @click.command(cls=EnvironmentChooser, short_help='Source an existing environment', invoke_without_command=True)
 @click.pass_context
