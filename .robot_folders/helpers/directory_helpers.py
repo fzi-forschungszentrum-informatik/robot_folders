@@ -73,14 +73,13 @@ def get_checkout_dir():
 
 def get_catkin_dir():
     """Tries to find the right catkin workspace in the Currently \
-    sourced environment. Directory names are defined in the array below."""
-    catkin_names = ['catkin_ws', 'catkin_workspace']
+    sourced environment."""
 
     path_found = False
     path = ''
     cur_env_path = get_active_env_path()
 
-    for path_name in catkin_names:
+    for path_name in userconfig.directories.get('catkin_names', ["catkin_workspace"]):
         path = os.path.join(cur_env_path, path_name)
         if os.path.exists(path):
             return path

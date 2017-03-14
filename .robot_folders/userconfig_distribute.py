@@ -7,5 +7,6 @@ config = {
 
 directories = {
     # if left blank, the default robot_folders/checkout will be used
-    "checkout_dir": ""
+    "checkout_dir": "",
+    "catkin_names": ["catkin_workspace", "catkin_ws"]
 }
