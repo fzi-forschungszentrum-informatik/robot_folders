@@ -16,7 +16,7 @@ class WorkspaceChooser(click.MultiCommand):
             cmds.append('ic')
         if 'mca_workspace' in workspaces:
             cmds.append('mca')
-        if get_catkin_dir() not None:
+        if get_catkin_dir() is not None:
             cmds.append('ros')
 
         return cmds
