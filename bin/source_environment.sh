@@ -74,7 +74,17 @@ if [ -d $environment_dir ]; then
 
   # Run ROS initialization if available
   # We run the setup.sh in the catkin_ws folder. Afterwards we can run rosrun, roslaunch etc. with the files in it.
-  catkin_dir=$environment_dir/catkin_workspace
+  catkin_dir_long=$environment_dir/catkin_workspace
+  catkin_dir_short=$environment_dir/catkin_ws
+
+  # check if catkin_ws is used
+  if [ -d $catkin_dir_short ]
+  then
+    catkin_dir=$catkin_dir_short
+  else
+    catkin_dir=$catkin_dir_long
+  fi
+
   if [ -d $catkin_dir ]
   then
     if [ -f $catkin_dir/devel_isolated/setup.$shell_type ]

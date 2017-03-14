@@ -69,3 +69,20 @@ def get_checkout_dir():
         if not os.path.exists(checkout_config):
             mkdir_p(checkout_config)
         return checkout_config
+
+
+def get_catkin_dir():
+    """Tries to find the right catkin workspace in the Currently \
+    sourced environment. Directory names are defined in the array below."""
+    catkin_names = ['catkin_ws', 'catkin_workspace']
+
+    path_found = False
+    path = ''
+    cur_env_path = get_active_env_path()
+
+    for path_name in catkin_names:
+        path = os.path.join(cur_env_path, path_name)
+        if os.path.exists(path):
+            return path
+    print "No catkin workspace was found in the current environment"
+    return None

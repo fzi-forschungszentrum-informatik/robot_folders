@@ -3,7 +3,7 @@ import os
 import userconfig
 import subprocess
 
-from helpers.directory_helpers import get_active_env_path, mkdir_p
+from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir
 from helpers.which import which
 
 def get_cmake_flags():
@@ -136,7 +136,7 @@ class CatkinBuilder(Builder):
         return build_cmd
 
     def invoke(self, ctx):
-        catkin_dir = os.path.join(get_active_env_path(), 'catkin_workspace')
+        catkin_dir = get_catkin_dir()
         self.build_dir = os.path.join(catkin_dir, 'build')
         click.echo("Building catkin_workspace in {}".format(catkin_dir))
 

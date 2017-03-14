@@ -8,7 +8,7 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
-from helpers.directory_helpers import get_base_dir, get_checkout_dir
+from helpers.directory_helpers import get_base_dir, get_checkout_dir, get_catkin_dir
 from helpers.repository_helpers import create_rosinstall_entry
 
 
@@ -16,7 +16,8 @@ class EnvironmentScraper(click.Command):
     def invoke(self, ctx):
         env_dir = os.path.join(get_checkout_dir(), self.name)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
-        catkin_src_dir = os.path.join(env_dir, 'catkin_workspace', 'src')
+        catkin_dir = get_catkin_dir()
+        catkin_src_dir = os.path.join(catkin_dir, 'src')
         mca_library_dir = os.path.join(env_dir, 'mca_workspace', 'libraries')
         mca_project_dir = os.path.join(env_dir, 'mca_workspace', 'projects')
         mca_tool_dir = os.path.join(env_dir, 'mca_workspace', 'tools')

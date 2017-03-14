@@ -17,7 +17,7 @@ environment '{}'".format(get_last_activated_env()))
             if name == 'ic':
                 target_dir = os.path.join(target_dir, 'ic_workspace')
             elif name == 'ros':
-                target_dir = os.path.join(target_dir, 'catkin_workspace')
+                target_dir = get_catkin_dir()
             elif name == 'mca':
                 target_dir = os.path.join(target_dir, 'mca_workspace')
         else:

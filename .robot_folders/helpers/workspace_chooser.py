@@ -16,7 +16,7 @@ class WorkspaceChooser(click.MultiCommand):
             cmds.append('ic')
         if 'mca_workspace' in workspaces:
             cmds.append('mca')
-        if 'catkin_workspace' in workspaces:
+        if 'catkin_workspace' in workspaces or 'catkin_ws' in workspaces:
             cmds.append('ros')
 
         return cmds
