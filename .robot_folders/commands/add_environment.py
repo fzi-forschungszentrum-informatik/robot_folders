@@ -183,8 +183,8 @@ def cli(env_name, config_file, no_build):
     create_demo_docs(demos_dir)
     ic_directory = os.path.join(get_checkout_dir(), env_name, "ic_workspace")
     ic_build_directory = os.path.join(build_base_dir, env_name,  "ic_workspace", "build")
-    catkin_directory = get_catkin_dir()
-    catkin_build_directory = os.path.join(catkin_directory, "build")
+    catkin_directory = os.path.join(get_checkout_dir(), env_name, "catkin_workspace")
+    catkin_build_directory = os.path.join(build_base_dir, env_name, "catkin_workspace", "build")
     mca_directory = os.path.join(get_checkout_dir(), env_name, "mca_workspace")
     mca_build_directory = os.path.join(build_base_dir, env_name, "mca_workspace", "build")
 
