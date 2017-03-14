@@ -84,5 +84,5 @@ def get_catkin_dir():
         path = os.path.join(cur_env_path, path_name)
         if os.path.exists(path):
             return path
-    print "No catkin workspace was found in the current environment"
+    # print "No catkin workspace was found in the current environment"
     return None
