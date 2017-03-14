@@ -12,9 +12,9 @@ except ImportError:
 from helpers.directory_helpers import get_base_dir
 from helpers.directory_helpers import get_checkout_dir
 from helpers.directory_helpers import recursive_rmdir
-from helpers.repository_helpers import create_rosinstall_entry
 from helpers.directory_helpers import mkdir_p
 from helpers.directory_helpers import get_catkin_dir
+from helpers.repository_helpers import create_rosinstall_entry
 
 local_delete_policy_saved = False
 
