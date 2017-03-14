@@ -1,6 +1,6 @@
 import click
 import os
-from helpers.directory_helpers import get_base_dir, get_active_env_path
+from helpers.directory_helpers import get_base_dir, get_active_env_path, get_catkin_dir
 class WorkspaceChooser(click.MultiCommand):
     def get_workspaces(self):
         checkout_folder = os.path.join(get_base_dir(), 'checkout')
@@ -16,7 +16,7 @@ class WorkspaceChooser(click.MultiCommand):
             cmds.append('ic')
         if 'mca_workspace' in workspaces:
             cmds.append('mca')
-        if 'catkin_workspace' in workspaces or 'catkin_ws' in workspaces:
+        if get_catkin_dir() not None:
             cmds.append('ros')
 
         return cmds
