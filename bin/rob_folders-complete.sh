@@ -13,7 +13,8 @@ if [ -n "${BASH_VERSION+1}" ];
 then
   _ce_completion() {
     checkout_dir=$(rob_folders get_checkout_base_dir)
-    _envs=$(ls ${checkout_dir})
+    #_envs=$(ls ${checkout_dir})
+    _envs=$(ce --help | sed -e '1,/Commands:/d' )
     local cur prev
     COMPREPLY=()
     cur="${COMP_WORDS[COMP_CWORD]}"

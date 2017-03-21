@@ -71,7 +71,7 @@ fzirob()
       fi
     else
       rob_folders $@
-      if [ $1 = "change_environment" ]; then
+      if [ $1 = "change_environment" ] && [ "$2" != "--help"  ]; then
         checkout_dir=$(rob_folders get_checkout_base_dir)
         if [ -f ${checkout_dir}/.cur_env ]; then
           export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
