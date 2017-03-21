@@ -1,57 +1,31 @@
-Basic structure for creating a home directory on a robot. Supports handling different workspaces for different kinds of purposes/demos/projects.
+This directory contains a robot_folders workspace. robot_folders helps you
+keeping track of different environment setups including multiple workspaces
+such as ic_workspace, catkin_workspace and mca_workspace.
 
+For initial setup, please call
 
-The git repository consists of three folders:
+  bin/install_robot_folders.sh
 
- bin       # Some useful scripts
- checkout  # The base dir for checking out different workspaces
- demos     # Folder for storing demo scripts
+and follow the instructions on the screen. If you don't know whether you should
+select 'bash' or 'zsh', you might want to select 'bash'
 
+After installation open up a new terminal to use robot_folders. The main command
+for using robot_folders is 'fzirob'. Type
 
+  fzirob --help
 
-Optional: On robot systems if you want to have bin, checkout and demos in your
-home folder run the following in repos base folder. You can also do this on
-a private existing home folder but we recommend to keep it in a subfolder then.
+to get an overview over all available commands.
 
- #move the git file to your home folder 
- cp -r .git ~        
- #go to your home folder
- cd ~
- #checkout the repository again into your home folder
- git checkout .
- #delete the robot_folder.
- rm -rf robot_folders
+If you used the old bash-based robot folders before, you might be happy to know
+that many of the old aliases exist here, as well. To see a list of available
+aliases you can have a look at bin/fzirob_source.sh
 
-This will checkout this repository directly in your home folder. If there are no
-conflicts with existing folders this should work out of the box.
+If you want to source additional files or want to run other various commands when
+sourcing an environment, you can add the necessary commands to the
+source_local.sh in that enviroment's folder.
 
+NOTE: Unlike the old bash-based robot folders, LC_ALL is not set to C per default
+anymore. If you want to keep this behaviour, use source_local.sh to set LC_ALL=C.
 
-
-Now you should add some useful aliases and environment variables to your ~/.bashrc:
-
- # Prepare robot_folders
- if [ -f ~/robot_folders/bin/prepare_robot_folders.bash ]; then
-    . ~/robot_folders/bin/prepare_robot_folders.bash
- fi
-
-or if you chose to have everything in your home folder:
-
- # Prepare robot_folders
- if [ -f ~/bin/prepare_robot_folders.bash ]; then
-    . ~/bin/prepare_robot_folders.bash
- fi
-
-
-
-If you have put this into ~/.bashrc you can open a new terminal and create your first project:
-
- add_fzi_project main
-
-
-
-At the end of the script you will get useful instructions about the next steps.
-If you haven't worked with an ic_workspace or catkin_ws before
-you should first read the tutorials in the wiki:
-
-http://idswiki.fzi.de/wiki/index.php/Dokumentation/Tutorials/IcWorkspace
-http://idswiki.fzi.de/wiki/index.php/Dokumentation/Tutorials/Icl_ROS
+By default make will be used to build your workspaces. You can change your
+default build system and other settings in .robot_folders/userconfig.py

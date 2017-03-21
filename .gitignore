@@ -1,2 +1,6 @@
 *~
-.*
+.robot_folders/venv
+.robot_folders/userconfig.py
+checkout
+*.pyc
+robot_folders.egg-info
