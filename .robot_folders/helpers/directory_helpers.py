@@ -37,8 +37,8 @@ def get_active_env_path():
         active_env_fallback = get_last_activated_env()
         if active_env_fallback is None:
             return None
+        active_env = active_env_fallback
     return os.path.join(get_checkout_dir(), active_env)
-
 
 def mkdir_p(path):
     """Checks whether a directory exists, otherwise it will be created."""
