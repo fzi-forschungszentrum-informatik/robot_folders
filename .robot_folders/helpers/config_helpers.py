@@ -4,18 +4,20 @@ import yaml
 import imp
 
 
+# We need to define this here, as we need the base dir a lot.
 def get_base_dir():
     base_dir = os.environ['ROB_FOLDERS_BASE_DIR']
     return os.path.realpath(base_dir)
 
 
-# Migrate from old python config system to yaml
+# Migrate a config entry from old python config system to yaml
 def migrate_entry(section, value, section_module, yaml_dump):
     if value in section_module:
         yaml_dump[section][value] = section_module[value]
         print('  {}.{}: {}'.format(section, value, section_module[value]))
 
 
+# Migration of old python module config to yaml config stucture
 def migrate_userconfig(old_location, new_location):
     legacy_config = imp.load_source('*', old_location)
     build_config = legacy_config.config
@@ -81,6 +83,8 @@ except IOError, exc:
     shutil.copy(filename_distribute, filename_userconfig)
 
 
+# This is the internal yaml query. It can be used for the modified
+# or the distribution config
 def _get_value_safe(dictionary, section, value, debug=True):
     result = None
     try:
@@ -95,7 +99,25 @@ def _get_value_safe(dictionary, section, value, debug=True):
     return result
 
 
+# Interface funtion to the outside. You might want to consider the
 def get_value_safe(section, value, debug=True):
+    '''Retrieve an entry from the config backend.
+
+    Will try to find the given entry in the config. If it is not
+    found in the user-modified config, the default value from the
+    distributed config will be used.
+    If it is not found at all, a None object will be returned.
+
+    - **parameters**, **types**, **return** and **return types**::
+        :param section: The top level key for the searched entry
+        :param value: The second level key for the searched entry
+        :param debug: Print debug output when searching for the entry (default True)
+        :type section: string
+        :type value: string
+        :type debug: bool
+        :returns: config entry
+        :rtype: mixed
+    '''
     result = _get_value_safe(config, section, value, debug=False)
     if result is None:
         result = _get_value_safe(config_fallback, section, value, debug)
@@ -103,6 +125,25 @@ def get_value_safe(section, value, debug=True):
 
 
 def get_value_safe_default(section, value, default, debug=True):
+    '''Retrieve an entry from the config backend or use default value.
+
+    Will try to find the given entry in the config. If it is not
+    found in the user-modified config, the default value from the
+    distributed config will be used.
+    If it is not found at all, the default value will be returned.
+
+    - **parameters**, **types**, **return** and **return types**::
+        :param section: The top level key for the searched entry
+        :param value: The second level key for the searched entry
+        :param default: The default entry if not found
+        :param debug: Print debug output when searching for the entry (default True)
+        :type section: string
+        :type value: string
+        :type default: mixed, the same as return type
+        :type debug: bool
+        :returns: config entry
+        :rtype: mixed
+    '''
     result = get_value_safe(section, value, debug)
     if result is None:
         result = default
