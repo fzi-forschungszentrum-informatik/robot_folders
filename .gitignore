@@ -1,6 +1,6 @@
 *~
 .robot_folders/venv
-.robot_folders/userconfig.py
+config/userconfig.yaml
 checkout
 *.pyc
 robot_folders.egg-info
