@@ -1,18 +1,36 @@
+# Robot Folders
 This directory contains a robot_folders workspace. robot_folders helps you
 keeping track of different environment setups including multiple workspaces
 such as ic_workspace, catkin_workspace and mca_workspace.
 
-For initial setup, please call
+## Installation
+### Required packages
+To use robot_folders you must have the following requirements installed:
+ * python-pip 
+ * python-virtualenv 
+ * python-wstool
 
-  bin/install_robot_folders.sh
+To install them on a ubuntu system just call
+```bash
+sudo apt-get install python-pip python-virtualenv python-wstool
+```
+
+### Initial setup
+For initial setup, please call
+```bash
+bin/install_robot_folders.sh
+```
 
 and follow the instructions on the screen. If you don't know whether you should
 select 'bash' or 'zsh', you might want to select 'bash'
 
+
+## Basic usage
 After installation open up a new terminal to use robot_folders. The main command
 for using robot_folders is 'fzirob'. Type
-
-  fzirob --help
+```bash
+fzirob --help
+```
 
 to get an overview over all available commands.
 
@@ -29,3 +47,4 @@ anymore. If you want to keep this behaviour, use source_local.sh to set LC_ALL=C
 
 By default make will be used to build your workspaces. You can change your
 default build system and other settings in .robot_folders/userconfig.py
+
