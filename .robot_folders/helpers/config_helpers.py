@@ -23,7 +23,7 @@ except IOError, exc:
 # Load the user-modified config file
 filename_userconfig = os.path.join(get_base_dir(),
                                    'config',
-                                   'userconfigs.yaml')
+                                   'userconfig.yaml')
 config = None
 try:
     config = yaml.load(file(filename_userconfig, 'r'))
