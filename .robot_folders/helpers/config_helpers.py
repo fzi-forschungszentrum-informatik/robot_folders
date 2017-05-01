@@ -13,7 +13,7 @@ def get_base_dir():
 def migrate_entry(section, value, section_module, yaml_dump):
     if value in section_module:
         yaml_dump[section][value] = section_module[value]
-        print('{}.{}: {}'.format(section, value, section_module[value]))
+        print('  {}.{}: {}'.format(section, value, section_module[value]))
 
 
 def migrate_userconfig(old_location, new_location):
@@ -61,14 +61,14 @@ location_old = os.path.join(get_base_dir(),
                             '.robot_folders',
                             'userconfig.py')
 if os.path.isfile(location_old):
-    print('!!!!! MIGRATION WARNING !!!!!')
+    print('\n\n!!!!! MIGRATION WARNING !!!!!')
     print('The config file format and location have changed.')
     print('The old config file at {} is deprecated and will be renamed.'
           .format(location_old))
     print('The new config file is located at {}.'
           .format(filename_userconfig))
     migrate_userconfig(location_old, filename_userconfig)
-    print('!!!!! MIGRATION DONE !!!!!')
+    print('!!!!! MIGRATION DONE !!!!!\n\n')
 
 config = None
 try:
@@ -76,7 +76,7 @@ try:
 except yaml.YAMLError, exc:
     print "Error in configuration file:", exc
 except IOError, exc:
-    print 'Did not find userconfig file. Copying the distribution file'
+    print 'Did not find userconfig file. Copying the distribution file.'
     config = yaml.load(file(filename_distribute, 'r'))
     shutil.copy(filename_distribute, filename_userconfig)
 
