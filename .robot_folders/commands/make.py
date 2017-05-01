@@ -6,6 +6,11 @@ from helpers.directory_helpers import get_active_env
 
 class BuildChooser(WorkspaceChooser):
     def get_command(self, ctx, name):
+        if get_active_env() is None:
+            # click.echo("Currently, there is no sourced environment. "
+            #            "Please source one before calling the make function.")
+            return self
+
         if name in self.list_commands(ctx):
             if name == 'ic':
                 return build.IcBuilder(name=name, add_help_option=False)
@@ -28,7 +33,6 @@ def cli(ctx):
 the workspaces by adding the respective arg. Use tab completion to see which \
 workspaces are present.
     """
-
     if get_active_env() == None:
         click.echo("Currently, there is no sourced environment. Please source one \
 before calling the make function.")
