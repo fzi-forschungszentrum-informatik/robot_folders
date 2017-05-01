@@ -1,6 +1,6 @@
 import os
 import errno
-import userconfig
+import config_helpers
 
 
 def get_base_dir():
@@ -62,8 +62,10 @@ def recursive_rmdir(path):
 
 
 def get_checkout_dir():
-    checkout_config = userconfig.directories.get('checkout_dir', '')
-    if checkout_config == '':
+    checkout_config = config_helpers.get_value_safe('directories',
+                                                    'checkout_dir',
+                                                    debug=False)
+    if checkout_config == '' or checkout_config is None:
         return os.path.join(get_base_dir(), 'checkout')
     else:
         if not os.path.exists(checkout_config):
@@ -79,7 +81,9 @@ def get_catkin_dir():
     path = ''
     cur_env_path = get_active_env_path()
 
-    for path_name in userconfig.directories.get('catkin_names', ["catkin_workspace"]):
+    valid_names = config_helpers.get_value_safe_default(
+        'directories', 'catkin_names', ["catkin_workspace"], debug=False)
+    for path_name in valid_names:
         path = os.path.join(cur_env_path, path_name)
         if os.path.exists(path):
             return path
