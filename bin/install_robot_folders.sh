@@ -43,15 +43,6 @@ function install
 
   echo "Installing robot_folders"
   pip install --editable .
-
-  if [ -e "userconfig.py" ]
-  then
-    echo "userconfig.py already exists. Not overwriting."
-    echo "If this is not your first install, but an update, you might want to check for config updates, though."
-  else
-    cp userconfig_distribute.py userconfig.py
-  fi
-
   popd
 }
 

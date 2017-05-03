@@ -1,6 +1,6 @@
 import click
 import os
-import userconfig
+from helpers import config_helpers
 
 from helpers.directory_helpers import get_last_activated_env, get_checkout_dir, get_catkin_dir
 
@@ -32,7 +32,11 @@ class EnvironmentChooser(click.MultiCommand):
         is_environment = False
 
         environment_folders = ['ic_workspace', 'mca_workspace']
-        environment_folders = environment_folders + userconfig.directories.get('catkin_names', ["catkin_workspace"])
+        environment_folders = environment_folders + \
+                              config_helpers.get_value_safe_default(
+                                  section='directories',
+                                  value='catkin_names',
+                                  default=["catkin_workspace"])
         environment_files = ['setup.bash', 'setup.zsh', 'setup.sh']
 
         possible_env = os.path.join(checkout_folder, dir)

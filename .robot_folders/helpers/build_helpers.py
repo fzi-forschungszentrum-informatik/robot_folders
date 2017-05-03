@@ -1,14 +1,17 @@
 import click
 import os
-import userconfig
 import subprocess
 
 from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir
 from helpers.which import which
+from helpers import config_helpers
 
 def get_cmake_flags():
     """Reads the configuration for default cmake flags"""
-    generator = userconfig.config.get('generator', 'make')
+    generator = config_helpers.get_value_safe_default(
+        section='build',
+        value='generator',
+        default='make')
 
     cmake_flags = ''
 
@@ -41,7 +44,10 @@ class Builder(click.Command):
                     # remove any trailing chars like newlines
                     build_cmd = line[start+len(search_str):].rstrip()
         else:
-            build_cmd = userconfig.config.get('generator', 'make')
+            build_cmd = config_helpers.get_value_safe_default(
+                section='build',
+                value='generator',
+                default='make')
 
         if which(build_cmd) is None:
             click.echo("WARNING: Generator '{}' was requested. However, "
@@ -52,7 +58,10 @@ class Builder(click.Command):
 
         if 'make' in build_cmd:
             if not '-j' in build_cmd:
-                num_threads = userconfig.config.get('make_threads', 2)
+                num_threads = config_helpers.get_value_safe_default(
+                    section='build',
+                    value='make_threads',
+                    default=2)
                 build_cmd = " ".join([build_cmd, '-j', str(num_threads)])
 
         if self.should_install():
@@ -74,8 +83,11 @@ class Builder(click.Command):
 
     def should_install(self):
         """ Checks if the build command should be run with the install option."""
-        return eval(userconfig.config.get(self.get_install_key(),
-                                          str(self.get_install_default())))
+        foobar = config_helpers.get_value_safe_default(
+            section='build',
+            value=self.get_install_key(),
+            default=str(self.get_install_default()))
+        return foobar
 
     def get_install_key(self):
         """ Returns the userconfig key for the install command of this builder."""
@@ -119,7 +131,10 @@ class CatkinBuilder(Builder):
                     if "ninja" in line:
                         build_cmd="catkin_make --use-ninja"
         else:
-            generator = userconfig.config.get('generator', 'make')
+            generator = config_helpers.get_value_safe_default(
+                section='build',
+                value='generator',
+                default='make')
             if generator == "ninja":
                 build_cmd="catkin_make --use-ninja"
 
