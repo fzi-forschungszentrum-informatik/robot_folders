@@ -16,7 +16,7 @@ class EnvironmentScraper(click.Command):
     def invoke(self, ctx):
         env_dir = os.path.join(get_checkout_dir(), self.name)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
-        catkin_dir = get_catkin_dir()
+        catkin_dir = get_catkin_dir(env_dir)
         catkin_src_dir = os.path.join(catkin_dir, 'src')
         mca_library_dir = os.path.join(env_dir, 'mca_workspace', 'libraries')
         mca_project_dir = os.path.join(env_dir, 'mca_workspace', 'projects')

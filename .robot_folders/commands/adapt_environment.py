@@ -24,7 +24,7 @@ class EnvironmentAdapter(click.Command):
         env_dir = os.path.join(get_checkout_dir(), self.name)
         ic_dir = os.path.join(env_dir, "ic_workspace")
         mca_dir = os.path.join(env_dir, "mca_workspace")
-        catkin_dir = get_catkin_dir()
+        catkin_dir = get_catkin_dir(env_dir)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
         catkin_src_dir = os.path.join(catkin_dir, 'src')
         mca_library_dir = os.path.join(env_dir, 'mca_workspace', 'libraries')

@@ -73,13 +73,15 @@ def get_checkout_dir():
         return checkout_config
 
 
-def get_catkin_dir():
+def get_catkin_dir(env_dir=''):
     """Tries to find the right catkin workspace in the Currently \
     sourced environment."""
 
     path_found = False
     path = ''
-    cur_env_path = get_active_env_path()
+    cur_env_path = env_dir
+    if env_dir == '':
+        cur_env_path = get_active_env_path()
 
     valid_names = config_helpers.get_value_safe_default(
         'directories', 'catkin_names', ["catkin_workspace"], debug=False)
