@@ -41,14 +41,14 @@ class EnvironmentChooser(click.MultiCommand):
 
         possible_env = os.path.join(checkout_folder, dir)
         if os.path.isdir(possible_env):
-            # check folders for exlistance
+            # check folders for existence
             for folder in environment_folders:
                 if os.path.isdir(os.path.join(possible_env, folder)):
                     is_environment = True
                     break
             # check if folder was already found
             if not is_environment:
-                # check files for existances
+                # check files for existences
                 for file in environment_files:
                     if os.path.exists(os.path.join(possible_env, file)):
                         is_environment = True
