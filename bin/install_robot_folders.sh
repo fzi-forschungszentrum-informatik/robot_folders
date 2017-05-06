@@ -26,7 +26,7 @@ hook_symlinks ()
   echo "Creating hook symlinks"
   pushd $ROB_FOLDERS_BASE_DIR
   for file in $(ls git_hooks); do
-    echo "ln -s -f git_hooks/$file .git/hooks/$file" 
+    echo "ln -s -f git_hooks/$file .git/hooks/$file"
     ln -s -f git_hooks/$file .git/hooks/$file
   done
   popd
