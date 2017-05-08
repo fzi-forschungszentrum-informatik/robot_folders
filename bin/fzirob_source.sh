@@ -41,7 +41,7 @@ add_fzi_project()
 
 # These aliases are created after an environment is changed into.
 # They are environment-specific but are created for all environments.
-# Note: This is not done in the source_envoronment.sh script as the source
+# Note: This is not done in the source_environment.sh script as the source
 # script might be overwritten by the user and then suddenly these aliases
 # won't be there anymore. We decided to keep all alias definitions inside
 # this file.
