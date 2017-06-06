@@ -36,7 +36,7 @@ function install
 {
   echo "Creating virtual environment..."
   pushd $ROB_FOLDERS_BASE_DIR/.robot_folders
-  virtualenv venv
+  virtualenv -p python2.7 venv
   . venv/bin/activate
   pip install Click
   pip install PyYaml
