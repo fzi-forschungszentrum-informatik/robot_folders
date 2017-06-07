@@ -88,3 +88,10 @@ anymore. If you want to keep this behaviour, use source_local.sh to set LC_ALL=C
 By default make will be used to build your workspaces. You can change your
 default build system and other settings in .robot_folders/userconfig.py
 
+ATTENTION: The files setup.bash, setup.sh, setup.zsh from the old bash-based robot folders may 
+shadow the new change_environment function of the python based robot folders. This can cause various problems, 
+since the folder ~/.cmake/packages does not get removed on every change_environment command and the builds of 
+two environments may be messed up and corrupted. When you switch to the new robot folders, please check for setup.* files 
+and delete them if want to rely on the standard python robot folders.
+
+
