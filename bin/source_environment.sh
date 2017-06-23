@@ -125,7 +125,10 @@ if [ -d $environment_dir ]; then
   fi
 
   # source local source file
-  if [ -f $environment_dir/source_local.sh ];
+  if [ -f $environment_dir/setup_local.sh ];
+  then
+    source $environment_dir/setup_local.sh
+  elif [ -f $environment_dir/source_local.sh ];  # for backward compatibility
   then
     source $environment_dir/source_local.sh
   fi
