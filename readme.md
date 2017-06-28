@@ -80,7 +80,7 @@ aliases you can have a look at bin/fzirob_source.sh
 
 If you want to source additional files or want to run other various commands when
 sourcing an environment, you can add the necessary commands to the
-source_local.sh in that enviroment's folder.
+setup_local.sh in that enviroment's folder.
 
 NOTE: Unlike the old bash-based robot folders, LC_ALL is not set to C per default
 anymore. If you want to keep this behaviour, use source_local.sh to set LC_ALL=C.

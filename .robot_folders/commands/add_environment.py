@@ -262,7 +262,7 @@ def cli(env_name, config_file, no_build):
                                          default=True)
 
     # Add a custom source file to the environment. Custom source commands go in here.
-    env_source_file = open(os.path.join(get_checkout_dir(), env_name, "source_local.sh"), 'w')
+    env_source_file = open(os.path.join(get_checkout_dir(), env_name, "setup_local.sh"), 'w')
     env_source_file.write("#This file is for custom source commands in this environment.\n")
     env_source_file.close()
 
