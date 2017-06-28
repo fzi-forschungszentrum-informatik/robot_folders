@@ -134,7 +134,7 @@ def create_ic_ws(ic_directory,
 @click.argument('env_name', nargs=1)
 #@click.option('-m', '--mca2_workspace', default=False, help='Create an mac2_workspace.')
 def cli(env_name, config_file, no_build):
-    """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_workspace."""
+    """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_ws."""
 
     base_dir = get_base_dir()
     build_base_dir = get_checkout_dir()
@@ -183,8 +183,8 @@ def cli(env_name, config_file, no_build):
     create_demo_docs(demos_dir)
     ic_directory = os.path.join(get_checkout_dir(), env_name, "ic_workspace")
     ic_build_directory = os.path.join(build_base_dir, env_name,  "ic_workspace", "build")
-    catkin_directory = os.path.join(get_checkout_dir(), env_name, "catkin_workspace")
-    catkin_build_directory = os.path.join(build_base_dir, env_name, "catkin_workspace", "build")
+    catkin_directory = os.path.join(get_checkout_dir(), env_name, "catkin_ws")
+    catkin_build_directory = os.path.join(build_base_dir, env_name, "catkin_ws", "build")
     mca_directory = os.path.join(get_checkout_dir(), env_name, "mca_workspace")
     mca_build_directory = os.path.join(build_base_dir, env_name, "mca_workspace", "build")
 
@@ -242,10 +242,10 @@ def cli(env_name, config_file, no_build):
 
     else:
         create_ic = click.confirm("Would you like to create an ic_workspace?", default=True)
-        create_catkin = click.confirm("Would you like to create a catkin_workspace?", default=True)
+        create_catkin = click.confirm("Would you like to create a catkin_ws?", default=True)
         create_mca = click.confirm("Would you like to create an mca_workspace?", default=True)
 
-    # If we create a catkin_workspace query some more stuff at the beginning of the script.
+    # If we create a catkin_ws query some more stuff at the beginning of the script.
     if create_catkin:
         installed_ros_distros = os.listdir("/opt/ros")
         click.echo("Available ROS distributions: {}".format(installed_ros_distros))
@@ -284,7 +284,7 @@ def cli(env_name, config_file, no_build):
 
     # Check if we should create a catkin workspace and create one if desired
     if create_catkin:
-        click.echo("Creating catkin_workspace")
+        click.echo("Creating catkin_ws")
 
         # Create directories and symlinks, if necessary
         os.mkdir(catkin_directory)
@@ -336,7 +336,7 @@ def cli(env_name, config_file, no_build):
                 click.echo(e.output)
                 click.echo("An error occurred while copying the CMakeLists.txt to the catkin source directory")
     else:
-        click.echo("Requested to not create a catkin_workspace")
+        click.echo("Requested to not create a catkin_ws")
 
     # Check if we should create an mca workspace and create one if desired
     if create_mca:
