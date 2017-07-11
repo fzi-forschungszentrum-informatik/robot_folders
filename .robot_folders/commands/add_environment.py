@@ -131,11 +131,20 @@ def create_ic_ws(ic_directory,
 @click.option('--config_file', help='Create an environment from a given config file.')
 @click.option('--no_build', is_flag=True, default=False,
               help='Do not perform an initial build.')
+@click.option('--create_ic', is_flag=True, default=False, help='if given, an ic-workspace is created without asking for it again.')
+@click.option('--create_catkin', is_flag=True, default=False, help='if given, a catkin workspace is created without asking for it again.')
+@click.option('--create_mca', is_flag=True, default=False, help='if given, a mca workspace is created without asking for it again.')
+@click.option('--copy_cmake_lists', is_flag=True, default=True, help='if given, the toplevel CMakeLists files of the catkin workspace is copied to the src folder of the catkin ws without asking for it again.')
+@click.option('--local_build', is_flag=True, default=True, help='if true, the local build options is set and the build is executed in the folder ic_workspace/build.')
+@click.option('--non_interactive', is_flag=True, default=False, help='if true, the fzirob script will query for all options instead of accepting command line options.')
 @click.argument('env_name', nargs=1)
 #@click.option('-m', '--mca2_workspace', default=False, help='Create an mac2_workspace.')
-def cli(env_name, config_file, no_build):
+def cli(env_name, config_file, no_build, create_ic, create_catkin, create_mca, copy_cmake_lists, local_build, non_interactive):
     """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_ws."""
 
+
+    print(non_interactive)
+    print(create_ic)
     base_dir = get_base_dir()
     build_base_dir = get_checkout_dir()
     ic_packages = "base"
@@ -150,10 +159,7 @@ def cli(env_name, config_file, no_build):
     mca_additional_repos = ""
 
     os.environ['ROB_FOLDERS_ACTIVE_ENV'] = env_name
-
-    create_ic = False
-    create_catkin = False
-    create_mca = False
+    
 
     # If we are on a workstation or when no_backup is mounted like on a workstation offer to build in no_backup
     has_nobackup = False
@@ -164,7 +170,9 @@ def cli(env_name, config_file, no_build):
         pass
 
     if has_nobackup:
-        build_dir_choice = click.prompt("Which folder should I use as a base for creating the build tree?\nType 'local' for building inside the local robot_folders tree.\nType 'no_backup' (or simply press enter) for building in the no_backup space (should be used on workstations).\n",
+        build_dir_choice = "local"
+        if not non_interactive:
+            build_dir_choice = click.prompt("Which folder should I use as a base for creating the build tree?\nType 'local' for building inside the local robot_folders tree.\nType 'no_backup' (or simply press enter) for building in the no_backup space (should be used on workstations).\n",
                                         type=click.Choice(['no_backup', 'local']),
                                         default='no_backup')
         if build_dir_choice == 'no_backup':
@@ -240,7 +248,7 @@ def cli(env_name, config_file, no_build):
                         f.close()
                     os.chmod(filename, 00755)
 
-    else:
+    elif not non_interactive:
         create_ic = click.confirm("Would you like to create an ic_workspace?", default=True)
         create_catkin = click.confirm("Would you like to create a catkin_ws?", default=True)
         create_mca = click.confirm("Would you like to create an mca_workspace?", default=True)
@@ -256,7 +264,10 @@ def cli(env_name, config_file, no_build):
                                       default=installed_ros_distros[0])
         click.echo("Using ROS distribution \'{}\'".format(ros_distro))
         ros_global_dir = "/opt/ros/{}".format(ros_distro)
-        copy_cmake_lists = click.confirm(("Would you like to copy the top-level CMakeLists.txt to the catkin"
+        
+        
+        if not non_interactive:
+            copy_cmake_lists = click.confirm(("Would you like to copy the top-level CMakeLists.txt to the catkin"
                                          " src directory instead of using a symlink?\n"
                                          "(This is incredibly useful when using the QtCreator.)"),
                                          default=True)
@@ -271,7 +282,6 @@ def cli(env_name, config_file, no_build):
 
 
     # Now, we're done asking the user. Let's get to work
-
     if create_ic:
         create_ic_ws(ic_directory=ic_directory,
                      build_directory=ic_build_directory,
