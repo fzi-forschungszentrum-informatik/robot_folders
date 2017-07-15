@@ -1,6 +1,7 @@
 import click
 import os
 import shutil
+import getpass
 
 import helpers.directory_helpers as directory_helpers
 
@@ -47,6 +48,11 @@ class EnvironmentDeleter(click.Command):
             click.echo('No mca-Workspace found')
 
         delete_list.append(env_dir)
+
+        # no_backup build base
+        username = getpass.getuser()
+        build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
+        self.appendToListIfFolder(os.path.join(build_base_dir, self.name), delete_list)
 
         click.echo('Going to delete the following paths:\n{}'.format('\n'.join(delete_list)))
 
