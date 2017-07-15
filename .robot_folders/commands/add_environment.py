@@ -161,7 +161,6 @@ def cli(env_name, config_file, no_build, create_ic, create_catkin, create_mca, c
     mca_additional_repos = ""
 
     os.environ['ROB_FOLDERS_ACTIVE_ENV'] = env_name
-    
 
     # If we are on a workstation or when no_backup is mounted like on a workstation offer to build in no_backup
     has_nobackup = False
@@ -280,7 +279,6 @@ def cli(env_name, config_file, no_build, create_ic, create_catkin, create_mca, c
                                       default=installed_ros_distros[0])
         click.echo("Using ROS distribution \'{}\'".format(ros_distro))
         ros_global_dir = "/opt/ros/{}".format(ros_distro)
-
 
         if copy_cmake_lists == 'ask':
             copy_cmake_lists = click.confirm(("Would you like to copy the top-level CMakeLists.txt to the catkin"
