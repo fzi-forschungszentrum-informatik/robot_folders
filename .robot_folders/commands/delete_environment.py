@@ -1,5 +1,6 @@
 import click
 import os
+import shutil
 
 import helpers.directory_helpers as directory_helpers
 
@@ -60,7 +61,7 @@ class EnvironmentDeleter(click.Command):
             click.echo('performing deletion!')
             for folder in delete_list:
                 click.echo('Deleting {}'.format(folder))
-                # TODO: Actually remove non-empty directory
+                self.deleteFolder(folder)
         else:
             click.echo('Delete request aborted. Nothing happened.')
 
@@ -82,6 +83,15 @@ class EnvironmentDeleter(click.Command):
         if os.path.exists(os.path.realpath(path)):
             if os.path.isdir(path):
                 delete_list.append(os.path.realpath(path))
+                return True
+        return False
+
+    def deleteFolder(self, path):
+        """Deletes the given path, if it exists and is a folder.
+        Returns true, if folder exists and was successfully delete."""
+        if os.path.exists(path):
+            if os.path.isdir(path):
+                shutil.rmtree(path)
                 return True
         return False
 
