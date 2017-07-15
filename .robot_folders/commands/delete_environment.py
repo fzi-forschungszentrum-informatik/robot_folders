@@ -83,10 +83,11 @@ class EnvironmentDeleter(click.Command):
         return False
 
     def appendToListIfFolder(self, path, delete_list):
-        """Appends the given path to the given list, if it exists and is a folder.
+        """Appends the given path to the given list, if it exists, is a folder
+        and is not in the list yet.
         Returns true, if folder exists, false otherwise."""
         if os.path.exists(os.path.realpath(path)):
-            if os.path.isdir(path):
+            if os.path.isdir(path) and not os.path.realpath(path) in delete_list:
                 delete_list.append(os.path.realpath(path))
                 return True
         return False
