@@ -91,7 +91,7 @@ def _get_value_safe(dictionary, section, value, debug=True):
         result = dictionary[section][value]
     except KeyError:
         if debug:
-            print 'Did not find key!!!'
+            print 'Did not find key {}.{}!!!'.format(section, value)
     except TypeError:
         print('There is an illegal config. '
               'Probably something went wrong during initialization. '

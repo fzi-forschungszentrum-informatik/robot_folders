@@ -77,6 +77,7 @@ class Builder(click.Command):
         cmake_cache_file = os.path.join(self.build_dir, 'CMakeCache.txt')
         if not os.path.isfile(cmake_cache_file):
             cmake_cmd = " ".join(["cmake", base_directory, get_cmake_flags()])
+            click.echo("Starting initial build with command\n\t{}".format(cmake_cmd))
             process = subprocess.Popen(["bash", "-c", cmake_cmd],
                                        cwd=self.build_dir)
             process.wait()
