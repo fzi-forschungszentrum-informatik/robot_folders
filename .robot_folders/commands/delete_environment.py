@@ -57,7 +57,7 @@ class EnvironmentDeleter(click.Command):
         click.echo('Going to delete the following paths:\n{}'.format('\n'.join(delete_list)))
 
         confirm = click.prompt(
-            "Please confirm by typing in the environment name '{}' once again.\nWARNING:"
+            "Please confirm by typing in the environment name '{}' once again.\nWARNING: "
             "After this all environment files will be deleted and cannot be recovered! "
             "If you wish to abort your delete request, type 'abort'".format(
                 self.name),
@@ -68,15 +68,14 @@ class EnvironmentDeleter(click.Command):
             for folder in delete_list:
                 click.echo('Deleting {}'.format(folder))
                 self.deleteFolder(folder)
+            click.echo('Successfully deleted environment \'{}\''.format(self.name))
         else:
             click.echo('Delete request aborted. Nothing happened.')
 
-        click.echo('Successfully deleted environment \'{}\''.format(self.name))
 
     def appendToListIfSymlink(self, path, delete_list):
         """Checks whether the given path exists and is a symlink and appends it to the
         given list if both are true"""
-
         if os.path.exists(os.path.realpath(path)):
             if os.path.islink(path):
                 delete_list.append(os.path.realpath(path))
