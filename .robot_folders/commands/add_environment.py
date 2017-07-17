@@ -9,6 +9,7 @@ from helpers.directory_helpers import get_checkout_dir
 from helpers.directory_helpers import get_catkin_dir
 import helpers.build_helpers as build
 import helpers.environment_helpers as environment_helpers
+from helpers.ConfigFileParser import ConfigFileParser
 
 from yaml import load as yaml_load, dump as yaml_dump
 
@@ -17,30 +18,119 @@ try:
 except ImportError:
     from yaml import Loader, Dumper
 
-# NOTE: Sourcing this way only works inside the python session and it's children.
-def source_ic_workspace(env_name):
-    ic_dir = os.path.join(get_checkout_dir(), env_name, "ic_workspace")
-    click.echo("Sourcing ic_workspace for environment {}".format(env_name))
-    lib_path = os.path.join(ic_dir, "export", "lib")
-    os.environ['LD_LIBRARY_PATH'] = os.pathsep.join([lib_path, os.getenv('LD_LIBRARY_PATH', '')])
-    python_path = os.path.join(ic_dir, "export", "lib", "python2.7", "site_packages")
-    os.environ['PYTHONPATH'] = os.pathsep.join([python_path, os.getenv('PYTHONPATH', '')])
-    path = os.path.join(ic_dir, "export", "bin")
-    os.environ['PATH'] = os.pathsep.join([path, os.getenv('PATH', '')])
-    qml_import_path = os.path.join(ic_dir, "export", "plugins", "qml")
-    os.environ['QML_IMPORT_PATH'] = os.pathsep.join([qml_import_path, os.getenv('QML_IMPORT_PATH', '')])
-    os.environ['CMAKE_PREFIX_PATH'] = os.pathsep.join([os.path.join(ic_dir, "export"), os.getenv('CMAKE_PREFIX_PATH', '')])
-    os.environ['IC_MAKER_DIR'] = os.path.join(ic_dir, "icmaker")
 
-    subprocess.call("export", shell=True)
+class EnvCreator:
+    __init__(self, name):
+        self.env_name = name
+        self.build_base_dir = get_checkout_dir()
+        self.ic_packages = "base"
+        self.ic_package_versions = {}
+        self.ic_grab_flags = []
+        self.ic_cmake_flags = ""
+        self.ic_rosinstall = None
+        self.cama_flags = ""
+        self.catkin_rosinstall = ""
+        self.mca_cmake_flags = ""
+        self.mca_additional_repos = ""
+        self.script_list = list()
+        self.build = True
+        self.has_nobackup = False
 
-def create_demo_docs(demo_dir):
-    doc_filename = os.path.join(demo_dir, 'readme.txt')
-    with open(doc_filename, 'w') as file:
-        docstring = '''This folder can contain any executable files. These files can be run
-with the fzirob run command. When scraping an environment to a config file
-all demo scripts will be copied into the environment config, as well.'''
-        file.write(docstring)
+        os.environ['ROB_FOLDERS_ACTIVE_ENV'] = env_name
+
+        self.create_ic = False
+        self.create_catkin = False
+        self.create_mca = False
+
+    def create_new_environment(self, env_name, config_file=None):
+        if os.path.exists(os.path.join(get_checkout_dir(), env_name)):
+            click.echo("An environment with the name \"{}\" already exists. Exiting now.".format(env_name))
+            return
+        self.check_nobackup()
+
+        self.demos_dir = os.path.join(get_checkout_dir(), self.env_name, 'demos')
+
+        # Build directories
+        self.ic_directory = os.path.join(get_checkout_dir(), self.env_name, "ic_workspace")
+        self.ic_build_directory = os.path.join(self.build_base_dir, self.env_name,  "ic_workspace", "build")
+        self.catkin_directory = os.path.join(get_checkout_dir(), self.env_name, "catkin_ws")
+        self.catkin_build_directory = os.path.join(self.build_base_dir, self.env_name, "catkin_ws", "build")
+        self.mca_directory = os.path.join(get_checkout_dir(), self.env_name, "mca_workspace")
+        self.mca_build_directory = os.path.join(self.build_base_dir, self.env_name, "mca_workspace", "build")
+
+        click.echo("Creating environment with name \"{}\"".format(env_name))
+        self.create_directories()
+        self.create_demo_docs(demos_dir)
+
+    def check_nobackup(self):
+        # If we are on a workstation or when no_backup is mounted like on a workstation offer to build in no_backup
+        has_nobackup = False
+        try:
+            if os.path.isdir('/disk/no_backup'):
+                has_nobackup = True
+        except subprocess.CalledProcessError as e:
+            pass
+
+        if has_nobackup:
+            build_dir_choice = click.prompt("Which folder should I use as a base for creating the build tree?\nType 'local' for building inside the local robot_folders tree.\nType 'no_backup' (or simply press enter) for building in the no_backup space (should be used on workstations).\n",
+                                            type=click.Choice(['no_backup', 'local']),
+                                            default='no_backup')
+            if build_dir_choice == 'no_backup':
+                username = getpass.getuser()
+                self.build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
+
+    def create_directories(self):
+        os.mkdir(os.path.join(get_checkout_dir(), self.env_name))
+        os.mkdir(self.demos_dir)
+
+    def parse_config(self):
+        parser = ConfigFileParser(config_file)
+
+        # Parse ic_workspace packages with error checking
+        self.create_ic, self.ic_rosinstall, self.ic_packages, self.ic_package_versions, self.ic_flags = \
+            parser.parse_ic_config()
+        # Parse catkin_workspace packages
+        self.create_catkin, self.catkin_rosinstall = parser.parse_ros_config()
+
+        # Parse mca_workspace packages
+        self.create_mca, self.mca_additional_repos = parser.parse_mca_config()
+
+        # Parse demo scripts and copy them to individual files
+        self.script_list = parser.parse_demo_scripts()
+
+    def create_demo_scripts(self)
+        click.echo('Found the following demo scripts:')
+        for demo in script_list:
+            click.echo(demo)
+            filename = os.path.join(self.demos_dir, demo)
+            with open(filename, mode='w') as f:
+                f.write(self.script_list[demo])
+                f.close()
+            os.chmod(filename, 00755)
+
+
+    # NOTE: Sourcing this way only works inside the python session and it's children.
+    def source_ic_workspace(self):
+        ic_dir = os.path.join(get_checkout_dir(), self.env_name, "ic_workspace")
+        click.echo("Sourcing ic_workspace for environment {}".format(env_name))
+        lib_path = os.path.join(ic_dir, "export", "lib")
+        os.environ['LD_LIBRARY_PATH'] = os.pathsep.join([lib_path, os.getenv('LD_LIBRARY_PATH', '')])
+        python_path = os.path.join(ic_dir, "export", "lib", "python2.7", "site_packages")
+        os.environ['PYTHONPATH'] = os.pathsep.join([python_path, os.getenv('PYTHONPATH', '')])
+        path = os.path.join(ic_dir, "export", "bin")
+        os.environ['PATH'] = os.pathsep.join([path, os.getenv('PATH', '')])
+        qml_import_path = os.path.join(ic_dir, "export", "plugins", "qml")
+        os.environ['QML_IMPORT_PATH'] = os.pathsep.join([qml_import_path, os.getenv('QML_IMPORT_PATH', '')])
+        os.environ['CMAKE_PREFIX_PATH'] = os.pathsep.join([os.path.join(ic_dir, "export"), os.getenv('CMAKE_PREFIX_PATH', '')])
+        os.environ['IC_MAKER_DIR'] = os.path.join(ic_dir, "icmaker")
+
+    def create_demo_docs(self):
+        doc_filename = os.path.join(self.demos_dir, 'readme.txt')
+        with open(doc_filename, 'w') as file:
+            docstring = '''This folder can contain any executable files. These files can be run
+    with the fzirob run command. When scraping an environment to a config file
+    all demo scripts will be copied into the environment config, as well.'''
+            file.write(docstring)
 
 
 @click.command(short_help='Add a new environment')
@@ -48,114 +138,16 @@ all demo scripts will be copied into the environment config, as well.'''
 @click.option('--no_build', is_flag=True, default=False,
               help='Do not perform an initial build.')
 @click.argument('env_name', nargs=1)
-#@click.option('-m', '--mca2_workspace', default=False, help='Create an mac2_workspace.')
 def cli(env_name, config_file, no_build):
     """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_ws."""
 
-    base_dir = get_base_dir()
-    build_base_dir = get_checkout_dir()
-    ic_packages = "base"
-    ic_package_versions = {}
-    ic_grab_flags = []
-    ic_cmake_flags = ""
-    ic_rosinstall = None
-    cama_flags = ""
-    catkin_rosinstall = ""
-    mca_repo_url = "git@ids-git.fzi.de:mca2/mca2.git"
-    mca_cmake_flags = ""
-    mca_additional_repos = ""
-
-    os.environ['ROB_FOLDERS_ACTIVE_ENV'] = env_name
-
-    create_ic = False
-    create_catkin = False
-    create_mca = False
-
-    # If we are on a workstation or when no_backup is mounted like on a workstation offer to build in no_backup
-    has_nobackup = False
-    try:
-        if os.path.isdir('/disk/no_backup'):
-            has_nobackup = True
-    except subprocess.CalledProcessError as e:
-        pass
-
-    if has_nobackup:
-        build_dir_choice = click.prompt("Which folder should I use as a base for creating the build tree?\nType 'local' for building inside the local robot_folders tree.\nType 'no_backup' (or simply press enter) for building in the no_backup space (should be used on workstations).\n",
-                                        type=click.Choice(['no_backup', 'local']),
-                                        default='no_backup')
-        if build_dir_choice == 'no_backup':
-            username = getpass.getuser()
-            build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
-
-    if os.path.exists(os.path.join(get_checkout_dir(), env_name)):
-        click.echo("An environment with the name \"{}\" already exists. Exiting now.".format(env_name))
-        return
-
-    # Set all necessary paths for the environments.
-    click.echo("Creating environment with name \"{}\"".format(env_name))
-    os.mkdir(os.path.join(get_checkout_dir(), env_name))
-    demos_dir = os.path.join(get_checkout_dir(), env_name, 'demos')
-    os.mkdir(demos_dir)
-    create_demo_docs(demos_dir)
-    ic_directory = os.path.join(get_checkout_dir(), env_name, "ic_workspace")
-    ic_build_directory = os.path.join(build_base_dir, env_name,  "ic_workspace", "build")
-    catkin_directory = os.path.join(get_checkout_dir(), env_name, "catkin_ws")
-    catkin_build_directory = os.path.join(build_base_dir, env_name, "catkin_ws", "build")
-    mca_directory = os.path.join(get_checkout_dir(), env_name, "mca_workspace")
-    mca_build_directory = os.path.join(build_base_dir, env_name, "mca_workspace", "build")
+    environment_creator = EnvCreator(env_name)
+    environment_creator.build = not no_build
 
     # If we have a config file check which packages should be fetched.
     # Otherwise ask which empty workspaces should be created
     if config_file:
-        yaml_stream = file(config_file, 'r')
-        data = yaml_load(yaml_stream, Loader=Loader)
-        click.echo(data)
-
-        # Parse ic_workspace packages with error checking
-        if 'ic_workspace' in data:
-            create_ic = True
-            if 'rosinstall' in data['ic_workspace']:
-                ic_rosinstall = data['ic_workspace']['rosinstall']
-                ic_packages = None
-
-            if 'packages' in data['ic_workspace']:
-                ic_packages = ' '.join(data['ic_workspace']['packages'])
-                # if the base package is not specified in the config_file, add it nevertheless.
-                #TODO: alternatively only print the warning
-                if "base" not in ic_packages:
-                    ic_packages = "base " + ic_packages
-                    click.echo("The base-package for the ic_workspace has not been specified in the"
-                               " configuration. It will be added regardless.")
-                if 'package_versions' in data['ic_workspace'] and data['ic_workspace']['package_versions'] is not None:
-                    ic_package_versions = data['ic_workspace']['package_versions']
-                if 'flags' in data['ic_workspace'] and data['ic_workspace']['flags'] is not None:
-                    for flag in data['ic_workspace']['flags']:
-                        ic_grab_flags.append("--" + flag)
-
-                ic_rosinstall = None
-
-        if 'catkin_workspace' in data:
-            create_catkin = True
-            if data['catkin_workspace'] is not None and 'rosinstall' in data['catkin_workspace']:
-                if data['catkin_workspace']['rosinstall'] is not None:
-                    catkin_rosinstall = data['catkin_workspace']['rosinstall']
-
-        if 'mca_workspace' in data:
-            create_mca = True
-            if data['mca_workspace'] is not None:
-                mca_additional_repos = data['mca_workspace']
-
-        if 'demos' in data:
-            if data['demos'] is not None:
-                print ('Found the following demo scripts:')
-                for demo in data['demos']:
-                    print(demo)
-                    filename = os.path.join(get_checkout_dir(), env_name, 'demos', demo)
-                    with open(filename, mode='w') as f:
-                        f.write(data['demos'][demo])
-                        f.close()
-                    os.chmod(filename, 00755)
-
+        self.parse_config()
     else:
         create_ic = click.confirm("Would you like to create an ic_workspace?", default=True)
         create_catkin = click.confirm("Would you like to create a catkin_ws?", default=True)
@@ -187,7 +179,7 @@ def cli(env_name, config_file, no_build):
 
     # Now, we're done asking the user. Let's get to work
 
-    # Check if we should create an catkin workspace and create one if desired
+    # Check if we should create a catkin workspace and create one if desired
     if create_ic:
         click.echo("Creating ic_workspace")
         environment_helpers.IcCreator(ic_directory=ic_directory,

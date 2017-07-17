@@ -5,6 +5,11 @@ build: {
     install_catkin: False
 }
 
+repositories: {
+    ic_workspace_repo: "git@ids-git.fzi.de:core/ic_workspace.git",
+    mca_workspace_repo: "git@ids-git.fzi.de:mca2/mca2.git"
+}
+
 directories: {
     # if left blank, the default robot_folders/checkout will be used
     checkout_dir: ,
