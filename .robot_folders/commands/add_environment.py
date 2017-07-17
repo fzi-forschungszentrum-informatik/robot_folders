@@ -178,7 +178,7 @@ def cli(env_name, config_file, no_build, create_ic, create_catkin, create_mca, c
         else:
             build_dir_choice = local_build
 
-        if build_dir_choice == 'no_backup':
+        if build_dir_choice == 'no':
             username = getpass.getuser()
             build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
 
