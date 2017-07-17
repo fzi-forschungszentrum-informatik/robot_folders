@@ -35,6 +35,12 @@ def source_ic_workspace(env_name):
 
     subprocess.call("export", shell=True)
 
+def yes_no_to_bool(str):
+    if str == 'yes' or str == 'Yes':
+        return True
+    else:
+        return False
+
 def create_demo_docs(demo_dir):
     doc_filename = os.path.join(demo_dir, 'readme.txt')
     with open(doc_filename, 'w') as file:
@@ -131,9 +137,14 @@ def create_ic_ws(ic_directory,
 @click.option('--config_file', help='Create an environment from a given config file.')
 @click.option('--no_build', is_flag=True, default=False,
               help='Do not perform an initial build.')
+@click.option('--create_ic', type=click.Choice(['yes', 'no', 'ask']), default='ask', help='If set to \'yes\', an ic-workspace is created without asking for it again.')
+@click.option('--create_catkin', type=click.Choice(['yes', 'no', 'ask']), default='ask', help='If set to \'yes\', a catkin-workspace is created without asking for it again.')
+@click.option('--create_mca', type=click.Choice(['yes', 'no', 'ask']), default='ask', help='If set to \'yes\', a mca-workspace is created without asking for it again.')
+@click.option('--copy_cmake_lists', type=click.Choice(['yes', 'no', 'ask']), default='ask', help='If set to \'yes\', the toplevel CMakeLists files of the catkin workspace is copied to the src folder of the catkin ws without asking for it again.')
+@click.option('--local_build', type=click.Choice(['yes', 'no', 'ask']), default='ask', help='If set to \'yes\', the local build options is set and the build is executed in the folder ic_workspace/build.')
 @click.argument('env_name', nargs=1)
 #@click.option('-m', '--mca2_workspace', default=False, help='Create an mac2_workspace.')
-def cli(env_name, config_file, no_build):
+def cli(env_name, config_file, no_build, create_ic, create_catkin, create_mca, copy_cmake_lists, local_build):
     """Adds a new environment and creates the basic needed folders, e.g. a ic_orkspace and a catkin_ws."""
 
     base_dir = get_base_dir()
@@ -151,10 +162,6 @@ def cli(env_name, config_file, no_build):
 
     os.environ['ROB_FOLDERS_ACTIVE_ENV'] = env_name
 
-    create_ic = False
-    create_catkin = False
-    create_mca = False
-
     # If we are on a workstation or when no_backup is mounted like on a workstation offer to build in no_backup
     has_nobackup = False
     try:
@@ -164,10 +171,14 @@ def cli(env_name, config_file, no_build):
         pass
 
     if has_nobackup:
-        build_dir_choice = click.prompt("Which folder should I use as a base for creating the build tree?\nType 'local' for building inside the local robot_folders tree.\nType 'no_backup' (or simply press enter) for building in the no_backup space (should be used on workstations).\n",
+        if local_build== 'ask':
+            build_dir_choice = click.prompt("Which folder should I use as a base for creating the build tree?\nType 'local' for building inside the local robot_folders tree.\nType 'no_backup' (or simply press enter) for building in the no_backup space (should be used on workstations).\n",
                                         type=click.Choice(['no_backup', 'local']),
                                         default='no_backup')
-        if build_dir_choice == 'no_backup':
+        else:
+            build_dir_choice = local_build
+
+        if build_dir_choice == 'no':
             username = getpass.getuser()
             build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
 
@@ -240,10 +251,22 @@ def cli(env_name, config_file, no_build):
                         f.close()
                     os.chmod(filename, 00755)
 
+    # Check given flags or ask user
     else:
-        create_ic = click.confirm("Would you like to create an ic_workspace?", default=True)
-        create_catkin = click.confirm("Would you like to create a catkin_ws?", default=True)
-        create_mca = click.confirm("Would you like to create an mca_workspace?", default=True)
+        if create_ic== 'ask':
+            create_ic = click.confirm("Would you like to create an ic_workspace?", default=True)
+        else:
+            create_ic = yes_no_to_bool(create_ic)
+
+        if create_catkin == 'ask':
+            create_catkin = click.confirm("Would you like to create a catkin_ws?", default=True)
+        else:
+            create_catkin = yes_no_to_bool(create_catkin)
+
+        if create_mca == 'ask':
+            create_mca = click.confirm("Would you like to create an mca_workspace?", default=True)
+        else:
+            create_mca = yes_no_to_bool(create_mca)
 
     # If we create a catkin_ws query some more stuff at the beginning of the script.
     if create_catkin:
@@ -256,10 +279,14 @@ def cli(env_name, config_file, no_build):
                                       default=installed_ros_distros[0])
         click.echo("Using ROS distribution \'{}\'".format(ros_distro))
         ros_global_dir = "/opt/ros/{}".format(ros_distro)
-        copy_cmake_lists = click.confirm(("Would you like to copy the top-level CMakeLists.txt to the catkin"
+
+        if copy_cmake_lists == 'ask':
+            copy_cmake_lists = click.confirm(("Would you like to copy the top-level CMakeLists.txt to the catkin"
                                          " src directory instead of using a symlink?\n"
                                          "(This is incredibly useful when using the QtCreator.)"),
                                          default=True)
+        else:
+            copy_cmake_lists = yes_no_to_bool(copy_cmake_lists)
 
     # Add a custom source file to the environment. Custom source commands go in here.
     env_source_file = open(os.path.join(get_checkout_dir(), env_name, "setup_local.sh"), 'w')
@@ -271,7 +298,6 @@ def cli(env_name, config_file, no_build):
 
 
     # Now, we're done asking the user. Let's get to work
-
     if create_ic:
         create_ic_ws(ic_directory=ic_directory,
                      build_directory=ic_build_directory,
