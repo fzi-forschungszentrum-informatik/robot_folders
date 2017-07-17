@@ -8,7 +8,7 @@ from helpers.directory_helpers import get_base_dir
 from helpers.directory_helpers import get_checkout_dir
 import helpers.build_helpers as build
 import helpers.environment_helpers as environment_helpers
-from helpers.ConfigFileParser import ConfigFileParser
+from helpers.ConfigParser import ConfigFileParser
 
 
 def yes_no_to_bool(str):
@@ -40,7 +40,6 @@ class EnvCreator:
         self.create_mca = False
 
     def create_new_environment(self,
-                               env_name,
                                config_file,
                                no_build,
                                create_ic,
@@ -48,11 +47,11 @@ class EnvCreator:
                                create_mca,
                                copy_cmake_lists,
                                local_build):
-        if os.path.exists(os.path.join(get_checkout_dir(), env_name)):
+        if os.path.exists(os.path.join(get_checkout_dir(), self.env_name)):
             click.echo("An environment with the name \"{}\" already exists. Exiting now."
-                       .format(env_name))
-            return
-        self.check_nobackup()
+                       .format(self.env_name))
+            raise Exception
+        self.check_nobackup(local_build)
 
         self.demos_dir = os.path.join(get_checkout_dir(), self.env_name, 'demos')
 
@@ -115,11 +114,11 @@ class EnvCreator:
                                                  default=True)
             else:
                 copy_cmake_lists = yes_no_to_bool(copy_cmake_lists)
-        click.echo("Creating environment with name \"{}\"".format(env_name))
+        click.echo("Creating environment with name \"{}\"".format(self.env_name))
 
         # Let's get down to business
         self.create_directories()
-        self.create_demo_docs(self.demos_dir)
+        self.create_demo_docs()
 
         if self.create_ic:
             click.echo("Creating ic_workspace")
@@ -157,7 +156,7 @@ class EnvCreator:
             if self.create_ic:
                 ic_builder = build.IcBuilder(name="ic_builder", add_help_option=False)
                 ic_builder.invoke(None)
-                self.source_ic_workspace(self.env_name)
+                self.source_ic_workspace()
             if self.create_catkin:
                 ros_builder = build.CatkinBuilder(name=ros_distro, add_help_option=False)
                 ros_builder.invoke(None)
@@ -305,5 +304,6 @@ def cli(env_name,
                                                    copy_cmake_lists,
                                                    local_build)
         click.echo("Initial workspace setup completed")
-    except:
+    except Exception as e:
+        click.echo(e)
         click.echo("Something went wrong while creating the environment!")
