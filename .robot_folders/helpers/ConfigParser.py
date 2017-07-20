@@ -57,7 +57,8 @@ class ConfigFileParser():
 
     def parse_mca_config(self):
         has_mca = False
-        if self.data['mca_workspace'] is not None:
+        mca_additional_repos = None
+        if 'mca_workspace' in self.data:
             has_mca = True
             mca_additional_repos = self.data['mca_workspace']
         return has_mca, mca_additional_repos
