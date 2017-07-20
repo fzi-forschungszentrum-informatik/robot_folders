@@ -171,14 +171,18 @@ def cli(env_name, config_file, no_build, create_ic, create_catkin, create_mca, c
         pass
 
     if has_nobackup:
-        if local_build== 'ask':
+        use_nobackup = False
+        build_dir_choice = ''
+        if local_build == 'ask':
             build_dir_choice = click.prompt("Which folder should I use as a base for creating the build tree?\nType 'local' for building inside the local robot_folders tree.\nType 'no_backup' (or simply press enter) for building in the no_backup space (should be used on workstations).\n",
                                         type=click.Choice(['no_backup', 'local']),
                                         default='no_backup')
-        else:
-            build_dir_choice = local_build
+            use_nobackup = build_dir_choice == 'no_backup'
 
-        if build_dir_choice == 'no':
+        else:
+            use_nobackup = local_build == 'yes'
+
+        if use_nobackup:
             username = getpass.getuser()
             build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
 
