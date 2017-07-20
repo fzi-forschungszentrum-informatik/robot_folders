@@ -206,6 +206,10 @@ def cli(env_name, config_file, no_build, create_ic, create_catkin, create_mca, c
         data = yaml_load(yaml_stream, Loader=Loader)
         click.echo(data)
 
+        create_ic = False
+        create_catkin = False
+        create_mca = False
+
         # Parse ic_workspace packages with error checking
         if 'ic_workspace' in data:
             create_ic = True
