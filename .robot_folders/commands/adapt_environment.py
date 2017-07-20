@@ -15,7 +15,7 @@ from helpers.directory_helpers import recursive_rmdir
 from helpers.directory_helpers import mkdir_p
 from helpers.directory_helpers import get_catkin_dir
 from helpers.repository_helpers import create_rosinstall_entry
-from helpers.ConfigFileParser import ConfigFileParser
+from helpers.ConfigParser import ConfigFileParser
 
 local_delete_policy_saved = False
 
@@ -86,7 +86,7 @@ class EnvironmentAdapter(click.Command):
 
         click.echo('Looking for demo scripts')
         mkdir_p(demos_dir)
-        scripts = self.parse_demo_scripts()
+        scripts = self.config_file_parser.parse_demo_scripts()
         for script in scripts:
             click.echo('Found {} in config. Will be overwritten if file exists'
                        .format(script))
@@ -208,21 +208,6 @@ class EnvironmentAdapter(click.Command):
                     entry = create_rosinstall_entry(subfolder_abs, local_name)
                     self.rosinstall[local_name] = entry
                 self.parse_folder(subfolder_abs, local_name)
-
-    def parse_ros_workspace_config(self):
-        ros_rosinstall = None
-        if "catkin_workspace" in self.yaml_data:
-            if "rosinstall" in self.yaml_data["catkin_workspace"]:
-                ros_rosinstall = self.yaml_data["catkin_workspace"]["rosinstall"]
-
-        return ros_rosinstall
-
-    def parse_demo_scripts(self):
-        script_list = dict()
-        if 'demos' in self.yaml_data:
-            for script in self.yaml_data['demos']:
-                script_list[script] = self.yaml_data['demos'][script]
-        return script_list
 
 
 class EnvironmentChooser(click.MultiCommand):
