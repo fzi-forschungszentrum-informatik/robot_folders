@@ -180,7 +180,7 @@ def cli(env_name, config_file, no_build, create_ic, create_catkin, create_mca, c
             use_nobackup = build_dir_choice == 'no_backup'
 
         else:
-            use_nobackup = local_build == 'yes'
+            use_nobackup = local_build == 'no'
 
         if use_nobackup:
             username = getpass.getuser()
