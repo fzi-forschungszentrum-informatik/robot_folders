@@ -39,6 +39,7 @@ class IcCreator:
             self.add_packages(packages, package_versions, grab_flags)
         else:
             self.add_rosinstall(rosinstall)
+        self.create_build_folders()
 
     def add_packages(self, packages, package_versions, grab_flags):
         # If something goes wrong here, this will throw an exception, which is fine, as it shoudln't
@@ -102,6 +103,7 @@ class CatkinCreator:
                  catkin_directory,
                  build_directory,
                  ros_distro,
+                 rosinstall,
                  copy_cmake_lists):
         self.catkin_directory = catkin_directory
         self.build_directory = build_directory
@@ -110,6 +112,7 @@ class CatkinCreator:
 
         self.create_catkin_skeleton()
         self.build()
+        self.clone_packages(rosinstall)
 
         if copy_cmake_lists:
             subprocess.check_call(["rm", "{}/src/CMakeLists.txt".format(self.catkin_directory)])

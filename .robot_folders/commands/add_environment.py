@@ -138,6 +138,7 @@ class EnvCreator:
             environment_helpers.CatkinCreator(catkin_directory=self.catkin_directory,
                                               build_directory=self.catkin_build_directory,
                                               ros_distro=ros_distro,
+                                              rosinstall=self.catkin_rosinstall,
                                               copy_cmake_lists=copy_cmake_lists)
         else:
             click.echo("Requested to not create a catkin_ws")
@@ -147,7 +148,7 @@ class EnvCreator:
             click.echo("Creating mca_workspace")
 
             environment_helpers.MCACreator(mca_directory=self.mca_directory,
-                                           mca_build_directory=self.mca_build_directory,
+                                           build_directory=self.mca_build_directory,
                                            mca_additional_repos=self.mca_additional_repos)
         else:
             click.echo("Requested to not create an mca workspace")
@@ -183,10 +184,11 @@ class EnvCreator:
                         "space (should be used on workstations).\n",
                         type=click.Choice(['no_backup', 'local']),
                         default='no_backup')
+                build_dir_choice = build_dir_choice == 'local'
             else:
-                build_dir_choice = local_build
+                build_dir_choice = yes_no_to_bool(local_build)
 
-            if build_dir_choice == 'no':
+            if not build_dir_choice:
                 username = getpass.getuser()
                 self.build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
 
