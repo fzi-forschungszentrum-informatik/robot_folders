@@ -30,7 +30,7 @@ class EnvironmentAdapter(click.Command):
         has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
             self.config_file_parser.parse_ic_config()
         has_catkin, ros_rosinstall = self.config_file_parser.parse_ros_config()
-        create_mca, mca_additional_repos = self.config_file_parser.parse_mca_config()
+        has_mca, mca_additional_repos = self.config_file_parser.parse_mca_config()
 
         if has_ic:
             if os.path.isdir(ic_pkg_dir):
@@ -69,24 +69,33 @@ class EnvironmentAdapter(click.Command):
                 # TODO: create catkin_ws
                 pass
 
-        if os.path.isdir(mca_library_dir):
-            self.yaml_data['mca_workspace'] = dict()
-            click.echo("Adapting mca libraries")
-            self.rosinstall = dict()
-            # TODO: compare parsed folder with yaml_data and adapt the ws accordingly
-
-            if os.path.isdir(mca_project_dir):
-                click.echo("Adapting mca projects")
+        if has_mca:
+            if os.path.isdir(mca_library_dir):
+                click.echo("Adapting mca libraries")
                 self.rosinstall = dict()
-                # TODO: compare parsed folder with yaml_data and adapt the ws accordingly
+                self.parse_folder(mca_library_dir)
+                if 'libraries' in mca_additional_repos:
+                    self.adapt_rosinstall(mca_additional_repos['libraries'],
+                                          mca_library_dir)
 
-            if os.path.isdir(mca_tool_dir):
-                click.echo("Adapting mca tools")
-                self.rosinstall = dict()
-                # TODO: compare parsed folder with yaml_data and adapt the ws accordingly
-        else:
-            # TODO: Create mca_workspace if desired
-            pass
+                if os.path.isdir(mca_project_dir):
+                    click.echo("Adapting mca projects")
+                    self.rosinstall = dict()
+                    self.parse_folder(mca_project_dir)
+                    if 'projects' in mca_additional_repos:
+                        self.adapt_rosinstall(mca_additional_repos['projects'],
+                                              mca_project_dir)
+
+                if os.path.isdir(mca_tool_dir):
+                    click.echo("Adapting mca tools")
+                    self.rosinstall = dict()
+                    self.parse_folder(mca_tool_dir)
+                    if 'tools' in mca_additional_repos:
+                        self.adapt_rosinstall(mca_additional_repos['tools'],
+                                              mca_tool_dir)
+            else:
+                # TODO: Create mca_workspace if desired
+                pass
 
         click.echo('Looking for demo scripts')
         mkdir_p(demos_dir)
