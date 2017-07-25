@@ -1,14 +1,16 @@
-import click
 import os
 import subprocess
 
-import config_helpers
-import build_helpers
+import click
+
+import helpers.config_helpers as config_helpers
+import helpers.build_helpers as build_helpers
 
 from yaml import dump as yaml_dump
 
 
-class IcCreator:
+class IcCreator(object):
+
     def __init__(self,
                  ic_directory,
                  build_directory,
@@ -20,11 +22,11 @@ class IcCreator:
         ic_workspace_version = 'master'  # TODO: Parse this from somewhere
 
         if packages is None and rosinstall is None:
-            click.error('Either packages or rosinstall must be declared, none was given!')
-            return False
+            click.echo('Either packages or rosinstall must be declared, none was given!')
+            raise Exception
         if packages is not None and rosinstall is not None:
-            return False
-            click.error('Either packages or rosinstall must be declared, not both!')
+            click.echo('Either packages or rosinstall must be declared, not both!')
+            raise Exception
 
         self.ic_directory = ic_directory
         self.build_directory = build_directory
@@ -42,7 +44,7 @@ class IcCreator:
         self.create_build_folders()
 
     def add_packages(self, packages, package_versions, grab_flags):
-        # If something goes wrong here, this will throw an exception, which is fine, as it shoudln't
+        # If something goes wrong here, this will throw an exception, which is fine, as it shouldn't
         grab_command = ["./IcWorkspace.py", "grab", packages]
         if grab_flags is not None:
             grab_command.extend(grab_flags)
@@ -57,12 +59,12 @@ class IcCreator:
                     package_dir = os.path.join(self.ic_directory, "packages", package)
                     click.echo("Package_dir: {}".format(package_dir))
                     process = subprocess.Popen(["git", "checkout", package_versions[package]],
-                                               cwd=self.package_dir)
+                                               cwd=package_dir)
                     process.wait()
                 else:
                     click.echo(
-                            'Version for package {} given, however, '
-                            'package is not listed in environment!'.format(package))
+                        'Version for package {} given, however, '
+                        'package is not listed in environment!'.format(package))
 
     def add_rosinstall(self, rosinstall):
         # if a rosinstall is specified, no base-grabbing is required
@@ -98,7 +100,8 @@ class IcCreator:
         os.makedirs(export_directory)
 
 
-class CatkinCreator:
+class CatkinCreator(object):
+
     def __init__(self,
                  catkin_directory,
                  build_directory,
@@ -165,7 +168,8 @@ class CatkinCreator:
             os.remove(rosinstall_filename)
 
 
-class MCACreator:
+class MCACreator(object):
+
     def __init__(self,
                  mca_directory,
                  build_directory,
