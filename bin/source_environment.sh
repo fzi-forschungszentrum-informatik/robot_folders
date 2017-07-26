@@ -61,6 +61,10 @@ rm -rf $HOME/.cmake/packages/
 if [ -d $environment_dir ]; then
   # Set the prefix path to the one stored away when starting a new session
   export CMAKE_PREFIX_PATH=${ROB_FOLDERS_EMPTY_CMAKE_PATH}
+  export PATH=${ROB_FOLDERS_EMPTY_PATH}
+  export LD_LIBRARY_PATH=${ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH}
+  export QML_IMPORT_PATH=${ROB_FOLDERS_EMPTY_QML_IMPORT_PATH}
+  export PYTHONPATH=${ROB_FOLDERS_EMPTY_PYTHONPATH}
   # Run ic_workspace initialization if available
   ic_dir=$environment_dir/ic_workspace
   if [ -f $ic_dir/CMakeLists.txt ]
