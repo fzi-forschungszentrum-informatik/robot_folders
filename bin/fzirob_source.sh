@@ -14,13 +14,13 @@ then
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 fi
 
+export PATH=$PATH:${ROB_FOLDERS_BASE_DIR}/.robot_folders/venv/bin
 export ROB_FOLDERS_EMPTY_CMAKE_PATH=${CMAKE_PREFIX_PATH}
 export ROB_FOLDERS_EMPTY_PATH=${PATH}
 export ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
 export ROB_FOLDERS_EMPTY_QML_IMPORT_PATH=${QML_IMPORT_PATH}
 export ROB_FOLDERS_EMPTY_PYTHONPATH=${PYTHONPATH}
 
-export PATH=$PATH:${ROB_FOLDERS_BASE_DIR}/.robot_folders/venv/bin
 
 # sourcing alias
 source ${ROB_FOLDERS_BASE_DIR}/bin/rob_folders-complete.sh
