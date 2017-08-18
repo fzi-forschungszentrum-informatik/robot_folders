@@ -1,3 +1,5 @@
+"""Prints the currently sourced environment"""
+
 import click
 from helpers.directory_helpers import get_active_env, get_last_activated_env
 
@@ -9,7 +11,8 @@ environment, which will be sourced by simply calling the
 source command."""
 
     active_env = get_active_env()
-    if active_env == None:
-        click.echo("No active environment. Last activated environment: {}".format(get_last_activated_env()))
+    if active_env is None:
+        click.echo("No active environment. Last activated environment: {}"
+                   .format(get_last_activated_env()))
     else:
         click.echo("Active environment: {}".format(active_env))

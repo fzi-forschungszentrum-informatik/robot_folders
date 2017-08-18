@@ -1,20 +1,14 @@
 import click
 import os
+import stat
 import subprocess
 
-from yaml import load as yaml_load
-
-try:
-    from yaml import CLoader as Loader
-except ImportError:
-    from yaml import Loader
-
-from helpers.directory_helpers import get_base_dir
 from helpers.directory_helpers import get_checkout_dir
 from helpers.directory_helpers import recursive_rmdir
 from helpers.directory_helpers import mkdir_p
 from helpers.directory_helpers import get_catkin_dir
 from helpers.repository_helpers import create_rosinstall_entry
+from helpers.ConfigParser import ConfigFileParser
 
 local_delete_policy_saved = False
 
@@ -27,56 +21,85 @@ class EnvironmentAdapter(click.Command):
         catkin_dir = get_catkin_dir(env_dir)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
         catkin_src_dir = os.path.join(catkin_dir, 'src')
-        mca_library_dir = os.path.join(env_dir, 'mca_workspace', 'libraries')
-        mca_project_dir = os.path.join(env_dir, 'mca_workspace', 'projects')
-        mca_tool_dir = os.path.join(env_dir, 'mca_workspace', 'tools')
+        mca_library_dir = os.path.join(mca_dir, 'libraries')
+        mca_project_dir = os.path.join(mca_dir, 'projects')
+        mca_tool_dir = os.path.join(mca_dir, 'tools')
         demos_dir = os.path.join(env_dir, 'demos')
-        self.yaml_data = self.parse_yaml_data(ctx.params['in_file'])
 
-        if os.path.isdir(ic_pkg_dir):
-            click.echo("Adapting IC workspace")
-            self.rosinstall = dict()
-            self.parse_folder(ic_pkg_dir)
-            ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
-                self.parse_ic_workspace_config()
-            if ic_rosinstall:
-                self.adapt_rosinstall(ic_rosinstall,
-                                      ic_pkg_dir,
-                                      workspace_dir=ic_dir,
-                                      is_ic=True,
-                                      ic_grab_flags=ic_flags)
-            elif ic_packages:
-                #TODO: compare the ic_dir_packages (with their versions) with the yaml_ic_rosinstall
-                click.echo('Sorry! Currently, the package list format is not supported for'
-                           ' adapting environments. Please use the rosinstall notation.')
+        self.config_file_parser = ConfigFileParser(ctx.params['in_file'])
+        has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
+            self.config_file_parser.parse_ic_config()
+        has_catkin, ros_rosinstall = self.config_file_parser.parse_ros_config()
+        has_mca, mca_additional_repos = self.config_file_parser.parse_mca_config()
 
-        if os.path.isdir(catkin_src_dir):
-            click.echo("Adapting catkin workspace")
-            self.rosinstall = dict()
-            self.parse_folder(catkin_src_dir)
-            ros_rosinstall = self.parse_ros_workspace_config()
-            if ros_rosinstall:
-                self.adapt_rosinstall(ros_rosinstall, catkin_src_dir)
-
-        if os.path.isdir(mca_library_dir):
-            self.yaml_data['mca_workspace'] = dict()
-            click.echo("Adapting mca libraries")
-            self.rosinstall = dict()
-            #TODO: compare parsed folder with yaml_data and adapt the ws accordingly
-
-            if os.path.isdir(mca_project_dir):
-                click.echo("Adapting mca projects")
+        if has_ic:
+            if os.path.isdir(ic_pkg_dir):
+                click.echo("Adapting IC workspace")
                 self.rosinstall = dict()
-                #TODO: compare parsed folder with yaml_data and adapt the ws accordingly
+                self.parse_folder(ic_pkg_dir)
+                if ic_rosinstall:
+                    self.adapt_rosinstall(ic_rosinstall,
+                                          ic_pkg_dir,
+                                          workspace_dir=ic_dir,
+                                          is_ic=True,
+                                          ic_grab_flags=ic_flags)
+                elif ic_packages:
+                    # TODO: compare the ic_dir_packages (with their versions)
+                    # with the yaml_ic_rosinstall
+                    click.echo('Sorry! Currently, the package list format is not supported for'
+                               ' adapting environments. Please use the rosinstall notation.')
+            else:
+                # TODO: Create Ic workspace here
+                # environment_helpers.IcCreator(ic_directory=self.ic_directory,
+                                                # build_directory=self.ic_build_directory,
+                                                # rosinstall=self.ic_rosinstall,
+                                                # packages=self.ic_packages,
+                                                # package_versions=self.ic_package_versions,
+                                                # grab_flags=self.ic_grab_flags)
+                pass
 
-            if os.path.isdir(mca_tool_dir):
-                click.echo("Adapting mca tools")
+        if has_catkin:
+            if os.path.isdir(catkin_src_dir):
+                click.echo("Adapting catkin workspace")
                 self.rosinstall = dict()
-                #TODO: compare parsed folder with yaml_data and adapt the ws accordingly
+                self.parse_folder(catkin_src_dir)
+                if ros_rosinstall:
+                    self.adapt_rosinstall(ros_rosinstall, catkin_src_dir)
+            else:
+                # TODO: create catkin_ws
+                pass
+
+        if has_mca:
+            if os.path.isdir(mca_library_dir):
+                click.echo("Adapting mca libraries")
+                self.rosinstall = dict()
+                self.parse_folder(mca_library_dir)
+                if 'libraries' in mca_additional_repos:
+                    self.adapt_rosinstall(mca_additional_repos['libraries'],
+                                          mca_library_dir)
+
+                if os.path.isdir(mca_project_dir):
+                    click.echo("Adapting mca projects")
+                    self.rosinstall = dict()
+                    self.parse_folder(mca_project_dir)
+                    if 'projects' in mca_additional_repos:
+                        self.adapt_rosinstall(mca_additional_repos['projects'],
+                                              mca_project_dir)
+
+                if os.path.isdir(mca_tool_dir):
+                    click.echo("Adapting mca tools")
+                    self.rosinstall = dict()
+                    self.parse_folder(mca_tool_dir)
+                    if 'tools' in mca_additional_repos:
+                        self.adapt_rosinstall(mca_additional_repos['tools'],
+                                              mca_tool_dir)
+            else:
+                # TODO: Create mca_workspace if desired
+                pass
 
         click.echo('Looking for demo scripts')
         mkdir_p(demos_dir)
-        scripts = self.parse_demo_scripts()
+        scripts = self.config_file_parser.parse_demo_scripts()
         for script in scripts:
             click.echo('Found {} in config. Will be overwritten if file exists'
                        .format(script))
@@ -84,8 +107,8 @@ class EnvironmentAdapter(click.Command):
             with open(script_path, mode='w') as f:
                 f.write(scripts[script])
                 f.close()
-            os.chmod(script_path, 00755)
-
+            os.chmod(script_path,
+                     stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
     def adapt_rosinstall(self,
                          config_rosinstall,
@@ -157,17 +180,18 @@ class EnvironmentAdapter(click.Command):
 
             # Change the origin to the uri specified
             if uri_update_required:
-                process = subprocess.Popen(["git", "remote", "set-url", "origin", uri], cwd=package_dir)
+                process = subprocess.Popen(["git", "remote", "set-url", "origin", uri],
+                                           cwd=package_dir)
                 process.wait()
 
             # Checkout the version specified
             if version_update_required:
                 process = subprocess.Popen(["git", "fetch"], cwd=package_dir)
                 process.wait()
-                #TODO: somehow decide wether to checkout the version from origin or local...
+                # TODO: somehow decide wether to checkout the version from origin or local...
                 process = subprocess.Popen(["git", "checkout", version], cwd=package_dir)
                 process.wait()
-                #TODO: add further git commands and/or some fancy output, if necessary
+                # TODO: add further git commands and/or some fancy output, if necessary
 
         config_name_list = [d['git']['local-name'] for d in config_rosinstall]
 
@@ -186,11 +210,6 @@ class EnvironmentAdapter(click.Command):
                 elif local_delete_policy_saved == 'keep_all':
                     click.echo("Keeping repository as all should be kept")
 
-    def parse_yaml_data(self, yaml_config):
-        yaml_stream = file(yaml_config, "r")
-        data = yaml_load(yaml_stream, Loader=Loader)
-        return data
-
     def parse_folder(self, folder, prefix=""):
         subfolders = os.listdir(folder)
         for subfolder in subfolders:
@@ -204,52 +223,13 @@ class EnvironmentAdapter(click.Command):
                     self.rosinstall[local_name] = entry
                 self.parse_folder(subfolder_abs, local_name)
 
-    def parse_ic_workspace_config(self):
-        ic_rosinstall = None
-        ic_packages = None
-        ic_package_versions = None
-        ic_grab_flags = []
-        if 'ic_workspace' in self.yaml_data:
-            if 'rosinstall' in self.yaml_data['ic_workspace']:
-                ic_rosinstall = self.yaml_data['ic_workspace']['rosinstall']
-                ic_packages = None
-
-            elif 'packages' in self.yaml_data['ic_workspace']:
-                ic_packages = ' '.join(self.yaml_data['ic_workspace']['packages'])
-                ic_rosinstall = None
-
-                if ('package_versions' in self.yaml_data['ic_workspace'] and
-                        self.yaml_data['ic_workspace']['package_versions'] is not None):
-                    ic_package_versions = self.yaml_data['ic_workspace']['package_versions']
-
-            if ('flags' in self.yaml_data['ic_workspace']
-                    and self.yaml_data['ic_workspace']['flags'] is not None):
-                for flag in self.yaml_data['ic_workspace']['flags']:
-                    ic_grab_flags.append("--" + flag)
-
-        return ic_rosinstall, ic_packages, ic_package_versions, ic_grab_flags
-
-    def parse_ros_workspace_config(self):
-        ros_rosinstall = None
-        if "catkin_workspace" in self.yaml_data:
-            if "rosinstall" in self.yaml_data["catkin_workspace"]:
-                ros_rosinstall = self.yaml_data["catkin_workspace"]["rosinstall"]
-
-        return ros_rosinstall
-
-    def parse_demo_scripts(self):
-        script_list = dict()
-        if 'demos' in self.yaml_data:
-            for script in self.yaml_data['demos']:
-                script_list[script] = self.yaml_data['demos'][script]
-        return script_list
-
 
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
         checkout_folder = get_checkout_dir()
         # TODO possibly check whether the directory contains actual workspace
-        return [dir for dir in os.listdir(checkout_folder) if os.path.isdir(os.path.join(checkout_folder, dir))]
+        return [dir for dir in os.listdir(checkout_folder) if
+                os.path.isdir(os.path.join(checkout_folder, dir))]
 
     def list_commands(self, ctx):
         return self.get_current_evironments()
@@ -279,7 +259,7 @@ def cli(ctx, local_delete_policy):
        New repositories will be added, versions/branches will be changed and
        deleted repositories will/may be removed.
     """
-    #TODO: pass this somehow to the invoked multicommand-object instead of a global variable
+    # TODO: pass this somehow to the invoked multicommand-object instead of a global variable
     global local_delete_policy_saved
     local_delete_policy_saved = local_delete_policy
 
