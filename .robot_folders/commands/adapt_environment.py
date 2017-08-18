@@ -9,6 +9,7 @@ from helpers.directory_helpers import mkdir_p
 from helpers.directory_helpers import get_catkin_dir
 from helpers.repository_helpers import create_rosinstall_entry
 from helpers.ConfigParser import ConfigFileParser
+import helpers.environment_helpers as environment_helpers
 
 local_delete_policy_saved = False
 
@@ -49,14 +50,33 @@ class EnvironmentAdapter(click.Command):
                     click.echo('Sorry! Currently, the package list format is not supported for'
                                ' adapting environments. Please use the rosinstall notation.')
             else:
-                # TODO: Create Ic workspace here
-                # environment_helpers.IcCreator(ic_directory=self.ic_directory,
-                                                # build_directory=self.ic_build_directory,
-                                                # rosinstall=self.ic_rosinstall,
-                                                # packages=self.ic_packages,
-                                                # package_versions=self.ic_package_versions,
-                                                # grab_flags=self.ic_grab_flags)
-                pass
+                click.echo("Creating IC workspace")
+                ic_build_dir = os.path.join(ic_dir, 'build')
+                try:
+                    if os.path.isdir('/disk/no_backup'):
+                        build_dir_choice = click.prompt(
+                                "Which folder should I use as a base for creating the build tree?\n"
+                                "Type 'local' for building inside the local robot_folders tree.\n"
+                                "Type 'no_backup' (or simply press enter) for building in the no_backup "
+                                "space (should be used on workstations).\n",
+                                type=click.Choice(['no_backup', 'local']),
+                                default='no_backup')
+                        if build_dir_choice == 'no_backup':
+                            username = getpass.getuser()
+                            ic_build_dir = os.path.join('/disk/no_backup',
+                                                        username,
+                                                        'robot_folders_build_base',
+                                                        self.name,
+                                                        'ic_workspace/build')
+                except subprocess.CalledProcessError:
+                    pass
+
+                environment_helpers.IcCreator(ic_directory=ic_dir,
+                                              build_directory=ic_build_dir,
+                                              rosinstall=ic_rosinstall,
+                                              packages=ic_packages,
+                                              package_versions=ic_package_versions,
+                                              grab_flags=ic_flags)
 
         if has_catkin:
             if os.path.isdir(catkin_src_dir):
