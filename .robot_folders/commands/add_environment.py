@@ -1,27 +1,17 @@
-import click
 import os
 import stat
-import subprocess
-import getpass
+import click
 
-from helpers.directory_helpers import get_base_dir
-from helpers.directory_helpers import get_checkout_dir
+import helpers.directory_helpers as dir_helpers
 import helpers.build_helpers as build
 import helpers.environment_helpers as environment_helpers
 from helpers.ConfigParser import ConfigFileParser
 
 
-def yes_no_to_bool(str):
-    if str == 'yes' or str == 'Yes':
-        return True
-    else:
-        return False
-
-
 class EnvCreator:
     def __init__(self, name):
         self.env_name = name
-        self.build_base_dir = get_checkout_dir()
+        self.build_base_dir = dir_helpers.get_checkout_dir()
         self.ic_packages = "base"
         self.ic_package_versions = {}
         self.ic_grab_flags = []
@@ -33,7 +23,6 @@ class EnvCreator:
         self.mca_additional_repos = ""
         self.script_list = list()
         self.build = True
-        self.has_nobackup = False
 
         self.create_ic = False
         self.create_catkin = False
@@ -47,26 +36,28 @@ class EnvCreator:
                                create_mca,
                                copy_cmake_lists,
                                local_build):
-        if os.path.exists(os.path.join(get_checkout_dir(), self.env_name)):
+        if os.path.exists(os.path.join(dir_helpers.get_checkout_dir(), self.env_name)):
             click.echo("An environment with the name \"{}\" already exists. Exiting now."
                        .format(self.env_name))
             raise Exception
-        self.check_nobackup(local_build)
 
-        self.demos_dir = os.path.join(get_checkout_dir(), self.env_name, 'demos')
+        has_nobackup = dir_helpers.check_nobackup(local_build)
+        self.build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
+
+        self.demos_dir = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, 'demos')
 
         # Build directories
-        self.ic_directory = os.path.join(get_checkout_dir(), self.env_name, "ic_workspace")
+        self.ic_directory = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "ic_workspace")
         self.ic_build_directory = os.path.join(self.build_base_dir,
                                                self.env_name,
                                                "ic_workspace",
                                                "build")
-        self.catkin_directory = os.path.join(get_checkout_dir(), self.env_name, "catkin_ws")
+        self.catkin_directory = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "catkin_ws")
         self.catkin_build_directory = os.path.join(self.build_base_dir,
                                                    self.env_name,
                                                    "catkin_ws",
                                                    "build")
-        self.mca_directory = os.path.join(get_checkout_dir(), self.env_name, "mca_workspace")
+        self.mca_directory = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "mca_workspace")
         self.mca_build_directory = os.path.join(self.build_base_dir,
                                                 self.env_name,
                                                 "mca_workspace",
@@ -81,39 +72,20 @@ class EnvCreator:
                 self.create_ic = click.confirm("Would you like to create an ic_workspace?",
                                                default=True)
             else:
-                self.create_ic = yes_no_to_bool(create_ic)
+                self.create_ic = dir_helpers.yes_no_to_bool(create_ic)
 
             if create_catkin == 'ask':
                 self.create_catkin = click.confirm("Would you like to create a catkin_ws?",
                                                    default=True)
             else:
-                self.create_catkin = yes_no_to_bool(create_catkin)
+                self.create_catkin = dir_helpers.yes_no_to_bool(create_catkin)
 
             if create_mca == 'ask':
                 self.create_mca = click.confirm("Would you like to create an mca_workspace?",
                                                 default=True)
             else:
-                self.create_mca = yes_no_to_bool(create_mca)
+                self.create_mca = dir_helpers.yes_no_to_bool(create_mca)
 
-        # If we create a catkin_ws query some more stuff at the beginning of the script.
-        if self.create_catkin:
-            installed_ros_distros = os.listdir("/opt/ros")
-            click.echo("Available ROS distributions: {}".format(installed_ros_distros))
-            ros_distro = installed_ros_distros[0]
-            if len(installed_ros_distros) > 1:
-                ros_distro = click.prompt('Which ROS distribution would you like to use?',
-                                          type=click.Choice(installed_ros_distros),
-                                          default=installed_ros_distros[0])
-            click.echo("Using ROS distribution \'{}\'".format(ros_distro))
-            if copy_cmake_lists == 'ask':
-                copy_cmake_lists = click.confirm("Would you like to copy the top-level "
-                                                 "CMakeLists.txt to the catkin"
-                                                 " src directory instead of using a symlink?\n"
-                                                 "(This is incredibly useful when using the "
-                                                 "QtCreator.)",
-                                                 default=True)
-            else:
-                copy_cmake_lists = yes_no_to_bool(copy_cmake_lists)
         click.echo("Creating environment with name \"{}\"".format(self.env_name))
 
         # Let's get down to business
@@ -135,9 +107,9 @@ class EnvCreator:
         if self.create_catkin:
             click.echo("Creating catkin_ws")
 
+            catkin_creator = \
             environment_helpers.CatkinCreator(catkin_directory=self.catkin_directory,
                                               build_directory=self.catkin_build_directory,
-                                              ros_distro=ros_distro,
                                               rosinstall=self.catkin_rosinstall,
                                               copy_cmake_lists=copy_cmake_lists)
         else:
@@ -159,53 +131,26 @@ class EnvCreator:
                 ic_builder.invoke(None)
                 self.source_ic_workspace()
             if self.create_catkin:
-                ros_builder = build.CatkinBuilder(name=ros_distro, add_help_option=False)
+                ros_builder = build.CatkinBuilder(name=catkin_creator.ros_distro, add_help_option=False)
                 ros_builder.invoke(None)
             if self.create_mca:
                 mca_builder = build.McaBuilder(name="mca_builder", add_help_option=False)
                 mca_builder.invoke(None)
 
-    def check_nobackup(self, local_build):
-        # If we are on a workstation or when no_backup is mounted like on
-        # a workstation offer to build in no_backup
-        has_nobackup = False
-        try:
-            if os.path.isdir('/disk/no_backup'):
-                has_nobackup = True
-        except subprocess.CalledProcessError:
-            pass
-
-        if has_nobackup:
-            if local_build == 'ask':
-                build_dir_choice = click.prompt(
-                        "Which folder should I use as a base for creating the build tree?\n"
-                        "Type 'local' for building inside the local robot_folders tree.\n"
-                        "Type 'no_backup' (or simply press enter) for building in the no_backup "
-                        "space (should be used on workstations).\n",
-                        type=click.Choice(['no_backup', 'local']),
-                        default='no_backup')
-                build_dir_choice = build_dir_choice == 'local'
-            else:
-                build_dir_choice = yes_no_to_bool(local_build)
-
-            if not build_dir_choice:
-                username = getpass.getuser()
-                self.build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
-
     def create_directories(self):
-        os.mkdir(os.path.join(get_checkout_dir(), self.env_name))
+        os.mkdir(os.path.join(dir_helpers.get_checkout_dir(), self.env_name))
         os.mkdir(self.demos_dir)
 
         # Add a custom source file to the environment. Custom source commands go in here.
-        env_source_file = open(os.path.join(get_checkout_dir(),
+        env_source_file = open(os.path.join(dir_helpers.get_checkout_dir(),
                                             self.env_name,
                                             "setup_local.sh"),
                                'w')
         env_source_file.write("#This file is for custom source commands in this environment.\n")
         env_source_file.close()
 
-        os.symlink(os.path.join(get_base_dir(), "bin", "source_environment.sh"),
-                   os.path.join(get_checkout_dir(), self.env_name, "setup.sh"))
+        os.symlink(os.path.join(dir_helpers.get_base_dir(), "bin", "source_environment.sh"),
+                   os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "setup.sh"))
 
     def parse_config(self, config_file):
         parser = ConfigFileParser(config_file)
@@ -239,7 +184,7 @@ class EnvCreator:
 
     # NOTE: Sourcing this way only works inside the python session and it's children.
     def source_ic_workspace(self):
-        ic_dir = os.path.join(get_checkout_dir(), self.env_name, "ic_workspace")
+        ic_dir = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "ic_workspace")
         click.echo("Sourcing ic_workspace for environment {}".format(self.env_name))
         lib_path = os.path.join(ic_dir, "export", "lib")
         os.environ['LD_LIBRARY_PATH'] = os.pathsep.join([lib_path,
