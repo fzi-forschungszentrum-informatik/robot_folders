@@ -18,14 +18,6 @@ class EnvironmentAdapter(click.Command):
     """
     Implements a click command interface to adapt an environment.
     """
-    def __init__(self, name, context_settings=None, callback=None,
-                 params=None, help=None, epilog=None, short_help=None,
-                 options_metavar='[OPTIONS]', add_help_option=True):
-        super(EnvironmentAdapter, self).__init__(
-            self, name, context_settings=None, callback=None,
-            params=None, help=None, epilog=None, short_help=None,
-            options_metavar='[OPTIONS]', add_help_option=True)
-        self.rosinstall = dict()
 
     def invoke(self, ctx):
         """
@@ -47,6 +39,7 @@ class EnvironmentAdapter(click.Command):
             config_file_parser.parse_ic_config()
         has_catkin, ros_rosinstall = config_file_parser.parse_ros_config()
         has_mca, mca_additional_repos = config_file_parser.parse_mca_config()
+        os.environ['ROB_FOLDERS_ACTIVE_ENV'] = self.name
 
         if has_ic:
             if os.path.isdir(ic_pkg_dir):
@@ -87,6 +80,7 @@ class EnvironmentAdapter(click.Command):
             else:
                 click.echo("Creating catkin workspace")
                 has_nobackup = dir_helpers.check_nobackup()
+                catkin_dir = os.path.join(env_dir, "catkin_ws")
                 build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
                 catkin_build_dir = os.path.join(build_base_dir, self.name, 'catkin_ws', 'build')
 
