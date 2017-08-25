@@ -1,3 +1,4 @@
+"""This module help parsing environment config files"""
 import click
 
 from yaml import load as yaml_load
@@ -8,13 +9,15 @@ except ImportError:
     from yaml import Loader
 
 
-class ConfigFileParser():
+class ConfigFileParser(object):
+    """Parser for robot_folders environment configs"""
     def __init__(self, config_file_name):
-        with open(config_file_name, 'r') as f:
-            self.data = yaml_load(f, Loader=Loader)
+        with open(config_file_name, 'r') as file_content:
+            self.data = yaml_load(file_content, Loader=Loader)
         click.echo('The following config file is passed:\n{}'.format(self.data))
 
     def parse_ic_config(self):
+        """Parses the ic_workspace part of the data"""
         ic_rosinstall = None
         ic_packages = None
         ic_package_versions = None
@@ -46,6 +49,7 @@ class ConfigFileParser():
         return has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_grab_flags
 
     def parse_ros_config(self):
+        """Parses the catkin_workspace part of the data"""
         ros_rosinstall = None
         has_catkin = False
         if "catkin_workspace" in self.data:
@@ -56,6 +60,7 @@ class ConfigFileParser():
         return has_catkin, ros_rosinstall
 
     def parse_mca_config(self):
+        """Parses the mca_workspace part of the data"""
         has_mca = False
         mca_additional_repos = None
         if 'mca_workspace' in self.data:
@@ -64,6 +69,7 @@ class ConfigFileParser():
         return has_mca, mca_additional_repos
 
     def parse_demo_scripts(self):
+        """Parses the demos part of the data"""
         script_list = dict()
         if 'demos' in self.data:
             for script in self.data['demos']:

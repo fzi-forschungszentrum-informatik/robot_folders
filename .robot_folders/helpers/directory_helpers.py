@@ -1,3 +1,4 @@
+"""Helpers around handling folders"""
 import os
 import errno
 import getpass
@@ -15,11 +16,12 @@ def get_base_dir():
 
 
 def get_last_activated_env():
+    """Looks for the most recently sourced environment"""
     env_file = os.path.join(get_checkout_dir(), '.cur_env')
 
     if os.path.isfile(env_file):
-        with open(env_file, 'r') as f:
-            return f.read().rstrip()
+        with open(env_file, 'r') as file_content:
+            return file_content.read().rstrip()
     else:
         print "No recently activated environment found. Is this your first run? \
 Try to add an environment and then do a change_environment to this."
@@ -27,6 +29,7 @@ Try to add an environment and then do a change_environment to this."
 
 
 def get_active_env():
+    """Returns the currently sourced environment. If none is sourced, this will return None"""
     try:
         active_env = os.environ['ROB_FOLDERS_ACTIVE_ENV']
         return active_env
@@ -38,6 +41,7 @@ def get_active_env():
 
 
 def get_active_env_path():
+    """Returns the path of the currently sourced environment"""
     active_env = get_active_env()
     if active_env is None:
         active_env_fallback = get_last_activated_env()
@@ -58,6 +62,7 @@ def mkdir_p(path):
 
 
 def recursive_rmdir(path):
+    """Recursively deletes a path"""
     for i in os.listdir(path):
         item = os.path.join(path, i)
         if os.path.isdir(item):
@@ -68,6 +73,7 @@ def recursive_rmdir(path):
 
 
 def get_checkout_dir():
+    """Get the robot folders checkout directory from the userconfig"""
     checkout_config = config_helpers.get_value_safe('directories',
                                                     'checkout_dir',
                                                     debug=False)
@@ -98,14 +104,11 @@ def get_catkin_dir(env_dir=''):
     return os.path.join(cur_env_path, "catkin_ws")
 
 
-def yes_no_to_bool(str):
+def yes_no_to_bool(bool_str):
     """
     Converts a yes/no string to a bool
     """
-    if str == 'yes' or str == 'Yes':
-        return True
-    else:
-        return False
+    return bool_str == 'yes' or bool_str == 'Yes'
 
 
 def check_nobackup(local_build='ask'):
@@ -128,12 +131,12 @@ def check_nobackup(local_build='ask'):
     if has_nobackup:
         if local_build == 'ask':
             build_dir_choice = click.prompt(
-                    "Which folder should I use as a base for creating the build tree?\n"
-                    "Type 'local' for building inside the local robot_folders tree.\n"
-                    "Type 'no_backup' (or simply press enter) for building in the no_backup "
-                    "space (should be used on workstations).\n",
-                    type=click.Choice(['no_backup', 'local']),
-                    default='no_backup')
+                "Which folder should I use as a base for creating the build tree?\n"
+                "Type 'local' for building inside the local robot_folders tree.\n"
+                "Type 'no_backup' (or simply press enter) for building in the no_backup "
+                "space (should be used on workstations).\n",
+                type=click.Choice(['no_backup', 'local']),
+                default='no_backup')
             build_dir_choice = build_dir_choice == 'local'
         else:
             build_dir_choice = yes_no_to_bool(local_build)
