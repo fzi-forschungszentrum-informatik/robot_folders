@@ -1,12 +1,45 @@
-import click
+"""
+Implements the delete command
+"""
 import os
 import shutil
 import getpass
+import click
 
 import helpers.directory_helpers as directory_helpers
 
 
+def append_to_list_if_symlink(path, delete_list):
+    """Checks whether the given path exists and is a symlink and appends it to the
+    given list if both are true"""
+    if os.path.exists(os.path.realpath(path)):
+        if os.path.islink(path):
+            delete_list.append(os.path.realpath(path))
+            return True
+    return False
+
+def append_to_list_if_folder(path, delete_list):
+    """Appends the given path to the given list, if it exists, is a folder
+    and is not in the list yet.
+    Returns true, if folder exists, false otherwise."""
+    if os.path.exists(os.path.realpath(path)):
+        if os.path.isdir(path) and os.path.realpath(path) not in delete_list:
+            delete_list.append(os.path.realpath(path))
+            return True
+    return False
+
+def delete_folder(path):
+    """Deletes the given path, if it exists and is a folder.
+    Returns true, if folder exists and was successfully delete."""
+    if os.path.exists(path):
+        if os.path.isdir(path):
+            shutil.rmtree(path)
+            return True
+    return False
+
+
 class EnvironmentDeleter(click.Command):
+    """Command that deletes an environment"""
 
     def invoke(self, ctx):
         env_dir = os.path.join(directory_helpers.get_checkout_dir(), self.name)
@@ -21,10 +54,10 @@ class EnvironmentDeleter(click.Command):
             catkin_build = os.path.join(catkin_dir, 'build')
             catkin_devel = os.path.join(catkin_dir, 'devel')
             catkin_install = os.path.join(catkin_dir, 'install')
-            self.appendToListIfSymlink(catkin_build, delete_list)
-            self.appendToListIfSymlink(catkin_devel, delete_list)
-            self.appendToListIfSymlink(catkin_install, delete_list)
-            self.appendToListIfFolder(catkin_dir, delete_list)
+            append_to_list_if_symlink(catkin_build, delete_list)
+            append_to_list_if_symlink(catkin_devel, delete_list)
+            append_to_list_if_symlink(catkin_install, delete_list)
+            append_to_list_if_folder(catkin_dir, delete_list)
         else:
             click.echo('No catkin workspace found')
 
@@ -32,9 +65,9 @@ class EnvironmentDeleter(click.Command):
         if os.path.exists(ic_dir):
             ic_build = os.path.join(ic_dir, 'build')
             ic_export = os.path.join(ic_dir, 'export')
-            self.appendToListIfSymlink(ic_build, delete_list)
-            self.appendToListIfSymlink(ic_export, delete_list)
-            self.appendToListIfFolder(ic_dir, delete_list)
+            append_to_list_if_symlink(ic_build, delete_list)
+            append_to_list_if_symlink(ic_export, delete_list)
+            append_to_list_if_folder(ic_dir, delete_list)
         else:
             click.echo('No Ic-Workspace found')
 
@@ -42,8 +75,8 @@ class EnvironmentDeleter(click.Command):
         if os.path.exists(mca_dir):
             mca_build = os.path.join(mca_dir, 'build')
 
-            self.appendToListIfSymlink(mca_build, delete_list)
-            self.appendToListIfFolder(mca_dir, delete_list)
+            append_to_list_if_symlink(mca_build, delete_list)
+            append_to_list_if_folder(mca_dir, delete_list)
         else:
             click.echo('No mca-Workspace found')
 
@@ -52,7 +85,7 @@ class EnvironmentDeleter(click.Command):
         # no_backup build base
         username = getpass.getuser()
         build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
-        self.appendToListIfFolder(os.path.join(build_base_dir, self.name), delete_list)
+        append_to_list_if_folder(os.path.join(build_base_dir, self.name), delete_list)
 
         click.echo('Going to delete the following paths:\n{}'.format('\n'.join(delete_list)))
 
@@ -67,55 +100,23 @@ class EnvironmentDeleter(click.Command):
             click.echo('performing deletion!')
             for folder in delete_list:
                 click.echo('Deleting {}'.format(folder))
-                self.deleteFolder(folder)
+                delete_folder(folder)
             click.echo('Successfully deleted environment \'{}\''.format(self.name))
         else:
             click.echo('Delete request aborted. Nothing happened.')
 
 
-    def appendToListIfSymlink(self, path, delete_list):
-        """Checks whether the given path exists and is a symlink and appends it to the
-        given list if both are true"""
-        if os.path.exists(os.path.realpath(path)):
-            if os.path.islink(path):
-                delete_list.append(os.path.realpath(path))
-                return True
-        return False
-
-    def appendToListIfFolder(self, path, delete_list):
-        """Appends the given path to the given list, if it exists, is a folder
-        and is not in the list yet.
-        Returns true, if folder exists, false otherwise."""
-        if os.path.exists(os.path.realpath(path)):
-            if os.path.isdir(path) and not os.path.realpath(path) in delete_list:
-                delete_list.append(os.path.realpath(path))
-                return True
-        return False
-
-    def deleteFolder(self, path):
-        """Deletes the given path, if it exists and is a folder.
-        Returns true, if folder exists and was successfully delete."""
-        if os.path.exists(path):
-            if os.path.isdir(path):
-                shutil.rmtree(path)
-                return True
-        return False
 
 
 class EnvironmentChooser(click.MultiCommand):
-
-    def get_current_evironments(self):
-        checkout_folder = directory_helpers.get_checkout_dir()
-        # TODO possibly check whether the directory contains actual workspace
-        return [dir for dir in os.listdir(checkout_folder)
-                if os.path.isdir(os.path.join(checkout_folder, dir))]
+    """Choose an environment"""
 
     def list_commands(self, ctx):
-        return self.get_current_evironments()
+        return directory_helpers.list_environments()
 
     def get_command(self, ctx, name):
         # return empty command with the correct name
-        if name in self.get_current_evironments():
+        if name in directory_helpers.list_environments():
             cmd = EnvironmentDeleter(name=name)
             return cmd
         else:

@@ -1,10 +1,14 @@
+"""Command to perform environment builds"""
 import click
-import os
+
 from helpers.workspace_chooser import WorkspaceChooser
 import helpers.build_helpers as build
 from helpers.directory_helpers import get_active_env
 
+
 class BuildChooser(WorkspaceChooser):
+    """Checks which workspaces are inside an env and returns these as subcommands"""
+
     def get_command(self, ctx, name):
         if get_active_env() is None:
             # click.echo("Currently, there is no sourced environment. "
@@ -33,7 +37,7 @@ def cli(ctx):
 the workspaces by adding the respective arg. Use tab completion to see which \
 workspaces are present.
     """
-    if get_active_env() == None:
+    if get_active_env() is None:
         click.echo("Currently, there is no sourced environment. Please source one \
 before calling the make function.")
         return
@@ -45,7 +49,7 @@ before calling the make function.")
         cmd = BuildChooser(ctx)
 
         # Build all present workspaces individually
-        for ws in cmd.list_commands(ctx):
-            build_cmd = cmd.get_command(ctx, ws)
+        for workspace in cmd.list_commands(ctx):
+            build_cmd = cmd.get_command(ctx, workspace)
             build_cmd.invoke(ctx)
     return
