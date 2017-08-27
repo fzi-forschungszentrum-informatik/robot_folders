@@ -162,3 +162,39 @@ def get_build_base_dir(use_no_backup):
         build_base_dir = get_checkout_dir()
 
     return build_base_dir
+
+def is_fzirob_environment(checkout_folder, env_dir):
+    """Checks whether a given directory actually contains an environment"""
+    is_environment = False
+
+    environment_folders = ['ic_workspace', 'mca_workspace']
+    environment_folders = environment_folders + \
+        config_helpers.get_value_safe_default(
+            section='directories',
+            value='catkin_names',
+            default=["catkin_workspace"])
+    environment_files = ['setup.bash', 'setup.zsh', 'setup.sh']
+
+    possible_env = os.path.join(checkout_folder, env_dir)
+    if os.path.isdir(possible_env):
+        # check folders for existence
+        for folder in environment_folders:
+            if os.path.isdir(os.path.join(possible_env, folder)):
+                is_environment = True
+                break
+        # check if folder was already found
+        if not is_environment:
+            # check files for existences
+            for filename in environment_files:
+                if os.path.exists(os.path.join(possible_env, filename)):
+                    is_environment = True
+                    break
+
+    return is_environment
+
+
+def list_environments():
+    """List all environments"""
+    checkout_folder = get_checkout_dir()
+    return [env_dir for env_dir in os.listdir(checkout_folder)
+            if is_fzirob_environment(checkout_folder, env_dir)]
