@@ -11,6 +11,12 @@ from helpers.repository_helpers import create_rosinstall_entry
 class EnvironmentScraper(click.Command):
     """Class thath implements the command"""
 
+    def __init__(self, name=None, **attrs):
+        click.Command.__init__(self, name, **attrs)
+
+        self.rosinstall = dict()
+        self.yaml_data = dict()
+
     def invoke(self, ctx):
         env_dir = os.path.join(get_checkout_dir(), self.name)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
@@ -20,7 +26,6 @@ class EnvironmentScraper(click.Command):
         mca_project_dir = os.path.join(env_dir, 'mca_workspace', 'projects')
         mca_tool_dir = os.path.join(env_dir, 'mca_workspace', 'tools')
         demos_dir = os.path.join(env_dir, 'demos')
-        self.yaml_data = dict()
 
         if os.path.isdir(ic_pkg_dir):
             click.echo("Scraping IC workspace")
