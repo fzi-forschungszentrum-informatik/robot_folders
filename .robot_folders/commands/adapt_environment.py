@@ -187,12 +187,25 @@ class EnvironmentAdapter(click.Command):
                     version_update_required = False
                 else:
                     click.echo("Package '{}' version differs from local version. "
-                               "Going to checkout config file version.".format(local_name))
+                               .format(local_name))
+                    click.echo("1) local version: {}".format(local_repo["git"]["version"]))
+                    click.echo("2) config_file version: {}".format(version))
+                    version_to_keep = click.prompt("Which version should be used?",
+                                                   type=click.Choice(['1', '2']),
+                                                   default='1')
+                    version_update_required = (version_to_keep == '2')
+
                 if uri == local_repo["git"]["uri"]:
                     uri_update_required = False
                 else:
                     click.echo("Package '{}' uri differs from local version. "
-                               "Going to set config file uri.".format(local_name))
+                               .format(local_name))
+                    click.echo("local version: {}".format(local_repo["git"]["uri"]))
+                    click.echo("config_file version: {}".format(uri))
+                    version_to_keep = click.prompt("Which uri should be used?",
+                                                   type=click.Choice(['1', '2']),
+                                                   default='2')
+                    uri_update_required = (version_to_keep == '2')
 
             else:
                 click.echo("Package '{}' does not exist in local structure. "
@@ -221,10 +234,8 @@ class EnvironmentAdapter(click.Command):
             if version_update_required:
                 process = subprocess.Popen(["git", "fetch"], cwd=package_dir)
                 process.wait()
-                # TODO: somehow decide wether to checkout the version from origin or local...
                 process = subprocess.Popen(["git", "checkout", version], cwd=package_dir)
                 process.wait()
-                # TODO: add further git commands and/or some fancy output, if necessary
 
         config_name_list = [d['git']['local-name'] for d in config_rosinstall]
 
