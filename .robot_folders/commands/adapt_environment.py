@@ -1,24 +1,32 @@
-import click
+"""
+This implements a command to adapt an environment with a config file.
+"""
 import os
 import stat
 import subprocess
+import click
 
-from helpers.directory_helpers import get_checkout_dir
-from helpers.directory_helpers import recursive_rmdir
-from helpers.directory_helpers import mkdir_p
-from helpers.directory_helpers import get_catkin_dir
+import helpers.directory_helpers as dir_helpers
 from helpers.repository_helpers import create_rosinstall_entry
 from helpers.ConfigParser import ConfigFileParser
+import helpers.environment_helpers as environment_helpers
 
 local_delete_policy_saved = False
 
 
 class EnvironmentAdapter(click.Command):
+    """
+    Implements a click command interface to adapt an environment.
+    """
+
     def invoke(self, ctx):
-        env_dir = os.path.join(get_checkout_dir(), self.name)
+        """
+        This invokes the actual command.
+        """
+        env_dir = os.path.join(dir_helpers.get_checkout_dir(), self.name)
         ic_dir = os.path.join(env_dir, "ic_workspace")
         mca_dir = os.path.join(env_dir, "mca_workspace")
-        catkin_dir = get_catkin_dir(env_dir)
+        catkin_dir = dir_helpers.get_catkin_dir(env_dir)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
         catkin_src_dir = os.path.join(catkin_dir, 'src')
         mca_library_dir = os.path.join(mca_dir, 'libraries')
@@ -26,11 +34,12 @@ class EnvironmentAdapter(click.Command):
         mca_tool_dir = os.path.join(mca_dir, 'tools')
         demos_dir = os.path.join(env_dir, 'demos')
 
-        self.config_file_parser = ConfigFileParser(ctx.params['in_file'])
+        config_file_parser = ConfigFileParser(ctx.params['in_file'])
         has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
-            self.config_file_parser.parse_ic_config()
-        has_catkin, ros_rosinstall = self.config_file_parser.parse_ros_config()
-        has_mca, mca_additional_repos = self.config_file_parser.parse_mca_config()
+            config_file_parser.parse_ic_config()
+        has_catkin, ros_rosinstall = config_file_parser.parse_ros_config()
+        has_mca, mca_additional_repos = config_file_parser.parse_mca_config()
+        os.environ['ROB_FOLDERS_ACTIVE_ENV'] = self.name
 
         if has_ic:
             if os.path.isdir(ic_pkg_dir):
@@ -49,14 +58,17 @@ class EnvironmentAdapter(click.Command):
                     click.echo('Sorry! Currently, the package list format is not supported for'
                                ' adapting environments. Please use the rosinstall notation.')
             else:
-                # TODO: Create Ic workspace here
-                # environment_helpers.IcCreator(ic_directory=self.ic_directory,
-                                                # build_directory=self.ic_build_directory,
-                                                # rosinstall=self.ic_rosinstall,
-                                                # packages=self.ic_packages,
-                                                # package_versions=self.ic_package_versions,
-                                                # grab_flags=self.ic_grab_flags)
-                pass
+                click.echo("Creating IC workspace")
+                has_nobackup = dir_helpers.check_nobackup()
+                build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
+                ic_build_dir = os.path.join(build_base_dir, self.name, 'ic_workspace', 'build')
+
+                environment_helpers.IcCreator(ic_directory=ic_dir,
+                                              build_directory=ic_build_dir,
+                                              rosinstall=ic_rosinstall,
+                                              packages=ic_packages,
+                                              package_versions=ic_package_versions,
+                                              grab_flags=ic_flags)
 
         if has_catkin:
             if os.path.isdir(catkin_src_dir):
@@ -66,8 +78,16 @@ class EnvironmentAdapter(click.Command):
                 if ros_rosinstall:
                     self.adapt_rosinstall(ros_rosinstall, catkin_src_dir)
             else:
-                # TODO: create catkin_ws
-                pass
+                click.echo("Creating catkin workspace")
+                has_nobackup = dir_helpers.check_nobackup()
+                catkin_dir = os.path.join(env_dir, "catkin_ws")
+                build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
+                catkin_build_dir = os.path.join(build_base_dir, self.name, 'catkin_ws', 'build')
+
+                environment_helpers.CatkinCreator(catkin_directory=catkin_dir,
+                                                  build_directory=catkin_build_dir,
+                                                  rosinstall=ros_rosinstall
+                                                 )
 
         if has_mca:
             if os.path.isdir(mca_library_dir):
@@ -94,12 +114,18 @@ class EnvironmentAdapter(click.Command):
                         self.adapt_rosinstall(mca_additional_repos['tools'],
                                               mca_tool_dir)
             else:
-                # TODO: Create mca_workspace if desired
-                pass
+                click.echo("Creating mca workspace")
+                has_nobackup = dir_helpers.check_nobackup()
+                build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
+                mca_build_dir = os.path.join(build_base_dir, self.name, 'mca_workspace', 'build')
+
+                environment_helpers.MCACreator(mca_directory=mca_dir,
+                                               build_directory=mca_build_dir,
+                                               mca_additional_repos=mca_additional_repos)
 
         click.echo('Looking for demo scripts')
-        mkdir_p(demos_dir)
-        scripts = self.config_file_parser.parse_demo_scripts()
+        dir_helpers.mkdir_p(demos_dir)
+        scripts = config_file_parser.parse_demo_scripts()
         for script in scripts:
             click.echo('Found {} in config. Will be overwritten if file exists'
                        .format(script))
@@ -116,6 +142,9 @@ class EnvironmentAdapter(click.Command):
                          workspace_dir="",
                          is_ic=False,
                          ic_grab_flags=None):
+        """
+        Parses the given config rosinstall and compares it to the locally installed packages
+        """
         for repo in config_rosinstall:
             local_version_exists = False
             version_update_required = True
@@ -201,16 +230,19 @@ class EnvironmentAdapter(click.Command):
                 local_name = self.rosinstall[repo]["git"]["local-name"]
                 package_dir = os.path.join(packages_dir, local_name)
                 if local_delete_policy_saved == 'delete_all':
-                    recursive_rmdir(package_dir)
+                    dir_helpers.recursive_rmdir(package_dir)
                     click.echo("Deleted '{}'".format(repo))
                 elif local_delete_policy_saved == 'ask':
                     if click.confirm('Do you want to delete it?'):
-                        recursive_rmdir(package_dir)
+                        dir_helpers.recursive_rmdir(package_dir)
                         click.echo("Deleted '{}'".format(repo))
                 elif local_delete_policy_saved == 'keep_all':
                     click.echo("Keeping repository as all should be kept")
 
     def parse_folder(self, folder, prefix=""):
+        """
+        Function to recursively find git repositories
+        """
         subfolders = os.listdir(folder)
         for subfolder in subfolders:
             subfolder_abs = os.path.join(folder, subfolder)
@@ -226,7 +258,7 @@ class EnvironmentAdapter(click.Command):
 
 class EnvironmentChooser(click.MultiCommand):
     def get_current_evironments(self):
-        checkout_folder = get_checkout_dir()
+        checkout_folder = dir_helpers.get_checkout_dir()
         # TODO possibly check whether the directory contains actual workspace
         return [dir for dir in os.listdir(checkout_folder) if
                 os.path.isdir(os.path.join(checkout_folder, dir))]

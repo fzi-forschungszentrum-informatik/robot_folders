@@ -2,7 +2,7 @@ import click
 import os
 from helpers import config_helpers
 
-from helpers.directory_helpers import get_last_activated_env, get_checkout_dir, get_catkin_dir
+from helpers.directory_helpers import get_last_activated_env, get_checkout_dir
 
 class EnvironmentChoice(click.Command):
     def invoke(self, ctx):

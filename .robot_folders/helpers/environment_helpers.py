@@ -5,6 +5,7 @@ import click
 
 import helpers.config_helpers as config_helpers
 import helpers.build_helpers as build_helpers
+import helpers.directory_helpers as dir_helpers
 
 from yaml import dump as yaml_dump
 
@@ -105,23 +106,43 @@ class CatkinCreator(object):
     def __init__(self,
                  catkin_directory,
                  build_directory,
-                 ros_distro,
                  rosinstall,
-                 copy_cmake_lists):
+                 copy_cmake_lists='ask'):
         self.catkin_directory = catkin_directory
         self.build_directory = build_directory
-        self.ros_distro = ros_distro
-        ros_global_dir = "/opt/ros/{}".format(ros_distro)
+        self.copy_cmake_lists = copy_cmake_lists
+        self.ros_distro=''
 
+        self.ask_questions()
+        ros_global_dir = "/opt/ros/{}".format(self.ros_distro)
         self.create_catkin_skeleton()
         self.build()
         self.clone_packages(rosinstall)
 
-        if copy_cmake_lists:
+        if self.copy_cmake_lists:
             subprocess.check_call(["rm", "{}/src/CMakeLists.txt".format(self.catkin_directory)])
             subprocess.check_call(["cp",
                                    "{}/share/catkin/cmake/toplevel.cmake".format(ros_global_dir),
                                    "{}/src/CMakeLists.txt".format(self.catkin_directory)])
+
+    def ask_questions(self):
+        installed_ros_distros = os.listdir("/opt/ros")
+        click.echo("Available ROS distributions: {}".format(installed_ros_distros))
+        self.ros_distro = installed_ros_distros[0]
+        if len(installed_ros_distros) > 1:
+            self.ros_distro = click.prompt('Which ROS distribution would you like to use?',
+                                           type=click.Choice(installed_ros_distros),
+                                           default=installed_ros_distros[0])
+        click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
+        if self.copy_cmake_lists == 'ask':
+            self.copy_cmake_lists = click.confirm("Would you like to copy the top-level "
+                                                  "CMakeLists.txt to the catkin"
+                                                  " src directory instead of using a symlink?\n"
+                                                  "(This is incredibly useful when using the "
+                                                  "QtCreator.)",
+                                                  default=True)
+        else:
+            self.copy_cmake_lists = dir_helpers.yes_no_to_bool(self.copy_cmake_lists)
 
     def build(self):
         # We abuse the name parameter to code the ros distribution
