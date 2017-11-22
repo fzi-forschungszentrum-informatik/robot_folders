@@ -77,24 +77,26 @@ fzirob()
       fi
     else
       rob_folders $@
-      if [ $1 = "change_environment" ] && [ "$2" != "--help"  ]; then
-        checkout_dir=$(rob_folders get_checkout_base_dir)
-        if [ -f ${checkout_dir}/.cur_env ]; then
-          export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
-          environment_dir="${checkout_dir}/${ROB_FOLDERS_ACTIVE_ENV}"
-          if [ -f ${environment_dir}/setup.sh ]; then
-            source ${environment_dir}/setup.sh
-          elif [ -f ${environment_dir}/setup.zsh ]; then
-            source ${environment_dir}/setup.zsh
-          elif [ -f ${environment_dir}/setup.bash ]; then
-            source ${environment_dir}/setup.bash
+      if [ $? -eq 0 ]; then
+        if [ $1 = "change_environment" ] && [ "$2" != "--help"  ]; then
+          checkout_dir=$(rob_folders get_checkout_base_dir)
+          if [ -f ${checkout_dir}/.cur_env ]; then
+            export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
+            environment_dir="${checkout_dir}/${ROB_FOLDERS_ACTIVE_ENV}"
+            if [ -f ${environment_dir}/setup.sh ]; then
+              source ${environment_dir}/setup.sh
+            elif [ -f ${environment_dir}/setup.zsh ]; then
+              source ${environment_dir}/setup.zsh
+            elif [ -f ${environment_dir}/setup.bash ]; then
+              source ${environment_dir}/setup.bash
+            else
+              source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
+            fi
+            # declare environment-specific aliases
+            env_aliases
           else
-            source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
+            echo "Could not change environment"
           fi
-          # declare environment-specific aliases
-          env_aliases
-        else
-          echo "Could not change environment"
         fi
       fi
     fi

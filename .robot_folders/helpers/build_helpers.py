@@ -1,6 +1,7 @@
-import click
+"""Module that helps building workspaces"""
 import os
 import subprocess
+import click
 
 from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir
 from helpers.which import which
@@ -28,6 +29,7 @@ def get_cmake_flags():
 
 
 class Builder(click.Command):
+    """General builder class"""
     build_dir = 'build'
     def get_build_command(self):
         """ Determine whether to use make or ninja. If it cannot be guessed
@@ -57,7 +59,7 @@ class Builder(click.Command):
             build_cmd = 'make'
 
         if 'make' in build_cmd:
-            if not '-j' in build_cmd:
+            if '-j' not in build_cmd:
                 num_threads = config_helpers.get_value_safe_default(
                     section='build',
                     value='make_threads',
@@ -90,17 +92,20 @@ class Builder(click.Command):
             default=str(self.get_install_default()))
         return foobar
 
-    def get_install_key(self):
+    @classmethod
+    def get_install_key(cls):
         """ Returns the userconfig key for the install command of this builder."""
         return ''
 
-    def get_install_default(self):
+    @classmethod
+    def get_install_default(cls):
         """ Returns the default install behavior for this builder,
         if none is provided by the user config"""
         return False
 
 
 class IcBuilder(Builder):
+    """Builder class for an ic workspace"""
     def invoke(self, ctx):
         ic_dir = os.path.realpath(os.path.join(get_active_env_path(), 'ic_workspace'))
         self.build_dir = os.path.realpath(os.path.join(ic_dir, 'build'))
@@ -117,6 +122,7 @@ class IcBuilder(Builder):
         return True
 
 class CatkinBuilder(Builder):
+    """Builder class for catkin workspace"""
     def get_build_command(self, catkin_dir, ros_distro):
         # default: make
         build_cmd = "catkin_make"
@@ -130,14 +136,14 @@ class CatkinBuilder(Builder):
                 if start > -1:
                     # remove any trailing chars like newlines
                     if "ninja" in line:
-                        build_cmd="catkin_make --use-ninja"
+                        build_cmd = "catkin_make --use-ninja"
         else:
             generator = config_helpers.get_value_safe_default(
                 section='build',
                 value='generator',
                 default='make')
             if generator == "ninja":
-                build_cmd="catkin_make --use-ninja"
+                build_cmd = "catkin_make --use-ninja"
 
         ros_global_dir = "/opt/ros/{}".format(ros_distro)
 
@@ -168,6 +174,7 @@ class CatkinBuilder(Builder):
 # TODO: We could support building of single projects? Unfortunately, I don't know
 #       much about mca. (mauch: 20160417)
 class McaBuilder(Builder):
+    """Builder class for an mca workspace"""
     def invoke(self, ctx):
         mca_dir = os.path.realpath(os.path.join(get_active_env_path(), 'mca_workspace'))
         self.build_dir = os.path.realpath(os.path.join(mca_dir, 'build'))

@@ -1,10 +1,14 @@
+"""Module for implementing the 'which' command in python"""
+import os
+
 def which(program):
-    import os
+    """Defines a 'which' function similar to the linux command"""
 
     def is_exe(fpath):
+        """Checks whether a path points to an executable file"""
         return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
 
-    fpath, fname = os.path.split(program)
+    fpath = os.path.split(program)
     if fpath:
         if is_exe(program):
             return program

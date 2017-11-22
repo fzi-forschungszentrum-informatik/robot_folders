@@ -11,13 +11,17 @@ from helpers.repository_helpers import create_rosinstall_entry
 from helpers.ConfigParser import ConfigFileParser
 import helpers.environment_helpers as environment_helpers
 
-local_delete_policy_saved = False
-
 
 class EnvironmentAdapter(click.Command):
     """
     Implements a click command interface to adapt an environment.
     """
+
+    def __init__(self, name=None, **attrs):
+        click.Command.__init__(self, name, **attrs)
+
+        self.local_delete_policy = 'ask'
+        self.rosinstall = dict()
 
     def invoke(self, ctx):
         """
@@ -34,6 +38,8 @@ class EnvironmentAdapter(click.Command):
         mca_tool_dir = os.path.join(mca_dir, 'tools')
         demos_dir = os.path.join(env_dir, 'demos')
 
+        self.local_delete_policy = ctx.parent.params['local_delete_policy']
+
         config_file_parser = ConfigFileParser(ctx.params['in_file'])
         has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
             config_file_parser.parse_ic_config()
@@ -44,7 +50,6 @@ class EnvironmentAdapter(click.Command):
         if has_ic:
             if os.path.isdir(ic_pkg_dir):
                 click.echo("Adapting IC workspace")
-                self.rosinstall = dict()
                 self.parse_folder(ic_pkg_dir)
                 if ic_rosinstall:
                     self.adapt_rosinstall(ic_rosinstall,
@@ -86,8 +91,7 @@ class EnvironmentAdapter(click.Command):
 
                 environment_helpers.CatkinCreator(catkin_directory=catkin_dir,
                                                   build_directory=catkin_build_dir,
-                                                  rosinstall=ros_rosinstall
-                                                 )
+                                                  rosinstall=ros_rosinstall)
 
         if has_mca:
             if os.path.isdir(mca_library_dir):
@@ -130,9 +134,9 @@ class EnvironmentAdapter(click.Command):
             click.echo('Found {} in config. Will be overwritten if file exists'
                        .format(script))
             script_path = os.path.join(demos_dir, script)
-            with open(script_path, mode='w') as f:
-                f.write(scripts[script])
-                f.close()
+            with open(script_path, mode='w') as demo_script:
+                demo_script.write(scripts[script])
+                demo_script.close()
             os.chmod(script_path,
                      stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
@@ -183,12 +187,25 @@ class EnvironmentAdapter(click.Command):
                     version_update_required = False
                 else:
                     click.echo("Package '{}' version differs from local version. "
-                               "Going to checkout config file version.".format(local_name))
+                               .format(local_name))
+                    click.echo("1) local version: {}".format(local_repo["git"]["version"]))
+                    click.echo("2) config_file version: {}".format(version))
+                    version_to_keep = click.prompt("Which version should be used?",
+                                                   type=click.Choice(['1', '2']),
+                                                   default='1')
+                    version_update_required = (version_to_keep == '2')
+
                 if uri == local_repo["git"]["uri"]:
                     uri_update_required = False
                 else:
                     click.echo("Package '{}' uri differs from local version. "
-                               "Going to set config file uri.".format(local_name))
+                               .format(local_name))
+                    click.echo("local version: {}".format(local_repo["git"]["uri"]))
+                    click.echo("config_file version: {}".format(uri))
+                    version_to_keep = click.prompt("Which uri should be used?",
+                                                   type=click.Choice(['1', '2']),
+                                                   default='2')
+                    uri_update_required = (version_to_keep == '2')
 
             else:
                 click.echo("Package '{}' does not exist in local structure. "
@@ -217,10 +234,8 @@ class EnvironmentAdapter(click.Command):
             if version_update_required:
                 process = subprocess.Popen(["git", "fetch"], cwd=package_dir)
                 process.wait()
-                # TODO: somehow decide wether to checkout the version from origin or local...
                 process = subprocess.Popen(["git", "checkout", version], cwd=package_dir)
                 process.wait()
-                # TODO: add further git commands and/or some fancy output, if necessary
 
         config_name_list = [d['git']['local-name'] for d in config_rosinstall]
 
@@ -229,14 +244,14 @@ class EnvironmentAdapter(click.Command):
                 click.echo("Package '{}' found locally, but not in config.".format(repo))
                 local_name = self.rosinstall[repo]["git"]["local-name"]
                 package_dir = os.path.join(packages_dir, local_name)
-                if local_delete_policy_saved == 'delete_all':
+                if self.local_delete_policy == 'delete_all':
                     dir_helpers.recursive_rmdir(package_dir)
                     click.echo("Deleted '{}'".format(repo))
-                elif local_delete_policy_saved == 'ask':
+                elif self.local_delete_policy == 'ask':
                     if click.confirm('Do you want to delete it?'):
                         dir_helpers.recursive_rmdir(package_dir)
                         click.echo("Deleted '{}'".format(repo))
-                elif local_delete_policy_saved == 'keep_all':
+                elif self.local_delete_policy == 'keep_all':
                     click.echo("Keeping repository as all should be kept")
 
     def parse_folder(self, folder, prefix=""):
@@ -257,18 +272,14 @@ class EnvironmentAdapter(click.Command):
 
 
 class EnvironmentChooser(click.MultiCommand):
-    def get_current_evironments(self):
-        checkout_folder = dir_helpers.get_checkout_dir()
-        # TODO possibly check whether the directory contains actual workspace
-        return [dir for dir in os.listdir(checkout_folder) if
-                os.path.isdir(os.path.join(checkout_folder, dir))]
+    """Class to select an environment"""
 
     def list_commands(self, ctx):
-        return self.get_current_evironments()
+        return dir_helpers.list_environments()
 
     def get_command(self, ctx, name):
         # return empty command with the correct name
-        if name in self.get_current_evironments():
+        if name in dir_helpers.list_environments():
             cmd = EnvironmentAdapter(name=name, params=[click.Argument(param_decls=['in_file'])])
             return cmd
         else:
@@ -291,9 +302,7 @@ def cli(ctx, local_delete_policy):
        New repositories will be added, versions/branches will be changed and
        deleted repositories will/may be removed.
     """
-    # TODO: pass this somehow to the invoked multicommand-object instead of a global variable
-    global local_delete_policy_saved
-    local_delete_policy_saved = local_delete_policy
+    print "The policy for deleting repos only existing locally is: '{}'".format(local_delete_policy)
 
     if ctx.invoked_subcommand is None:
         click.echo('No environment specified. Please choose one '

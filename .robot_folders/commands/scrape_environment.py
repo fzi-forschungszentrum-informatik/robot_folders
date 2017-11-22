@@ -1,18 +1,22 @@
-import click
+"""Command that scrapes an environment's configuration into a config file"""
 import os
+import click
 
-from yaml import load as yaml_load, dump as yaml_dump, safe_dump as yaml_safe_dump
+from yaml import safe_dump as yaml_safe_dump
 
-try:
-    from yaml import CLoader as Loader, CDumper, Dumper
-except ImportError:
-    from yaml import Loader, Dumper
-
-from helpers.directory_helpers import get_base_dir, get_checkout_dir, get_catkin_dir
+from helpers.directory_helpers import get_checkout_dir, get_catkin_dir, list_environments
 from helpers.repository_helpers import create_rosinstall_entry
 
 
 class EnvironmentScraper(click.Command):
+    """Class thath implements the command"""
+
+    def __init__(self, name=None, **attrs):
+        click.Command.__init__(self, name, **attrs)
+
+        self.rosinstall = dict()
+        self.yaml_data = dict()
+
     def invoke(self, ctx):
         env_dir = os.path.join(get_checkout_dir(), self.name)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
@@ -22,7 +26,6 @@ class EnvironmentScraper(click.Command):
         mca_project_dir = os.path.join(env_dir, 'mca_workspace', 'projects')
         mca_tool_dir = os.path.join(env_dir, 'mca_workspace', 'tools')
         demos_dir = os.path.join(env_dir, 'demos')
-        self.yaml_data = dict()
 
         if os.path.isdir(ic_pkg_dir):
             click.echo("Scraping IC workspace")
@@ -60,18 +63,20 @@ class EnvironmentScraper(click.Command):
         if os.path.isdir(demos_dir):
             self.yaml_data['demos'] = dict()
             script_list = [script_file for script_file in os.listdir(demos_dir) if
-                    os.path.isfile(os.path.join(demos_dir, script_file)) and os.access(os.path.join(demos_dir, script_file), os.X_OK)]
+                           os.path.isfile(os.path.join(demos_dir, script_file)) and
+                           os.access(os.path.join(demos_dir, script_file), os.X_OK)]
             for script in script_list:
                 script_path = os.path.join(demos_dir, script)
-                with open(script_path, 'r') as f:
+                with open(script_path, 'r') as filecontent:
                     # content = f.read()
-                    self.yaml_data['demos'][script] = f.read()
-                    f.close()
+                    self.yaml_data['demos'][script] = filecontent.read()
+                    filecontent.close()
 
         yaml_stream = file(ctx.params['out_file'], 'w')
         yaml_safe_dump(self.yaml_data, stream=yaml_stream, encoding='utf-8', allow_unicode=True)
 
     def parse_folder(self, folder, prefix=''):
+        """Recursively pars subfolders"""
         subfolders = os.listdir(folder)
         for subfolder in subfolders:
             subfolder_abs = os.path.join(folder, subfolder)
@@ -88,17 +93,14 @@ class EnvironmentScraper(click.Command):
 
 
 class EnvironmentChooser(click.MultiCommand):
-    def get_current_evironments(self):
-        checkout_folder = get_checkout_dir()
-        # TODO possibly check whether the directory contains actual workspace
-        return [dir for dir in os.listdir(checkout_folder) if os.path.isdir(os.path.join(checkout_folder, dir))]
+    """Select the requested environment"""
 
     def list_commands(self, ctx):
-        return self.get_current_evironments()
+        return list_environments()
 
     def get_command(self, ctx, name):
         # return empty command with the correct name
-        if name in self.get_current_evironments():
+        if name in list_environments():
             cmd = EnvironmentScraper(name=name, params=[click.Argument(param_decls=['out_file'])])
             return cmd
         else:

@@ -1,23 +1,27 @@
-import click
+"""This command populates the 'cd' functionality"""
 import os
+import click
+
 from helpers.workspace_chooser import WorkspaceChooser
-from helpers.directory_helpers import *
+import helpers.directory_helpers as dir_helpers
 
 
 class CdChooser(WorkspaceChooser):
+    """Class implementing the cd command"""
+
     def get_command(self, ctx, name):
-        env = get_active_env()
+        env = dir_helpers.get_active_env()
         if env is None:
             click.echo("No active environment found. Using most recently activated \
-environment '{}'".format(get_last_activated_env()))
-            env = get_last_activated_env()
+environment '{}'".format(dir_helpers.get_last_activated_env()))
+            env = dir_helpers.get_last_activated_env()
 
-        target_dir = get_active_env_path()
+        target_dir = dir_helpers.get_active_env_path()
         if name in self.list_commands(ctx):
             if name == 'ic':
                 target_dir = os.path.join(target_dir, 'ic_workspace')
             elif name == 'ros':
-                target_dir = get_catkin_dir()
+                target_dir = dir_helpers.get_catkin_dir()
             elif name == 'mca':
                 target_dir = os.path.join(target_dir, 'mca_workspace')
         else:
@@ -38,10 +42,10 @@ def cli(ctx):
 
     if ctx.invoked_subcommand is None and \
        ctx.parent.invoked_subcommand == 'cd':
-        if get_active_env() is None:
+        if dir_helpers.get_active_env() is None:
             click.echo("No active environment found. Using most recently "
                        "activated environment")
-        active_env_path = get_active_env_path()
+        active_env_path = dir_helpers.get_active_env_path()
         if active_env_path is not None:
             click.echo("cd {}".format(active_env_path))
     return

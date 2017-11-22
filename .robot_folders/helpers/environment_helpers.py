@@ -1,3 +1,6 @@
+"""
+Module with helper classes to create workspaces
+"""
 import os
 import subprocess
 
@@ -11,6 +14,9 @@ from yaml import dump as yaml_dump
 
 
 class IcCreator(object):
+    """
+    Class to create an IcWorkspace
+    """
 
     def __init__(self,
                  ic_directory,
@@ -45,6 +51,10 @@ class IcCreator(object):
         self.create_build_folders()
 
     def add_packages(self, packages, package_versions, grab_flags):
+        """
+        Adds the given packages with the IcWorkspace.py script. Package versions and grab_flags can
+        be defined optionally.
+        """
         # If something goes wrong here, this will throw an exception, which is fine, as it shouldn't
         grab_command = ["./IcWorkspace.py", "grab", packages]
         if grab_flags is not None:
@@ -68,11 +78,14 @@ class IcCreator(object):
                         'package is not listed in environment!'.format(package))
 
     def add_rosinstall(self, rosinstall):
+        """
+        Adds packages from a rosinstall entry.
+        """
         # if a rosinstall is specified, no base-grabbing is required
         # Dump the rosinstall to a file and use wstool for getting the packages
         rosinstall_filename = '/tmp/rob_folders_rosinstall'
-        with open(rosinstall_filename, 'w') as f:
-            yaml_dump(rosinstall, f)
+        with open(rosinstall_filename, 'w') as rosinstall_content:
+            yaml_dump(rosinstall, rosinstall_content)
 
         # If something goes wrong here, this will throw an exception, which is fine, as it shoudln't
         process = subprocess.Popen(["wstool", "init", "packages", rosinstall_filename],
@@ -86,6 +99,10 @@ class IcCreator(object):
         process.wait()
 
     def create_build_folders(self):
+        """
+        Creates the necessary build directories in the file system. If a remote build is used (e.g.
+        no_backup) then symlinks are created automatically.
+        """
         (export_base_dir, _) = os.path.split(self.build_directory)
         export_directory = os.path.join(export_base_dir, "export")
 
@@ -102,6 +119,9 @@ class IcCreator(object):
 
 
 class CatkinCreator(object):
+    """
+    Creates a catkin workspace
+    """
 
     def __init__(self,
                  catkin_directory,
@@ -111,7 +131,7 @@ class CatkinCreator(object):
         self.catkin_directory = catkin_directory
         self.build_directory = build_directory
         self.copy_cmake_lists = copy_cmake_lists
-        self.ros_distro=''
+        self.ros_distro = ''
 
         self.ask_questions()
         ros_global_dir = "/opt/ros/{}".format(self.ros_distro)
@@ -126,6 +146,10 @@ class CatkinCreator(object):
                                    "{}/src/CMakeLists.txt".format(self.catkin_directory)])
 
     def ask_questions(self):
+        """
+        When creating a catkin workspace some questions need to be answered such as which ros
+        version to use and whether to copy the CMakeLists.txt
+        """
         installed_ros_distros = os.listdir("/opt/ros")
         click.echo("Available ROS distributions: {}".format(installed_ros_distros))
         self.ros_distro = installed_ros_distros[0]
@@ -145,6 +169,9 @@ class CatkinCreator(object):
             self.copy_cmake_lists = dir_helpers.yes_no_to_bool(self.copy_cmake_lists)
 
     def build(self):
+        """
+        Launch the build process
+        """
         # We abuse the name parameter to code the ros distribution
         # if we're building for the first time.
         ros_builder = build_helpers.CatkinBuilder(name=self.ros_distro,
@@ -152,6 +179,10 @@ class CatkinCreator(object):
         ros_builder.invoke(None)
 
     def create_catkin_skeleton(self):
+        """
+        Creates the workspace skeleton and if necessary the relevant folders for remote build (e.g.
+        no_backup)
+        """
         # Create directories and symlinks, if necessary
         os.mkdir(self.catkin_directory)
         os.mkdir(os.path.join(self.catkin_directory, "src"))
@@ -176,12 +207,15 @@ class CatkinCreator(object):
             os.symlink(catkin_install_directory, local_install_dir_name)
 
     def clone_packages(self, rosinstall):
+        """
+        Clone in packages froma rosinstall structure
+        """
         # copy packages
         if rosinstall != "":
             # Dump the rosinstall to a file and use wstool for getting the packages
             rosinstall_filename = '/tmp/rob_folders_rosinstall'
-            with open(rosinstall_filename, 'w') as f:
-                yaml_dump(rosinstall, f)
+            with open(rosinstall_filename, 'w') as rosinstall_content:
+                yaml_dump(rosinstall, rosinstall_content)
 
             process = subprocess.Popen(["wstool", "init", "src", rosinstall_filename],
                                        cwd=self.catkin_directory)
@@ -190,6 +224,9 @@ class CatkinCreator(object):
 
 
 class MCACreator(object):
+    """
+    Class to create an mca workspace
+    """
 
     def __init__(self,
                  mca_directory,
@@ -215,6 +252,9 @@ class MCACreator(object):
         self.create_build_folders()
 
     def add_from_config(self, mca_additional_repos):
+        """
+        Parses a config entry and clones libraries, projects and tools
+        """
         if 'libraries' in mca_additional_repos and mca_additional_repos['libraries'] is not None:
             for library in mca_additional_repos['libraries']:
                 libraries_dir = os.path.join(self.mca_directory,
@@ -259,6 +299,9 @@ class MCACreator(object):
                     process.wait()
 
     def create_build_folders(self):
+        """
+        Creates necessary build folders for an mca workspace
+        """
         os.makedirs(self.build_directory)
         local_build_dir_name = os.path.join(self.mca_directory, "build")
         if local_build_dir_name != self.build_directory:

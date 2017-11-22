@@ -1,3 +1,4 @@
+"""implements the add functionality"""
 import os
 import stat
 import click
@@ -8,19 +9,40 @@ import helpers.environment_helpers as environment_helpers
 from helpers.ConfigParser import ConfigFileParser
 
 
-class EnvCreator:
+class EnvCreator(object):
+    """Worker class that actually handles the environment creation"""
+
     def __init__(self, name):
         self.env_name = name
         self.build_base_dir = dir_helpers.get_checkout_dir()
+        self.demos_dir = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, 'demos')
+
+        self.ic_directory = os.path.join(
+            dir_helpers.get_checkout_dir(),
+            self.env_name,
+            "ic_workspace")
         self.ic_packages = "base"
         self.ic_package_versions = {}
         self.ic_grab_flags = []
         self.ic_cmake_flags = ""
         self.ic_rosinstall = None
+        self.ic_build_directory = 'to_be_set'
+        self.ic_flags = []
+
+        self.catkin_directory = os.path.join(
+            dir_helpers.get_checkout_dir(), self.env_name, "catkin_ws")
+        self.catkin_build_directory = 'to_be_set'
         self.cama_flags = ""
         self.catkin_rosinstall = ""
+
+        self.mca_directory = os.path.join(
+            dir_helpers.get_checkout_dir(),
+            self.env_name,
+            "mca_workspace")
+        self.mca_build_directory = 'to_be_set'
         self.mca_cmake_flags = ""
         self.mca_additional_repos = ""
+
         self.script_list = list()
         self.build = True
 
@@ -36,6 +58,7 @@ class EnvCreator:
                                create_mca,
                                copy_cmake_lists,
                                local_build):
+        """Worker method that does the actual job"""
         if os.path.exists(os.path.join(dir_helpers.get_checkout_dir(), self.env_name)):
             click.echo("An environment with the name \"{}\" already exists. Exiting now."
                        .format(self.env_name))
@@ -44,20 +67,15 @@ class EnvCreator:
         has_nobackup = dir_helpers.check_nobackup(local_build)
         self.build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
 
-        self.demos_dir = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, 'demos')
-
         # Build directories
-        self.ic_directory = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "ic_workspace")
         self.ic_build_directory = os.path.join(self.build_base_dir,
                                                self.env_name,
                                                "ic_workspace",
                                                "build")
-        self.catkin_directory = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "catkin_ws")
         self.catkin_build_directory = os.path.join(self.build_base_dir,
                                                    self.env_name,
                                                    "catkin_ws",
                                                    "build")
-        self.mca_directory = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "mca_workspace")
         self.mca_build_directory = os.path.join(self.build_base_dir,
                                                 self.env_name,
                                                 "mca_workspace",
@@ -108,10 +126,10 @@ class EnvCreator:
             click.echo("Creating catkin_ws")
 
             catkin_creator = \
-            environment_helpers.CatkinCreator(catkin_directory=self.catkin_directory,
-                                              build_directory=self.catkin_build_directory,
-                                              rosinstall=self.catkin_rosinstall,
-                                              copy_cmake_lists=copy_cmake_lists)
+                environment_helpers.CatkinCreator(catkin_directory=self.catkin_directory,
+                                                  build_directory=self.catkin_build_directory,
+                                                  rosinstall=self.catkin_rosinstall,
+                                                  copy_cmake_lists=copy_cmake_lists)
         else:
             click.echo("Requested to not create a catkin_ws")
 
@@ -131,13 +149,15 @@ class EnvCreator:
                 ic_builder.invoke(None)
                 self.source_ic_workspace()
             if self.create_catkin:
-                ros_builder = build.CatkinBuilder(name=catkin_creator.ros_distro, add_help_option=False)
+                ros_builder = build.CatkinBuilder(
+                    name=catkin_creator.ros_distro, add_help_option=False)
                 ros_builder.invoke(None)
             if self.create_mca:
                 mca_builder = build.McaBuilder(name="mca_builder", add_help_option=False)
                 mca_builder.invoke(None)
 
     def create_directories(self):
+        """Creates the directory skeleton with build_directories and symlinks"""
         os.mkdir(os.path.join(dir_helpers.get_checkout_dir(), self.env_name))
         os.mkdir(self.demos_dir)
 
@@ -153,6 +173,7 @@ class EnvCreator:
                    os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "setup.sh"))
 
     def parse_config(self, config_file):
+        """Parses a config file to get an environment information"""
         parser = ConfigFileParser(config_file)
 
         # Parse ic_workspace packages with error checking
@@ -172,18 +193,22 @@ class EnvCreator:
         self.script_list = parser.parse_demo_scripts()
 
     def create_demo_scripts(self):
+        """If there are demo scripts given to the environment, create them."""
         click.echo('Found the following demo scripts:')
         for demo in self.script_list:
             click.echo(demo)
             filename = os.path.join(self.demos_dir, demo)
-            with open(filename, mode='w') as f:
-                f.write(self.script_list[demo])
-                f.close()
+            with open(filename, mode='w') as script_file_content:
+                script_file_content.write(self.script_list[demo])
+                script_file_content.close()
             os.chmod(filename,
                      stat.S_IRWXU | stat.S_IRGRP | stat.S_IXGRP | stat.S_IROTH | stat.S_IXOTH)
 
-    # NOTE: Sourcing this way only works inside the python session and it's children.
     def source_ic_workspace(self):
+        """
+        Source the ic_workspace for further environment building
+        NOTE: Sourcing this way only works inside the python session and it's children.
+        """
         ic_dir = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "ic_workspace")
         click.echo("Sourcing ic_workspace for environment {}".format(self.env_name))
         lib_path = os.path.join(ic_dir, "export", "lib")
@@ -201,12 +226,13 @@ class EnvCreator:
         os.environ['IC_MAKER_DIR'] = os.path.join(ic_dir, "icmaker")
 
     def create_demo_docs(self):
+        """Creates a readme.txt in the demos folder to explain it's functionality"""
         doc_filename = os.path.join(self.demos_dir, 'readme.txt')
-        with open(doc_filename, 'w') as file:
+        with open(doc_filename, 'w') as out_file:
             docstring = '''This folder can contain any executable files. These files can be run
     with the fzirob run command. When scraping an environment to a config file
     all demo scripts will be copied into the environment config, as well.'''
-            file.write(docstring)
+            out_file.write(docstring)
 
 
 @click.command(short_help='Add a new environment')
@@ -251,6 +277,6 @@ def cli(env_name,
                                                    copy_cmake_lists,
                                                    local_build)
         click.echo("Initial workspace setup completed")
-    except Exception as e:
-        click.echo(e)
+    except Exception as my_exception:
+        click.echo(my_exception)
         click.echo("Something went wrong while creating the environment!")
