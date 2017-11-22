@@ -14,7 +14,10 @@ then
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
 fi
 
-export PATH=$PATH:${ROB_FOLDERS_BASE_DIR}/.robot_folders/venv/bin
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+
 export ROB_FOLDERS_EMPTY_CMAKE_PATH=${CMAKE_PREFIX_PATH}
 export ROB_FOLDERS_EMPTY_PATH=${PATH}
 export ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH=${LD_LIBRARY_PATH}

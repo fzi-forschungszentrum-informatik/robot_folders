@@ -7,7 +7,8 @@ setup(
     install_requires=[
         'Click',
         'PyYaml',
-        'vcstools'
+        'vcstools',
+        'wstool'
     ],
     entry_points='''
         [console_scripts]
