@@ -7,10 +7,10 @@
 # This script will search for an ic_workspace,                  #
 # a catkin_workspace and an mca_workspace and call their        #
 # respective source files.                                      #
-# Afterwards the sourc_local.sh file will be sourced if present.#
+# Afterwards the setup_local.sh file will be sourced if present.#
 #                                                               #
 # Please do not make modifications to this file, if you don't   #
-# know exactly what you're doing. Use the source_local.sh file  #
+# know exactly what you're doing. Use the setup_local.sh file  #
 # inside the environment_dir which will be sourced afterwards.  #
 #                                                               #
 # Usually a symlink to this file will be stored in each         #
