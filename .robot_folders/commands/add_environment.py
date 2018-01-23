@@ -109,6 +109,7 @@ class EnvCreator(object):
         # Let's get down to business
         self.create_directories()
         self.create_demo_docs()
+        self.create_demo_scripts()
 
         if self.create_ic:
             click.echo("Creating ic_workspace")
