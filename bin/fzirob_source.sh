@@ -24,6 +24,21 @@ export ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
 export ROB_FOLDERS_EMPTY_QML_IMPORT_PATH=${QML_IMPORT_PATH}
 export ROB_FOLDERS_EMPTY_PYTHONPATH=${PYTHONPATH}
 
+if [ ! -z "${ROB_FOLDERS_EMPTY_CMAKE_PATH}" ] && [ -z $ROB_FOLDERS_IGNORE_CMAKE_PREFIX_PATH ]
+then
+  echo "WARNING! WARNING! WARNING!"
+  echo "Your CMAKE_PREFIX_PATH is not empty. This probably means that you explicitly set your
+CMAKE_PREFIX_PATH to include some custom directory. If you want to keep this that way you can
+export the environment variable ROB_FOLDERS_IGNORE_CMAKE_PREFIX_PATH to some arbitrary value to
+suppress this warning. e.g.
+
+    export ROB_FOLDERS_IGNORE_CMAKE_PREFIX_PATH=\":-)\"
+    source /home/mauch/robot_folders/bin/fzirob_source.sh
+"
+  echo "By, the way your CMAKE_PREFIX_PATH is: \"${CMAKE_PREFIX_PATH}\""
+  echo "WARNING! WARNING! WARNING! END."
+fi
+
 
 # sourcing alias
 source ${ROB_FOLDERS_BASE_DIR}/bin/rob_folders-complete.sh
@@ -60,6 +75,15 @@ env_aliases()
   alias qtcreatoric="fzirob cd ic && cd .. && qtcreator ."
 }
 
+reset_environment()
+{
+  export CMAKE_PREFIX_PATH=${ROB_FOLDERS_EMPTY_CMAKE_PATH}
+  export PATH=${ROB_FOLDERS_EMPTY_PATH}
+  export LD_LIBRARY_PATH=${ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH}
+  export QML_IMPORT_PATH=${ROB_FOLDERS_EMPTY_QML_IMPORT_PATH}
+  export PYTHONPATH=${ROB_FOLDERS_EMPTY_PYTHONPATH}
+}
+
 
 # Create the fzirob function
 #
@@ -79,6 +103,10 @@ fzirob()
         cd ${cd_target}
       fi
     else
+      if [ $1 = "add_environment" ] && [ "$2" != "--help" ]; then
+        echo "Resetting environment before adding new one."
+        reset_environment
+      fi
       rob_folders $@
       if [ $? -eq 0 ]; then
         if [ $1 = "change_environment" ] && [ "$2" != "--help"  ]; then
