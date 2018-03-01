@@ -104,6 +104,23 @@ class EnvCreator(object):
             else:
                 self.create_mca = dir_helpers.yes_no_to_bool(create_mca)
 
+        if self.create_catkin:
+            installed_ros_distros = os.listdir("/opt/ros")
+            click.echo("Available ROS distributions: {}".format(installed_ros_distros))
+            self.ros_distro = installed_ros_distros[0]
+            if len(installed_ros_distros) > 1:
+                ros_distro = click.prompt('Which ROS distribution would you like to use?',
+                                          type=click.Choice(installed_ros_distros),
+                                          default=installed_ros_distros[0])
+            click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
+            if copy_cmake_lists == 'ask':
+                copy_cmake_lists = click.confirm("Would you like to copy the top-level "
+                                                 "CMakeLists.txt to the catkin"
+                                                 " src directory instead of using a symlink?\n"
+                                                 "(This is incredibly useful when using the "
+                                                 "QtCreator.)",
+                                                 default=True)
+
         click.echo("Creating environment with name \"{}\"".format(self.env_name))
 
         # Let's get down to business
