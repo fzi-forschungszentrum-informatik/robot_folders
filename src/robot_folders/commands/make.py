@@ -1,9 +1,11 @@
 """Command to perform environment builds"""
 import click
+import subprocess
 
 from helpers.workspace_chooser import WorkspaceChooser
 import helpers.build_helpers as build
 from helpers.directory_helpers import get_active_env
+from helpers.exceptions import ModuleException
 
 
 class BuildChooser(WorkspaceChooser):
@@ -28,6 +30,11 @@ class BuildChooser(WorkspaceChooser):
 
         return self
 
+    def invoke(self, ctx):
+        try:
+            super(BuildChooser, self).invoke(ctx)
+        except subprocess.CalledProcessError as err:
+            raise(ModuleException(str(err), 'build'))
 
 @click.command(cls=BuildChooser, invoke_without_command=True,
                short_help='Builds an environment')
