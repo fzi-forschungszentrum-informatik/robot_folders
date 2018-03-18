@@ -220,23 +220,19 @@ class EnvironmentAdapter(click.Command):
                         grab_command = ["./IcWorkspace.py", "grab", local_name]
                         if ic_grab_flags is not None:
                             grab_command.extend(ic_grab_flags)
-                        process = subprocess.Popen(grab_command, cwd=workspace_dir)
-                        process.wait()
+                        process = subprocess.check_call(grab_command, cwd=workspace_dir)
                 else:
                     subprocess.check_call(["git", "clone", uri, package_dir])
 
             # Change the origin to the uri specified
             if uri_update_required:
-                process = subprocess.Popen(["git", "remote", "set-url", "origin", uri],
-                                           cwd=package_dir)
-                process.wait()
+                process = subprocess.check_call(["git", "remote", "set-url", "origin", uri],
+                                                cwd=package_dir)
 
             # Checkout the version specified
             if version_update_required:
-                process = subprocess.Popen(["git", "fetch"], cwd=package_dir)
-                process.wait()
-                process = subprocess.Popen(["git", "checkout", version], cwd=package_dir)
-                process.wait()
+                process = subprocess.check_call(["git", "fetch"], cwd=package_dir)
+                process = subprocess.check_call(["git", "checkout", version], cwd=package_dir)
 
         config_name_list = [d['git']['local-name'] for d in config_rosinstall]
 

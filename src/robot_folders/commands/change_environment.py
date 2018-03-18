@@ -1,6 +1,7 @@
 """This command implements the change_environment functionality"""
 import os
 import click
+import subprocess
 
 import helpers.directory_helpers as dir_helpers
 
@@ -30,6 +31,11 @@ class EnvironmentChooser(click.MultiCommand):
         else:
             click.echo('No environment with name < %s > found.' % name)
             return None
+    def invoke(self, ctx):
+        try:
+            super(EnvironmentChooser, self).invoke(ctx)
+        except subprocess.CalledProcessError as err:
+            raise(ModuleException(str(err), 'change'))
 
 
 @click.command(cls=EnvironmentChooser, short_help='Source an existing environment',
