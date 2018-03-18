@@ -44,7 +44,8 @@ class Builder(click.Command):
                 start = line.find(search_str)
                 if start > -1:
                     # remove any trailing chars like newlines
-                    build_cmd = line[start+len(search_str):].rstrip()
+                    build_cmd = os.path.basename(
+                        os.path.normpath(line[start+len(search_str):].rstrip()))
         else:
             build_cmd = config_helpers.get_value_safe_default(
                 section='build',
