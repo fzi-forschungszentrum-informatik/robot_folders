@@ -51,6 +51,9 @@ The configuration is split into different sections which will be explained in th
   <dt>generator</dt>
   <dd>Currently <em>make</em> and <em>ninja</em> can be used. If <em>ninja</em> is configured, but not installed, building will throw an error.</dd>
 
+  <dt>cmake:flags</dt>
+  <dd>These flags will be passed to the cmake command.</dd>
+
   <dt>make_threads</dt>
   <dd>Number of threads that should be used with make. Only relevant when <b>generator</b> is set to <em>make</em>.</dd>
 

@@ -14,7 +14,10 @@ def get_cmake_flags():
         value='generator',
         default='make')
 
-    cmake_flags = ''
+    cmake_flags = config_helpers.get_value_safe_default(
+        section='build',
+        value='cmake_flags',
+        default='')
 
     if generator == 'ninja':
         cmake_flags = " ".join([cmake_flags, "-GNinja"])
@@ -27,6 +30,12 @@ def get_cmake_flags():
         cmake_flags = ''
     return cmake_flags
 
+def get_ros_cmake_flags():
+    cmake_flags = config_helpers.get_value_safe_default(
+        section='build',
+        value='cmake_flags',
+        default='')
+    return cmake_flags
 
 class Builder(click.Command):
     """General builder class"""
@@ -145,6 +154,9 @@ class CatkinBuilder(Builder):
                 default='make')
             if generator == "ninja":
                 build_cmd = "catkin_make --use-ninja"
+
+        # Add the cmake flags from the config file.
+        build_cmd += " " + get_ros_cmake_flags()
 
         ros_global_dir = "/opt/ros/{}".format(ros_distro)
 
