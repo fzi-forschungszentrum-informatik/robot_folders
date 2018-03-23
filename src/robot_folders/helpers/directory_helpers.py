@@ -1,4 +1,5 @@
 """Helpers around handling folders"""
+from __future__ import print_function
 import os
 import errno
 import getpass
@@ -23,8 +24,8 @@ def get_last_activated_env():
         with open(env_file, 'r') as file_content:
             return file_content.read().rstrip()
     else:
-        print "No recently activated environment found. Is this your first run? \
-Try to add an environment and then do a change_environment to this."
+        print("No recently activated environment found. Is this your first run?"
+              "Try to add an environment and then do a change_environment to this.")
         return None
 
 
