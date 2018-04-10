@@ -17,12 +17,13 @@ class Userconfig(object):
         filename_distribute = os.path.join(Userconfig.get_base_dir(),
                                            'config',
                                            'userconfig_distribute.yaml')
-        try:
-            Userconfig.config_fallback = yaml.load(file(filename_distribute, 'r'))
-        except yaml.YAMLError, exc:
-            print("Error in configuration file:", exc)
-        except IOError, exc:
-            print('ERROR: There was a problem loading the distribution file:', exc)
+        with open(filename_distribute, 'r') as file_content:
+            try:
+                Userconfig.config_fallback = yaml.load(file_content)
+            except yaml.YAMLError as exc:
+                print("Error in configuration file:", exc)
+            except IOError as exc:
+                print('ERROR: There was a problem loading the distribution file:', exc)
 
         # Load the user-modified config file
         filename_userconfig = os.path.join(Userconfig.get_base_dir(),
@@ -43,12 +44,14 @@ class Userconfig(object):
             print('!!!!! MIGRATION DONE !!!!!\n\n')
 
         try:
-            Userconfig.config = yaml.load(file(filename_userconfig, 'r'))
-        except yaml.YAMLError, exc:
-            print("Error in configuration file:", exc)
-        except IOError, exc:
+            with open(filename_userconfig, 'r') as file_content:
+                try:
+                    Userconfig.config = yaml.load(file_content)
+                except yaml.YAMLError as exc:
+                    print("Error in configuration file:", exc)
+        except (IOError, FileNotFoundError) as exc:
             print('Did not find userconfig file. Copying the distribution file.')
-            Userconfig.config = yaml.load(file(filename_distribute, 'r'))
+            Userconfig.config = Userconfig.config_fallback
             shutil.copy(filename_distribute, filename_userconfig)
         Userconfig.initialized = True
 
@@ -83,8 +86,8 @@ class Userconfig(object):
         Userconfig.migrate_entry('directories', 'checkout_dir', dir_config, yaml_dump)
         Userconfig.migrate_entry('directories', 'catkin_names', dir_config, yaml_dump)
 
-        out_stream = file(new_location, mode='w')
-        yaml.dump(yaml_dump, stream=out_stream, default_flow_style=False)
+        with open(new_location, mode='w') as out_stream:
+            yaml.dump(yaml_dump, stream=out_stream, default_flow_style=False)
         filename_deprectated = os.path.join(Userconfig.get_base_dir(),
                                             '.robot_folders',
                                             'userconfig_deprecated_safecopy.py')

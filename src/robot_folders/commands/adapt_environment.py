@@ -1,6 +1,7 @@
 """
 This implements a command to adapt an environment with a config file.
 """
+from __future__ import print_function
 import os
 import stat
 import subprocess
@@ -302,7 +303,8 @@ def cli(ctx, local_delete_policy):
        New repositories will be added, versions/branches will be changed and
        deleted repositories will/may be removed.
     """
-    print "The policy for deleting repos only existing locally is: '{}'".format(local_delete_policy)
+    print("The policy for deleting repos only existing locally is: '{}'"
+          .format(local_delete_policy))
 
     if ctx.invoked_subcommand is None:
         click.echo('No environment specified. Please choose one '
