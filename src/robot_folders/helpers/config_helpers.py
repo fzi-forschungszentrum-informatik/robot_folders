@@ -5,6 +5,10 @@ import imp
 import shutil
 import yaml
 
+try:
+    FileNotFoundError
+except NameError:
+    FileNotFoundError = IOError
 
 class Userconfig(object):
     """Class for managing a userconfig"""
