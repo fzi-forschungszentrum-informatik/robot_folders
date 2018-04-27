@@ -9,12 +9,10 @@ You can source, create or build environments very easy.
 ### Required packages
 To use robot_folders you must have the following requirements installed:
  * python-pip
- * python-virtualenv
- * python-wstool
 
 To install them on a ubuntu system just call
 ```bash
-sudo apt-get install python-pip python-virtualenv python-wstool
+sudo apt-get install python-pip
 ```
 
 ### Initial setup
