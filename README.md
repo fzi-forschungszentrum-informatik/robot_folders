@@ -1,5 +1,5 @@
 # Robot Folders
-Welcome to robpt_folders! robot_folders helps you
+Welcome to robot_folders! robot_folders helps you
 keeping track of different environment setups including multiple workspaces
 such as ic_workspace, catkin_workspace and mca_workspace.
 
@@ -51,7 +51,7 @@ The configuration is split into different sections which will be explained in th
   <dt>generator</dt>
   <dd>Currently <em>make</em> and <em>ninja</em> can be used. If <em>ninja</em> is configured, but not installed, building will throw an error.</dd>
 
-  <dt>cmake:flags</dt>
+  <dt>cmake_flags</dt>
   <dd>These flags will be passed to the cmake command.</dd>
 
   <dt>make_threads</dt>
