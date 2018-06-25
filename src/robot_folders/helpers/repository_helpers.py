@@ -4,7 +4,7 @@ This module contains helper functions around managing git repositories
 import vcstools
 
 
-def parse_repository(repo_path):
+def parse_repository(repo_path, use_commit_id):
     """
     Parses a repository path and returns the remote URL and the version (branch/commit)
     """
@@ -14,12 +14,12 @@ def parse_repository(repo_path):
     # the current version label returns <detached>.
     # In that case we will use the SHA-ID of the checked out commit.
     version = client.get_current_version_label()
-    if version == "<detached>":
+    if version == "<detached>" or use_commit_id:
         version = client.get_version()
     return url, version
 
 
-def create_rosinstall_entry(repo_path, local_name):
+def create_rosinstall_entry(repo_path, local_name, use_commit_id=False):
     """
     Creates a rosinstall dict entry for a given repo path and local folder name
     """
@@ -27,7 +27,7 @@ def create_rosinstall_entry(repo_path, local_name):
     repo['git'] = dict()
     repo['git']['local-name'] = local_name
 
-    url, version = parse_repository(repo_path)
+    url, version = parse_repository(repo_path, use_commit_id)
     repo['git']['uri'] = url
     repo['git']['version'] = version
     return repo

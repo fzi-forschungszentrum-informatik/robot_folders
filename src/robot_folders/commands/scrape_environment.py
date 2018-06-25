@@ -17,6 +17,8 @@ class EnvironmentScraper(click.Command):
         self.rosinstall = dict()
         self.yaml_data = dict()
 
+        self.use_commit_id = False
+
     def invoke(self, ctx):
         env_dir = os.path.join(get_checkout_dir(), self.name)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
@@ -26,6 +28,8 @@ class EnvironmentScraper(click.Command):
         mca_project_dir = os.path.join(env_dir, 'mca_workspace', 'projects')
         mca_tool_dir = os.path.join(env_dir, 'mca_workspace', 'tools')
         demos_dir = os.path.join(env_dir, 'demos')
+
+        self.use_commit_id = ctx.parent.params['use_commit_id']
 
         if os.path.isdir(ic_pkg_dir):
             click.echo("Scraping IC workspace")
@@ -85,7 +89,7 @@ class EnvironmentScraper(click.Command):
                 local_name = os.path.join(prefix, subfolder)
                 if os.path.isdir(git_dir):
                     click.echo(local_name)
-                    entry = create_rosinstall_entry(subfolder_abs, local_name)
+                    entry = create_rosinstall_entry(subfolder_abs, local_name, self.use_commit_id)
                     self.rosinstall.append(entry)
                 self.parse_folder(subfolder_abs, local_name)
 
@@ -111,8 +115,10 @@ class EnvironmentChooser(click.MultiCommand):
 @click.command(cls=EnvironmentChooser,
                short_help='Scrape an environment config to a config file',
                invoke_without_command=True)
+@click.option('--use_commit_id', is_flag=True, default=False,
+              help='If checked, the exact commit IDs get scraped instead of branch names.')
 @click.pass_context
-def cli(ctx):
+def cli(ctx, use_commit_id):
     """Scrapes an environment configuration into a config file,
        so that it can be given to somebody else. \
        This config file can then be used to initialize the environment
