@@ -60,7 +60,7 @@ class EnvCreator(object):
                                create_mca,
                                copy_cmake_lists,
                                local_build, 
-                               repo_uri_prefix):
+                               ic_grab_flags):
         """Worker method that does the actual job"""
         if os.path.exists(os.path.join(dir_helpers.get_checkout_dir(), self.env_name)):
             # click.echo("An environment with the name \"{}\" already exists. Exiting now."
@@ -306,7 +306,7 @@ def cli(env_name,
     except subprocess.CalledProcessError as err:
         raise(ModuleException(str(err), 'add'))
     except Exception as err:
-        click.echo(my_exception)
+        click.echo(err)
         click.echo("Something went wrong while creating the environment!")
         raise(ModuleException(str(err), 'add'))
     click.echo("Initial workspace setup completed")
