@@ -25,6 +25,7 @@ class IcCreator(object):
                  package_versions=None,
                  grab_flags=None,
                  rosinstall=None):
+        self.ic_grab_flags = grab_flags
         ic_repo_url = config_helpers.get_value_safe('repositories', 'ic_workspace_repo')
         ic_workspace_version = 'master'  # TODO: Parse this from somewhere
 
@@ -45,7 +46,7 @@ class IcCreator(object):
                                ic_repo_url,
                                ic_directory])
         if packages is not None:
-            self.add_packages(packages, package_versions, grab_flags)
+            self.add_packages(packages, package_versions, self.grab_flags)
         else:
             self.add_rosinstall(rosinstall)
         self.create_build_folders()
@@ -57,8 +58,9 @@ class IcCreator(object):
         """
         # If something goes wrong here, this will throw an exception, which is fine, as it shouldn't
         grab_command = ["./IcWorkspace.py", "grab", packages]
-        if grab_flags is not None:
-            grab_command.extend(grab_flags)
+        if self.ic_grab_flags is not None:
+            grab_command += [ self.ic_grab_flags ]
+
         process = subprocess.check_call(grab_command, cwd=self.ic_directory)
 
         if package_versions is not None:
@@ -92,6 +94,8 @@ class IcCreator(object):
 
         # It is necessary to grab the base packages to get an icmaker
         grab_command = ["./IcWorkspace.py", "grab", "base"]
+        if self.ic_grab_flags is not None:
+            grab_command += [ self.ic_grab_flags ]
         process = subprocess.check_call(grab_command, cwd=self.ic_directory)
 
     def create_build_folders(self):

@@ -273,7 +273,7 @@ class EnvCreator(object):
 @click.option('--local_build', type=click.Choice(['yes', 'no', 'ask']), default='ask',
               help=('If set to \'yes\', the local build options is set and the build is '
                     'executed in the folder ic_workspace/build.'))
-@click.option('--ic_grab_flags', default='',
+@click.option('--ic_grab_flags', default=str(''),
               help=('Specifies a list of ic_rab_flags that are passed to \
                 IcWorkspace grab when executing the inital workspace setup. \
                   This feature is used by gitlab CI runners to pass in their \
@@ -290,7 +290,7 @@ def cli(env_name,
         ic_grab_flags):
     """Adds a new environment and creates the basic needed folders,
     e.g. a ic_workspace and a catkin_ws."""
-    environment_creator = EnvCreator(env_name, ic_grab_flags)
+    environment_creator = EnvCreator(env_name, str(ic_grab_flags))
     environment_creator.build = not no_build
 
     os.environ['ROB_FOLDERS_ACTIVE_ENV'] = env_name
