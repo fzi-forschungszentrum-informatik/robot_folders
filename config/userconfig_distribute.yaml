@@ -7,6 +7,7 @@ build: {
 }
 
 repositories: {
+    ic_workspace_grab_base_url: "git@ids-git.fzi.de:",
     ic_workspace_repo: "git@ids-git.fzi.de:core/ic_workspace.git",
     mca_workspace_repo: "git@ids-git.fzi.de:mca2/mca2.git"
 }
