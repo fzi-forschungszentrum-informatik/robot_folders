@@ -14,7 +14,7 @@ from helpers.exceptions import ModuleException
 class EnvCreator(object):
     """Worker class that actually handles the environment creation"""
 
-    def __init__(self, name, ic_grab_flags):
+    def __init__(self, name):
         self.env_name = name
         self.build_base_dir = dir_helpers.get_checkout_dir()
         self.demos_dir = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, 'demos')
@@ -25,7 +25,7 @@ class EnvCreator(object):
             "ic_workspace")
         self.ic_packages = "base"
         self.ic_package_versions = {}
-        self.ic_grab_flags = ic_grab_flags
+
         self.ic_cmake_flags = ""
         self.ic_rosinstall = None
         self.ic_build_directory = 'to_be_set'
@@ -59,8 +59,7 @@ class EnvCreator(object):
                                create_catkin,
                                create_mca,
                                copy_cmake_lists,
-                               local_build, 
-                               ic_grab_flags):
+                               local_build):
         """Worker method that does the actual job"""
         if os.path.exists(os.path.join(dir_helpers.get_checkout_dir(), self.env_name)):
             # click.echo("An environment with the name \"{}\" already exists. Exiting now."
@@ -138,8 +137,7 @@ class EnvCreator(object):
                                           build_directory=self.ic_build_directory,
                                           rosinstall=self.ic_rosinstall,
                                           packages=self.ic_packages,
-                                          package_versions=self.ic_package_versions,
-                                          grab_flags=self.ic_grab_flags)
+                                          package_versions=self.ic_package_versions)
         else:
             click.echo("Requested to not create an ic_workspace")
 
@@ -273,11 +271,6 @@ class EnvCreator(object):
 @click.option('--local_build', type=click.Choice(['yes', 'no', 'ask']), default='ask',
               help=('If set to \'yes\', the local build options is set and the build is '
                     'executed in the folder ic_workspace/build.'))
-@click.option('--ic_grab_flags', default=str(''),
-              help=('Specifies a list of ic_rab_flags that are passed to \
-                IcWorkspace grab when executing the inital workspace setup. \
-                  This feature is used by gitlab CI runners to pass in their \
-                  tokens. Please do not use this if you are a common user.'))
 @click.argument('env_name', nargs=1)
 def cli(env_name,
         config_file,
@@ -286,11 +279,11 @@ def cli(env_name,
         create_catkin,
         create_mca,
         copy_cmake_lists,
-        local_build, 
-        ic_grab_flags):
+        local_build):
+    # Set the ic_workspace root 
     """Adds a new environment and creates the basic needed folders,
     e.g. a ic_workspace and a catkin_ws."""
-    environment_creator = EnvCreator(env_name, str(ic_grab_flags))
+    environment_creator = EnvCreator(env_name)
     environment_creator.build = not no_build
 
     os.environ['ROB_FOLDERS_ACTIVE_ENV'] = env_name
