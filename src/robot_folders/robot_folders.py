@@ -48,6 +48,10 @@ class RobotFolders(click.MultiCommand):
         except ModuleException as err:
             click.echo("Execution of module '{}' failed. Error message:\n{}".format(
                 err.module_name, err))
+            os._exit(err.return_code)
+        except:
+            click.echo("Execution of an unknown module failed. Exit with code 1.")
+            os._exit(1)
 
 cli = RobotFolders(help='This tool helps you managing different robot environments. '
                         'Use tab-completion for combining commands or type --help on each level '
