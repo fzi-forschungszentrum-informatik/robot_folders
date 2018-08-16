@@ -45,6 +45,7 @@ source ${ROB_FOLDERS_BASE_DIR}/bin/rob_folders-complete.sh
 
 # define some legacy aliases from old robot_folders
 alias ce="fzirob change_environment"
+alias cdr="fzirob cd"
 alias cdros="fzirob cd ros"
 alias cdic="fzirob cd ic"
 alias cdmca="fzirob cd mca"
