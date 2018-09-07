@@ -31,12 +31,8 @@ class BuildChooser(WorkspaceChooser):
         return self
 
     def invoke(self, ctx):
-        try:
-            super(BuildChooser, self).invoke(ctx)
-        except subprocess.CalledProcessError as err:
-            os._exit(err.returncode)
-        except ModuleException as err:
-            os._exit(err.return_code)
+        ### may raise an error.
+        super(BuildChooser, self).invoke(ctx)
 
 @click.command(cls=BuildChooser, invoke_without_command=True,
                short_help='Builds an environment')
@@ -60,9 +56,6 @@ before calling the make function.")
         # Build all present workspaces individually
         for workspace in cmd.list_commands(ctx):
             build_cmd = cmd.get_command(ctx, workspace)
-            try:
-                build_cmd.invoke(ctx)
-            except ModuleException as err:
-                os._exit(err.return_code)
+            build_cmd.invoke(ctx)
     return 
 
