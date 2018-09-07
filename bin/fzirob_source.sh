@@ -130,6 +130,8 @@ fzirob()
             echo "Could not change environment"
           fi
         fi
+      else
+        return $?
       fi
     fi
   else

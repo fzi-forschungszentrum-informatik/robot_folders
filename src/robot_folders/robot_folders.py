@@ -17,6 +17,8 @@
 import click
 import os
 
+from helpers.exceptions import ModuleException
+
 plugin_folder = os.path.join(os.path.dirname(__file__), 'commands')
 
 class RobotFolders(click.MultiCommand):
@@ -39,6 +41,17 @@ class RobotFolders(click.MultiCommand):
                 return ns['cli']
         else:
             return None
+
+    def invoke(self, ctx):
+        try:
+            super(RobotFolders, self).invoke(ctx)
+        except ModuleException as err:
+            click.echo("Execution of module '{}' failed. Error message:\n{}".format(
+                err.module_name, err))
+            os._exit(err.return_code)
+        except:
+            click.echo("Execution of an unknown module failed. Exit with code 1.")
+            os._exit(1)
 
 cli = RobotFolders(help='This tool helps you managing different robot environments. '
                         'Use tab-completion for combining commands or type --help on each level '

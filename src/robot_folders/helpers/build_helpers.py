@@ -6,6 +6,7 @@ import click
 from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir
 from helpers.which import which
 from helpers import config_helpers
+from helpers.exceptions import ModuleException
 
 def get_cmake_flags():
     """Reads the configuration for default cmake flags"""
@@ -90,9 +91,10 @@ class Builder(click.Command):
         if not os.path.isfile(cmake_cache_file):
             cmake_cmd = " ".join(["cmake", base_directory, get_cmake_flags()])
             click.echo("Starting initial build with command\n\t{}".format(cmake_cmd))
-            process = subprocess.Popen(["bash", "-c", cmake_cmd],
-                                       cwd=self.build_dir)
-            process.wait()
+            try:
+                process = subprocess.check_call(["bash", "-c", cmake_cmd], cwd=self.build_dir)
+            except subprocess.CalledProcessError as err:
+                raise(ModuleException(err.message, "build_check_previous", err.returncode))
 
     def should_install(self):
         """ Checks if the build command should be run with the install option."""
@@ -121,9 +123,11 @@ class IcBuilder(Builder):
         self.build_dir = os.path.realpath(os.path.join(ic_dir, 'build'))
         self.check_previous_build(ic_dir)
         click.echo("Building ic_workspace in {}".format(self.build_dir))
-        process = subprocess.Popen(["bash", "-c", self.get_build_command()],
+        try:
+            process = subprocess.check_call(["bash", "-c", self.get_build_command()],
                                    cwd=self.build_dir)
-        process.wait()
+        except subprocess.CalledProcessError as err:
+            raise(ModuleException(err.message, "build_ic", err.returncode))
 
     def get_install_key(self):
         return 'install_ic'
@@ -176,9 +180,13 @@ class CatkinBuilder(Builder):
         click.echo("Building catkin_workspace in {}".format(catkin_dir))
 
         # We abuse the name to code the ros distribution if we're building for the first time.
-        process = subprocess.Popen(["bash", "-c", self.get_build_command(catkin_dir, self.name)],
-                                   cwd=catkin_dir)
-        process.wait()
+        try:
+            process = subprocess.check_call(["bash",
+                                         "-c",
+                                         self.get_build_command(catkin_dir, self.name)],
+                                        cwd=catkin_dir)
+        except subprocess.CalledProcessError as err:
+            raise(ModuleException(err.message, "build_ros", err.returncode))
 
     def get_install_key(self):
         return 'install_catkin'
@@ -193,9 +201,12 @@ class McaBuilder(Builder):
         self.build_dir = os.path.realpath(os.path.join(mca_dir, 'build'))
         self.check_previous_build(mca_dir)
         click.echo("Building ic_workspace in {}".format(self.build_dir))
-        process = subprocess.Popen(["bash", "-c", self.get_build_command()],
-                                   cwd=self.build_dir)
-        process.wait()
+        try:
+            process = subprocess.check_call(["bash", "-c", self.get_build_command()],
+                                        cwd=self.build_dir)
+        except subprocess.CalledProcessError as err:
+            raise(ModuleException(err.message, "build_ros", err.returncode))
+        
 
     def get_install_default(self):
         return True

@@ -59,8 +59,7 @@ class IcCreator(object):
         grab_command = ["./IcWorkspace.py", "grab", packages]
         if grab_flags is not None:
             grab_command.extend(grab_flags)
-        process = subprocess.Popen(grab_command, cwd=self.ic_directory)
-        process.wait()
+        process = subprocess.check_call(grab_command, cwd=self.ic_directory)
 
         if package_versions is not None:
             for package in package_versions.keys():
@@ -69,9 +68,8 @@ class IcCreator(object):
                         package_versions[package], package))
                     package_dir = os.path.join(self.ic_directory, "packages", package)
                     click.echo("Package_dir: {}".format(package_dir))
-                    process = subprocess.Popen(["git", "checkout", package_versions[package]],
-                                               cwd=package_dir)
-                    process.wait()
+                    process = subprocess.check_call(["git", "checkout", package_versions[package]],
+                                                    cwd=package_dir)
                 else:
                     click.echo(
                         'Version for package {} given, however, '
@@ -88,15 +86,13 @@ class IcCreator(object):
             yaml_dump(rosinstall, rosinstall_content)
 
         # If something goes wrong here, this will throw an exception, which is fine, as it shoudln't
-        process = subprocess.Popen(["wstool", "init", "packages", rosinstall_filename],
-                                   cwd=self.ic_directory)
-        process.wait()
+        process = subprocess.check_call(["wstool", "init", "packages", rosinstall_filename],
+                                        cwd=self.ic_directory)
         os.remove(rosinstall_filename)
 
         # It is necessary to grab the base packages to get an icmaker
         grab_command = ["./IcWorkspace.py", "grab", "base"]
-        process = subprocess.Popen(grab_command, cwd=self.ic_directory)
-        process.wait()
+        process = subprocess.check_call(grab_command, cwd=self.ic_directory)
 
     def create_build_folders(self):
         """
@@ -217,9 +213,8 @@ class CatkinCreator(object):
             with open(rosinstall_filename, 'w') as rosinstall_content:
                 yaml_dump(rosinstall, rosinstall_content)
 
-            process = subprocess.Popen(["wstool", "init", "src", rosinstall_filename],
-                                       cwd=self.catkin_directory)
-            process.wait()
+            process = subprocess.check_call(["wstool", "init", "src", rosinstall_filename],
+                                            cwd=self.catkin_directory)
             os.remove(rosinstall_filename)
 
 
@@ -241,13 +236,9 @@ class MCACreator(object):
 
         self.add_from_config(mca_additional_repos)
 
-        process = subprocess.Popen(["script/git_clone_base.py"],
-                                   cwd=mca_directory)
-        process.wait()
+        process = subprocess.check_call(["script/git_clone_base.py"], cwd=mca_directory)
 
-        process = subprocess.Popen(["script/ic/update_cmake.py"],
-                                   cwd=mca_directory)
-        process.wait()
+        process = subprocess.check_call(["script/ic/update_cmake.py"], cwd=mca_directory)
 
         self.create_build_folders()
 
@@ -265,9 +256,8 @@ class MCACreator(object):
                     package_version = library['git']['version']
                     click.echo("Checking out version {} of package {}".format(
                         package_version, library['git']['local-name']))
-                    process = subprocess.Popen(["git", "checkout", package_version],
-                                               cwd=libraries_dir)
-                    process.wait()
+                    process = subprocess.check_call(["git", "checkout", package_version],
+                                                    cwd=libraries_dir)
 
         if 'projects' in mca_additional_repos and mca_additional_repos['projects'] is not None:
             for project in mca_additional_repos['projects']:
@@ -280,9 +270,8 @@ class MCACreator(object):
                     package_version = project['git']['version']
                     click.echo("Checking out version {} of package {}".format(
                         package_version, project['git']['local-name']))
-                    process = subprocess.Popen(["git", "checkout", package_version],
-                                               cwd=projects_dir)
-                    process.wait()
+                    process = subprocess.check_call(["git", "checkout", package_version],
+                                                    cwd=projects_dir)
 
         if 'tools' in mca_additional_repos and mca_additional_repos['tools'] is not None:
             for tool in mca_additional_repos['tools']:
@@ -294,9 +283,8 @@ class MCACreator(object):
                     package_version = tool['git']['version']
                     click.echo("Checking out version {} of package {}".format(
                         package_version, tool['git']['local-name']))
-                    process = subprocess.Popen(["git", "checkout", package_version],
-                                               cwd=tools_dir)
-                    process.wait()
+                    process = subprocess.check_call(["git", "checkout", package_version],
+                                                    cwd=tools_dir)
 
     def create_build_folders(self):
         """

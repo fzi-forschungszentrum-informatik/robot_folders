@@ -2,11 +2,13 @@
 import os
 import stat
 import click
+import subprocess
 
 import helpers.directory_helpers as dir_helpers
 import helpers.build_helpers as build
 import helpers.environment_helpers as environment_helpers
 from helpers.ConfigParser import ConfigFileParser
+from helpers.exceptions import ModuleException
 
 
 class EnvCreator(object):
@@ -60,9 +62,10 @@ class EnvCreator(object):
                                local_build):
         """Worker method that does the actual job"""
         if os.path.exists(os.path.join(dir_helpers.get_checkout_dir(), self.env_name)):
-            click.echo("An environment with the name \"{}\" already exists. Exiting now."
-                       .format(self.env_name))
-            raise Exception
+            # click.echo("An environment with the name \"{}\" already exists. Exiting now."
+                       # .format(self.env_name))
+            raise ModuleException("Environment \"{}\" already exists".format(self.env_name),
+                                  "add")
 
         has_nobackup = dir_helpers.check_nobackup(local_build)
         self.build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
@@ -294,7 +297,6 @@ def cli(env_name,
                                                    create_mca,
                                                    copy_cmake_lists,
                                                    local_build)
-        click.echo("Initial workspace setup completed")
-    except Exception as my_exception:
-        click.echo(my_exception)
-        click.echo("Something went wrong while creating the environment!")
+    except subprocess.CalledProcessError as err:
+        raise(ModuleException(str(err), 'add'))
+    click.echo("Initial workspace setup completed")

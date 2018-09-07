@@ -1,9 +1,11 @@
 """Command to perform environment builds"""
 import click
+import subprocess
 
 from helpers.workspace_chooser import WorkspaceChooser
 import helpers.build_helpers as build
 from helpers.directory_helpers import get_active_env
+from helpers.exceptions import ModuleException
 
 
 class BuildChooser(WorkspaceChooser):
@@ -28,6 +30,9 @@ class BuildChooser(WorkspaceChooser):
 
         return self
 
+    def invoke(self, ctx):
+        ### may raise an error.
+        super(BuildChooser, self).invoke(ctx)
 
 @click.command(cls=BuildChooser, invoke_without_command=True,
                short_help='Builds an environment')
@@ -52,4 +57,5 @@ before calling the make function.")
         for workspace in cmd.list_commands(ctx):
             build_cmd = cmd.get_command(ctx, workspace)
             build_cmd.invoke(ctx)
-    return
+    return 
+
