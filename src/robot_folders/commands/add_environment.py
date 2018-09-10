@@ -25,7 +25,7 @@ class EnvCreator(object):
             "ic_workspace")
         self.ic_packages = "base"
         self.ic_package_versions = {}
-        self.ic_grab_flags = []
+
         self.ic_cmake_flags = ""
         self.ic_rosinstall = None
         self.ic_build_directory = 'to_be_set'
@@ -137,8 +137,7 @@ class EnvCreator(object):
                                           build_directory=self.ic_build_directory,
                                           rosinstall=self.ic_rosinstall,
                                           packages=self.ic_packages,
-                                          package_versions=self.ic_package_versions,
-                                          grab_flags=self.ic_grab_flags)
+                                          package_versions=self.ic_package_versions)
         else:
             click.echo("Requested to not create an ic_workspace")
 
@@ -281,9 +280,9 @@ def cli(env_name,
         create_mca,
         copy_cmake_lists,
         local_build):
+    # Set the ic_workspace root 
     """Adds a new environment and creates the basic needed folders,
     e.g. a ic_workspace and a catkin_ws."""
-
     environment_creator = EnvCreator(env_name)
     environment_creator.build = not no_build
 
@@ -298,5 +297,9 @@ def cli(env_name,
                                                    copy_cmake_lists,
                                                    local_build)
     except subprocess.CalledProcessError as err:
+        raise(ModuleException(str(err), 'add'))
+    except Exception as err:
+        click.echo(err)
+        click.echo("Something went wrong while creating the environment!")
         raise(ModuleException(str(err), 'add'))
     click.echo("Initial workspace setup completed")

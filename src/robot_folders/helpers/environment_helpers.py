@@ -9,6 +9,7 @@ import click
 import helpers.config_helpers as config_helpers
 import helpers.build_helpers as build_helpers
 import helpers.directory_helpers as dir_helpers
+from helpers import config_helpers
 
 from yaml import dump as yaml_dump
 
@@ -23,8 +24,13 @@ class IcCreator(object):
                  build_directory,
                  packages=None,
                  package_versions=None,
-                 grab_flags=None,
                  rosinstall=None):
+        self.ic_grab_flags = None
+        base_url = config_helpers.get_value_safe_default("repositories", "ic_workspace_grab_base_url", "")
+        # Check if there is a valid base url given for the i workspace.
+        if base_url != "":
+            self.ic_grab_flags = "--repo_uri_prefix=" + str(base_url)
+
         ic_repo_url = config_helpers.get_value_safe('repositories', 'ic_workspace_repo')
         ic_workspace_version = 'master'  # TODO: Parse this from somewhere
 
@@ -45,20 +51,21 @@ class IcCreator(object):
                                ic_repo_url,
                                ic_directory])
         if packages is not None:
-            self.add_packages(packages, package_versions, grab_flags)
+            self.add_packages(packages, package_versions)
         else:
             self.add_rosinstall(rosinstall)
         self.create_build_folders()
 
-    def add_packages(self, packages, package_versions, grab_flags):
+    def add_packages(self, packages, package_versions):
         """
         Adds the given packages with the IcWorkspace.py script. Package versions and grab_flags can
         be defined optionally.
         """
         # If something goes wrong here, this will throw an exception, which is fine, as it shouldn't
         grab_command = ["./IcWorkspace.py", "grab", packages]
-        if grab_flags is not None:
-            grab_command.extend(grab_flags)
+        if self.ic_grab_flags is not None:
+            grab_command += [ self.ic_grab_flags ]
+
         process = subprocess.check_call(grab_command, cwd=self.ic_directory)
 
         if package_versions is not None:
@@ -92,7 +99,11 @@ class IcCreator(object):
 
         # It is necessary to grab the base packages to get an icmaker
         grab_command = ["./IcWorkspace.py", "grab", "base"]
+        if self.ic_grab_flags is not None:
+            grab_command += [ self.ic_grab_flags ]
+
         process = subprocess.check_call(grab_command, cwd=self.ic_directory)
+
 
     def create_build_folders(self):
         """
