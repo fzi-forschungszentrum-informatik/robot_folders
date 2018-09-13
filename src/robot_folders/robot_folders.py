@@ -16,6 +16,7 @@
 
 import click
 import os
+import traceback
 
 from helpers.exceptions import ModuleException
 
@@ -49,8 +50,14 @@ class RobotFolders(click.MultiCommand):
             click.echo("Execution of module '{}' failed. Error message:\n{}".format(
                 err.module_name, err))
             os._exit(err.return_code)
+        except SystemExit as err:
+            # If a SystemExit comes from inside click, simply execute it.
+            pass
+            # click.echo("A system exit was triggered from inside robot_folders.")
         except:
             click.echo("Execution of an unknown module failed. Exit with code 1.")
+            click.echo("Here's a traceback for debugging purposes:")
+            click.echo(traceback.format_exc())
             os._exit(1)
 
 cli = RobotFolders(help='This tool helps you managing different robot environments. '
