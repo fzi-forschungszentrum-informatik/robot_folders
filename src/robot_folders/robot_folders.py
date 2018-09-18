@@ -18,6 +18,7 @@ import click
 import os
 import traceback
 
+from click.exceptions import UsageError
 from helpers.exceptions import ModuleException
 
 plugin_folder = os.path.join(os.path.dirname(__file__), 'commands')
@@ -50,6 +51,9 @@ class RobotFolders(click.MultiCommand):
             click.echo("Execution of module '{}' failed. Error message:\n{}".format(
                 err.module_name, err))
             os._exit(err.return_code)
+        except UsageError as err:
+            click.echo("ERROR: Invalid use of robot_folders: %s\n" % err)
+            click.echo(self.get_help(ctx))
         except SystemExit as err:
             # If a SystemExit comes from inside click, simply execute it.
             pass
