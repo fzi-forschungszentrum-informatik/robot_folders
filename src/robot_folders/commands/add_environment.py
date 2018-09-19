@@ -286,6 +286,9 @@ def cli(env_name,
     environment_creator = EnvCreator(env_name)
     environment_creator.build = not no_build
 
+    is_env_active = False
+    if os.environ.get('ROB_FOLDERS_ACTIVE_ENV'):
+        is_env_active = True
     os.environ['ROB_FOLDERS_ACTIVE_ENV'] = env_name
 
     try:
@@ -303,3 +306,8 @@ def cli(env_name,
         click.echo("Something went wrong while creating the environment!")
         raise(ModuleException(str(err), 'add'))
     click.echo("Initial workspace setup completed")
+
+    if not is_env_active:
+        click.echo("Writing env %s into .cur_env" % env_name)
+        with open(os.path.join(dir_helpers.get_checkout_dir(), '.cur_env'), 'w') as cur_env_file:
+            cur_env_file.write("{}".format(env_name))

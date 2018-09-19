@@ -108,7 +108,9 @@ fzirob()
         echo "Resetting environment before adding new one."
         reset_environment
       fi
+
       rob_folders $@
+
       if [ $? -eq 0 ]; then
         if [ $1 = "change_environment" ] && [ "$2" != "--help"  ]; then
           checkout_dir=$(rob_folders get_checkout_base_dir)
@@ -128,6 +130,13 @@ fzirob()
             env_aliases
           else
             echo "Could not change environment"
+          fi
+        elif [ $1 = "add_environment" ] && [ "$2" != "--help"  ]; then
+          if [ -z "$ROB_FOLDERS_ACTIVE_ENV" ]; then
+            fzirob change_environment
+            echo "Sourced new environment"
+          else
+            echo "Currently, there is a sourced environment ($ROB_FOLDERS_ACTIVE_ENV). Not sourcing new one."
           fi
         fi
       else
