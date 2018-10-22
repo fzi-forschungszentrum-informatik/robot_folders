@@ -4,7 +4,7 @@ import click
 import subprocess
 
 import helpers.directory_helpers as dir_helpers
-
+from helpers.exceptions import ModuleException
 
 class EnvironmentChoice(click.Command):
     """
@@ -30,7 +30,8 @@ class EnvironmentChooser(click.MultiCommand):
             return cmd
         else:
             click.echo('No environment with name < %s > found.' % name)
-            return None
+            raise ModuleException("unknown environment", "EnvironmentChoice", 1)
+
     def invoke(self, ctx):
         try:
             super(EnvironmentChooser, self).invoke(ctx)
