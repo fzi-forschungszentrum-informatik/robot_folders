@@ -5,7 +5,7 @@ setup(
     version='0.1',
     py_modules=['robot_folders'],
     install_requires=[
-        'Click',
+        'Click==6.7',
         'PyYaml',
         'vcstools',
         'wstool'
