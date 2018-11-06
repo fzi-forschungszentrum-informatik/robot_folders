@@ -76,6 +76,25 @@ env_aliases()
   alias qtcreatoric="fzirob cd ic && cd .. && qtcreator ."
 }
 
+
+check_env()
+{
+  # for relevant env_vars
+  #   for each entry
+  #     if ROB_FOLDERS_CHECKOUT_DIR in entry and ROB_FOLDERS_ACTIVE_END not in entry
+  #       cry
+  VAR=$(echo "${CMAKE_PREFIX_PATH}" | sed 's/:/ /g')
+  checkout_dir=$(rob_folders get_checkout_base_dir)
+  for entry in $(echo "${VAR}"); do
+    if [[ "${entry}" =~ ${checkout_dir} ]]; then
+      if [[ ! "${entry}" =~ ${checkout_dir}/${ROB_FOLDERS_ACTIVE_ENV} ]]; then
+        echo "\033[0;33mWARNING: CMAKE_PREFIX_PATH contains a path outside the current env: ${entry}\033[0m"
+        echo "You probably built your catkin_ws the first time, when another workspace was sourced. To solve this, go to your catkin_ws, delete build and devel, open a new shell, source your environment, build your catkin_ws."
+      fi
+    fi
+  done
+}
+
 reset_environment()
 {
   export CMAKE_PREFIX_PATH=${ROB_FOLDERS_EMPTY_CMAKE_PATH}
@@ -128,6 +147,7 @@ fzirob()
             fi
             # declare environment-specific aliases
             env_aliases
+            check_env
           else
             echo "Could not change environment"
           fi
