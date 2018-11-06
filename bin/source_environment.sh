@@ -115,11 +115,21 @@ if [ -d $environment_dir ]; then
   ic_dir=$environment_dir/ic_workspace
   if [ -f $ic_dir/CMakeLists.txt ]
   then
-    export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
-    export PYTHONPATH=$ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
-    export PATH=$ic_dir/export/bin:${PATH}
-    export QML_IMPORT_PATH=$ic_dir/export/plugins/qml:$QML_IMPORT_PATH
-    export CMAKE_PREFIX_PATH=$ic_dir/export:$CMAKE_PREFIX_PATH
+    if [[ "$ic_dir/export/lib" =~ $LD_LIBRARY_PATH ]]; then
+      export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
+    fi
+    if [[ "$ic_dir/export/lib/python2.7/site-packages" =~ $PYTHONPATH ]]; then
+      export PYTHONPATH=$ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
+    fi
+    if [[ "$ic_dir/export/bin" =~ $PATH ]]; then
+      export PATH=$ic_dir/export/bin:${PATH}
+    fi
+    if [[ "$ic_dir/export/plugins/qml" =~ $QML_IMPORT_PATH ]]; then
+      export QML_IMPORT_PATH=$ic_dir/export/plugins/qml:$QML_IMPORT_PATH
+    fi
+    if [[ "$ic_dir/export/" =~ $CMAKE_PREFIX_PATH ]]; then
+      export CMAKE_PREFIX_PATH=$ic_dir/export:$CMAKE_PREFIX_PATH
+    fi
     export IC_MAKER_DIR=$ic_dir/icmaker
     echo "Sourced ic_workspace from $ic_dir"
   fi
