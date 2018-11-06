@@ -67,19 +67,9 @@ if [ -d $environment_dir ]; then
     export QML_IMPORT_PATH=${ROB_FOLDERS_EMPTY_QML_IMPORT_PATH}
     export PYTHONPATH=${ROB_FOLDERS_EMPTY_PYTHONPATH}
   fi
-  # Run ic_workspace initialization if available
-  ic_dir=$environment_dir/ic_workspace
-  if [ -f $ic_dir/CMakeLists.txt ]
-  then
-    export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
-    export PYTHONPATH=$ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
-    export PATH=$ic_dir/export/bin:${PATH}
-    export QML_IMPORT_PATH=$ic_dir/export/plugins/qml:$QML_IMPORT_PATH
-    export CMAKE_PREFIX_PATH=$ic_dir/export:$CMAKE_PREFIX_PATH
-    export IC_MAKER_DIR=$ic_dir/icmaker
-    echo "Sourced ic_workspace"
-  fi
 
+  # It is important to source the catkin_ws first, as it will remove non-existing paths from the
+  # environment (e.g. the export-folder of an ic_ws when not built yet)
   # Run ROS initialization if available
   # We run the setup.sh in the catkin_ws folder. Afterwards we can run rosrun, roslaunch etc. with the files in it.
   catkin_dir_long=$environment_dir/catkin_workspace
@@ -119,6 +109,19 @@ if [ -d $environment_dir ]; then
       source $setup_file
       echo "sourced $setup_file"
     fi
+  fi
+
+  # Run ic_workspace initialization if available
+  ic_dir=$environment_dir/ic_workspace
+  if [ -f $ic_dir/CMakeLists.txt ]
+  then
+    export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
+    export PYTHONPATH=$ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
+    export PATH=$ic_dir/export/bin:${PATH}
+    export QML_IMPORT_PATH=$ic_dir/export/plugins/qml:$QML_IMPORT_PATH
+    export CMAKE_PREFIX_PATH=$ic_dir/export:$CMAKE_PREFIX_PATH
+    export IC_MAKER_DIR=$ic_dir/icmaker
+    echo "Sourced ic_workspace from $ic_dir"
   fi
 
   # source mca environment
