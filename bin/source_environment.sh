@@ -59,7 +59,7 @@ rm -rf $HOME/.cmake/packages/
 
 # This is basically only relevant when calling the script with an externally defined environment_dir
 if [ -d $environment_dir ]; then
-  if [ -z ${ROB_FOLDERS_EMPTY_PATH} ]; then
+  if [ -n ${ROB_FOLDERS_EMPTY_PATH} ]; then
     # Set the prefix path to the one stored away when starting a new session
     export CMAKE_PREFIX_PATH=${ROB_FOLDERS_EMPTY_CMAKE_PATH}
     export PATH=${ROB_FOLDERS_EMPTY_PATH}
