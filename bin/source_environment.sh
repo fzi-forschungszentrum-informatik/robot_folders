@@ -115,19 +115,19 @@ if [ -d $environment_dir ]; then
   ic_dir=$environment_dir/ic_workspace
   if [ -f $ic_dir/CMakeLists.txt ]
   then
-    if [[ "$ic_dir/export/lib" =~ $LD_LIBRARY_PATH ]]; then
+    if [[ ! "$LD_LIBRARY_PATH" =~ "$ic_dir/export/lib" ]]; then
       export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
     fi
-    if [[ "$ic_dir/export/lib/python2.7/site-packages" =~ $PYTHONPATH ]]; then
+    if [[ ! "$PYTHONPATH" =~ "$ic_dir/export/lib/python2.7/site-packages" ]]; then
       export PYTHONPATH=$ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
     fi
-    if [[ "$ic_dir/export/bin" =~ $PATH ]]; then
+    if [[ ! "$PATH" =~ "$ic_dir/export/bin" ]]; then
       export PATH=$ic_dir/export/bin:${PATH}
     fi
-    if [[ "$ic_dir/export/plugins/qml" =~ $QML_IMPORT_PATH ]]; then
+    if [[ ! "$QML_IMPORT_PATH" =~ "$ic_dir/export/plugins/qml" ]]; then
       export QML_IMPORT_PATH=$ic_dir/export/plugins/qml:$QML_IMPORT_PATH
     fi
-    if [[ "$ic_dir/export/" =~ $CMAKE_PREFIX_PATH ]]; then
+    if [[ ! "$CMAKE_PREFIX_PATH" =~ "$ic_dir/export/" ]]; then
       export CMAKE_PREFIX_PATH=$ic_dir/export:$CMAKE_PREFIX_PATH
     fi
     export IC_MAKER_DIR=$ic_dir/icmaker
