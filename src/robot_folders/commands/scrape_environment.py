@@ -83,6 +83,11 @@ class EnvironmentScraper(click.Command):
         """Recursively pars subfolders"""
         subfolders = os.listdir(folder)
         for subfolder in subfolders:
+            try:
+                subfolder = subfolder.decode('utf-8')
+            except UnicodeDecodeError:
+                click.echo("Unicode parsing error within folder {}".format(folder))
+                continue
             subfolder_abs = os.path.join(folder, subfolder)
             if os.path.isdir(subfolder_abs):
                 git_dir = os.path.join(subfolder_abs, '.git')
