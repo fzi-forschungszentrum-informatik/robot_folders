@@ -25,7 +25,13 @@ pushd $ROB_FOLDERS_BASE_DIR/src
 
 echo "Installing robot_folders"
 #pip install --editable robot_folders
-pip install --user --editable robot_folders
+{ # try
+    pip install --user --editable robot_folders
+} || { # catch
+    echo -e "\n----------\nError!\nDid you forget to install the python-pip package?\nExiting...\n----------"
+    exit
+}
+
 popd
 
 mkdir -p ${ROB_FOLDERS_BASE_DIR}/checkout
