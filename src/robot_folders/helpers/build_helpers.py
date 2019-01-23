@@ -200,13 +200,12 @@ class McaBuilder(Builder):
         mca_dir = os.path.realpath(os.path.join(get_active_env_path(), 'mca_workspace'))
         self.build_dir = os.path.realpath(os.path.join(mca_dir, 'build'))
         self.check_previous_build(mca_dir)
-        click.echo("Building ic_workspace in {}".format(self.build_dir))
+        click.echo("Building mca_workspace in {}".format(self.build_dir))
         try:
             process = subprocess.check_call(["bash", "-c", self.get_build_command()],
                                         cwd=self.build_dir)
         except subprocess.CalledProcessError as err:
-            raise(ModuleException(err.message, "build_ros", err.returncode))
-        
+            raise(ModuleException(err.message, "build_mca", err.returncode))
 
     def get_install_default(self):
-        return True
+        return '' # don't install by default
