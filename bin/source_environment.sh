@@ -85,7 +85,12 @@ if [ -d $environment_dir ]; then
 
   if [ -d $catkin_dir ]
   then
-    if [ -f $catkin_dir/devel_isolated/setup.$shell_type ]
+    if [ -d $catkin_dir/.catkin_tools ]
+    then
+      SETUP_FILE=$(catkin locate --workspace $catkin_dir -d)/setup.$shell_type
+      echo "Sourcing $SETUP_FILE"
+      source $SETUP_FILE
+    elif [ -f $catkin_dir/devel_isolated/setup.$shell_type ]
     then
       source $catkin_dir/devel_isolated/setup.$shell_type
       echo "Sourced catkin_workspace"
