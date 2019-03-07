@@ -14,9 +14,6 @@ class EnvironmentScraper(click.Command):
     def __init__(self, name=None, **attrs):
         click.Command.__init__(self, name, **attrs)
 
-        self.rosinstall = dict()
-        self.yaml_data = dict()
-
         self.use_commit_id = False
 
     def invoke(self, ctx):
@@ -31,41 +28,33 @@ class EnvironmentScraper(click.Command):
 
         self.use_commit_id = ctx.parent.params['use_commit_id']
 
+        yaml_data = dict()
+
         if os.path.isdir(ic_pkg_dir):
             click.echo("Scraping IC workspace")
-            self.rosinstall = list()
-            self.parse_folder(ic_pkg_dir)
-            self.yaml_data['ic_workspace'] = dict()
-            self.yaml_data['ic_workspace']['rosinstall'] = self.rosinstall
+            yaml_data['ic_workspace'] = dict()
+            yaml_data['ic_workspace']['rosinstall'] = self.parse_folder(ic_pkg_dir)
 
         if os.path.isdir(catkin_src_dir):
             click.echo("Scraping catkin workspace")
-            self.rosinstall = list()
-            self.parse_folder(catkin_src_dir)
-            self.yaml_data['catkin_workspace'] = dict()
-            self.yaml_data['catkin_workspace']['rosinstall'] = self.rosinstall
+            yaml_data['catkin_workspace'] = dict()
+            yaml_data['catkin_workspace']['rosinstall'] = self.parse_folder(catkin_src_dir)
 
         if os.path.isdir(mca_library_dir):
-            self.yaml_data['mca_workspace'] = dict()
+            yaml_data['mca_workspace'] = dict()
             click.echo("Scraping mca libraries")
-            self.rosinstall = list()
-            self.parse_folder(mca_library_dir)
-            self.yaml_data['mca_workspace']['libraries'] = self.rosinstall
+            yaml_data['mca_workspace']['libraries'] = self.parse_folder(mca_library_dir)
 
             if os.path.isdir(mca_project_dir):
                 click.echo("Scraping mca projects")
-                self.rosinstall = list()
-                self.parse_folder(mca_project_dir)
-                self.yaml_data['mca_workspace']['projects'] = self.rosinstall
+                yaml_data['mca_workspace']['projects'] = self.parse_folder(mca_project_dir)
 
             if os.path.isdir(mca_tool_dir):
                 click.echo("Scraping mca tools")
-                self.rosinstall = list()
-                self.parse_folder(mca_tool_dir)
-                self.yaml_data['mca_workspace']['tools'] = self.rosinstall
+                yaml_data['mca_workspace']['tools'] = self.parse_folder(mca_tool_dir)
 
         if os.path.isdir(demos_dir):
-            self.yaml_data['demos'] = dict()
+            yaml_data['demos'] = dict()
             script_list = [script_file for script_file in os.listdir(demos_dir) if
                            os.path.isfile(os.path.join(demos_dir, script_file)) and
                            os.access(os.path.join(demos_dir, script_file), os.X_OK)]
@@ -73,32 +62,30 @@ class EnvironmentScraper(click.Command):
                 script_path = os.path.join(demos_dir, script)
                 with open(script_path, 'r') as filecontent:
                     # content = f.read()
-                    self.yaml_data['demos'][script] = filecontent.read()
+                    yaml_data['demos'][script] = filecontent.read()
                     filecontent.close()
 
         yaml_stream = file(ctx.params['out_file'], 'w')
-        yaml_safe_dump(self.yaml_data, stream=yaml_stream, encoding='utf-8', allow_unicode=True)
+        yaml_safe_dump(yaml_data, stream=yaml_stream, encoding='utf-8', allow_unicode=True)
 
-    def parse_folder(self, folder, prefix=''):
-        """Recursively pars subfolders"""
-        subfolders = os.listdir(folder)
-        for subfolder in subfolders:
+    def parse_folder(self, folder):
+        """Recursively parse subfolders"""
+        repos = list()
+        files = os.walk(folder)
+        for elem in files:
             try:
-                subfolder = subfolder.decode('utf-8')
+                subfolder = elem[0].decode('utf-8')
             except UnicodeDecodeError:
                 click.echo("Unicode parsing error within folder {}".format(folder))
                 continue
             subfolder_abs = os.path.join(folder, subfolder)
-            if os.path.isdir(subfolder_abs):
-                git_dir = os.path.join(subfolder_abs, '.git')
-                local_name = os.path.join(prefix, subfolder)
-                if os.path.isdir(git_dir):
-                    click.echo(local_name)
-                    entry = create_rosinstall_entry(subfolder_abs, local_name, self.use_commit_id)
-                    self.rosinstall.append(entry)
-                self.parse_folder(subfolder_abs, local_name)
-
-        self.rosinstall = sorted(self.rosinstall, key=lambda k: k['git']['local-name'])
+            git_dir = os.path.join(subfolder_abs, '.git')
+            local_name = os.path.relpath(subfolder, folder)
+            if os.path.isdir(git_dir):
+                click.echo(local_name)
+                entry = create_rosinstall_entry(subfolder_abs, local_name, self.use_commit_id)
+                repos.append(entry)
+        return sorted(repos, key=lambda k: k['git']['local-name'])
 
 
 class EnvironmentChooser(click.MultiCommand):
