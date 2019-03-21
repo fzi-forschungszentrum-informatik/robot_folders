@@ -23,7 +23,7 @@ class Userconfig(object):
                                            'userconfig_distribute.yaml')
         with open(filename_distribute, 'r') as file_content:
             try:
-                Userconfig.config_fallback = yaml.load(file_content)
+                Userconfig.config_fallback = yaml.load(file_content, Loader=yaml.FullLoader)
             except yaml.YAMLError as exc:
                 print("Error in configuration file:", exc)
             except IOError as exc:
@@ -50,7 +50,7 @@ class Userconfig(object):
         try:
             with open(filename_userconfig, 'r') as file_content:
                 try:
-                    Userconfig.config = yaml.load(file_content)
+                    Userconfig.config = yaml.load(file_content, Loader=yaml.FullLoader)
                 except yaml.YAMLError as exc:
                     print("Error in configuration file:", exc)
         except (IOError, FileNotFoundError) as exc:
