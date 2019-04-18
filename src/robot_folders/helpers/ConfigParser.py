@@ -3,17 +3,11 @@ import click
 
 from yaml import load as yaml_load
 
-try:
-    from yaml import CLoader as Loader
-except ImportError:
-    from yaml import Loader
-
-
 class ConfigFileParser(object):
     """Parser for robot_folders environment configs"""
     def __init__(self, config_file_name):
         with open(config_file_name, 'r') as file_content:
-            self.data = yaml_load(file_content, Loader=Loader)
+            self.data = yaml_load(file_content, Loader=yaml.SafeLoader)
         click.echo('The following config file is passed:\n{}'.format(self.data))
 
     def parse_ic_config(self):
