@@ -3,7 +3,8 @@ build: {
     cmake_flags: "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
     make_threads: 4,
     install_ic: True,
-    install_catkin: False
+    install_catkin: False,
+    catkin_make_cmd: catkin_make
 }
 
 repositories: {
