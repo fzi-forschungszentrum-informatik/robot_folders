@@ -139,9 +139,13 @@ class CatkinBuilder(Builder):
     """Builder class for catkin workspace"""
     def get_build_command(self, catkin_dir, ros_distro):
         # default: make
-        build_cmd = "catkin_make"
+        build_cmd = config_helpers.get_value_safe_default(
+            section='build',
+            value='catkin_make_cmd',
+            default='catkin_make')
         mkdir_p(self.build_dir)
 
+        generator_cmd = ""
         cmake_cache_file = os.path.join(catkin_dir, 'build', 'CMakeCache.txt')
         search_str = 'CMAKE_MAKE_PROGRAM:FILEPATH='
         if os.path.isfile(cmake_cache_file):
@@ -150,17 +154,26 @@ class CatkinBuilder(Builder):
                 if start > -1:
                     # remove any trailing chars like newlines
                     if "ninja" in line:
-                        build_cmd = "catkin_make --use-ninja"
+                        if build_cmd == "catkin build":
+                            raise(ModuleException(
+                                "Catkin build does not support an option for using ninja. "
+                                "Please set the generator to make if you want to use catkin build",
+                                "build_ros",
+                                1))
+                        else:
+                            generator_cmd = "--use-ninja"
         else:
             generator = config_helpers.get_value_safe_default(
                 section='build',
                 value='generator',
                 default='make')
             if generator == "ninja":
-                build_cmd = "catkin_make --use-ninja"
-
-        # Add the cmake flags from the config file.
-        build_cmd += " " + get_ros_cmake_flags()
+                if build_cmd == "catkin build":
+                    raise(ModuleException(
+                        "Catkin build does not support an option for using ninja. Please set the"
+                        "generator to make if you want to use catkin build", "build_ros", 1))
+                else:
+                    generator_cmd = "--use-ninja"
 
         ros_global_dir = "/opt/ros/{}".format(ros_distro)
 
@@ -169,10 +182,14 @@ class CatkinBuilder(Builder):
                                     .format(ros_global_dir, build_cmd)
             build_cmd = build_cmd_with_source
 
+        install_cmd = ""
         if self.should_install():
-            build_cmd = " ".join([build_cmd, "install"])
+            if build_cmd != "catkin build":
+                install_cmd = "--install"
 
-        return build_cmd
+        final_cmd = " ".join([build_cmd, generator_cmd, install_cmd, get_ros_cmake_flags()])
+        click.echo("Building with command " + final_cmd)
+        return final_cmd
 
     def invoke(self, ctx):
         catkin_dir = get_catkin_dir()
