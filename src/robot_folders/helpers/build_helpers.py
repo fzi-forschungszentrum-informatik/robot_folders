@@ -145,6 +145,15 @@ class CatkinBuilder(Builder):
             default='catkin_make')
         mkdir_p(self.build_dir)
 
+        if build_cmd != "catkin_make_isolated":
+            if os.path.isfile(os.path.join(get_catkin_dir(), "build_isolated",
+                "catkin_make_isolated.cache")):
+                click.echo("WARNING: There seems to be an existing isolated build environment in "
+                        "{}, however catkin_make_isolated is not configured as build command.\n"
+                        "The workspace will be built using catkin_make_isolated. If this is not "
+                        "the desired behavior, please remove the isolated build folder.")
+                build_cmd = "catkin_make_isolated"
+
         generator_cmd = ""
         cmake_cache_file = os.path.join(catkin_dir, 'build', 'CMakeCache.txt')
         search_str = 'CMAKE_MAKE_PROGRAM:FILEPATH='
