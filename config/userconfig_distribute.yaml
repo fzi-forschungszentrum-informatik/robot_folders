@@ -4,7 +4,8 @@ build: {
     make_threads: 4,
     install_ic: True,
     install_catkin: False,
-    catkin_make_cmd: catkin_make
+    catkin_make_cmd: catkin_make,
+    colcon_build_options: "--symlink-install"
 }
 
 repositories: {

@@ -31,7 +31,7 @@ def get_cmake_flags():
         cmake_flags = ''
     return cmake_flags
 
-def get_ros_cmake_flags():
+def get_cmake_flags():
     cmake_flags = config_helpers.get_value_safe_default(
         section='build',
         value='cmake_flags',
@@ -135,6 +135,39 @@ class IcBuilder(Builder):
     def get_install_default(self):
         return True
 
+class ColconBuilder(Builder):
+    """Builder class for colcon workspace"""
+    def get_build_command(self):
+        build_cmd = "colcon build"
+
+        colcon_options = config_helpers.get_value_safe_default(
+            section='build',
+            value='colcon_build_options',
+            default='')
+
+        generator_flag=""
+        generator = config_helpers.get_value_safe_default(
+            section='build',
+            value='generator',
+            default='make')
+        if generator == "ninja":
+            generator_flag = "-GNinja"
+
+        final_cmd = " ".join([build_cmd, colcon_options, "--cmake-args ",
+                              generator_flag, get_cmake_flags()])
+
+        click.echo("Building with command " + final_cmd)
+        return final_cmd
+
+    def invoke(self, ctx):
+        colcon_dir = os.path.realpath(os.path.join(get_active_env_path(), 'colcon_ws'))
+        click.echo("Building colcon_ws in {}".format(colcon_dir))
+        try:
+            process = subprocess.check_call(["bash", "-c", self.get_build_command()],
+                                   cwd=colcon_dir)
+        except subprocess.CalledProcessError as err:
+            raise(ModuleException(err.message, "build_colcon", err.returncode))
+
 class CatkinBuilder(Builder):
     """Builder class for catkin workspace"""
     def get_build_command(self, catkin_dir, ros_distro):
@@ -201,7 +234,7 @@ class CatkinBuilder(Builder):
             build_cmd = build_cmd_with_source
 
 
-        final_cmd = " ".join([build_cmd, generator_cmd, install_cmd, get_ros_cmake_flags()])
+        final_cmd = " ".join([build_cmd, generator_cmd, install_cmd, get_cmake_flags()])
         click.echo("Building with command " + final_cmd)
         return final_cmd
 

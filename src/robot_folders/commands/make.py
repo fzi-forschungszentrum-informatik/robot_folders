@@ -24,6 +24,8 @@ class BuildChooser(WorkspaceChooser):
                 return build.CatkinBuilder(name=name, add_help_option=False)
             elif name == 'mca':
                 return build.McaBuilder(name=name, add_help_option=False)
+            elif name == 'colcon':
+                return build.ColconBuilder(name=name, add_help_option=False)
         else:
             click.echo('Did not find a workspace with the key < {} >.'.format(name))
             return None

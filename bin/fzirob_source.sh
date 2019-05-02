@@ -47,11 +47,13 @@ fi
 alias ce="fzirob change_environment"
 alias cdr="fzirob cd"
 alias cdros="fzirob cd ros"
+alias cdcol="fzirob cd colcon"
 alias cdic="fzirob cd ic"
 alias cdmca="fzirob cd mca"
 alias cdhome="fzirob cd"
 alias makeic="fzirob make ic"
 alias makeros="fzirob make ros"
+alias makecol="fzirob make colcon"
 
 add_fzi_project()
 {

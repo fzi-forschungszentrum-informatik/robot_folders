@@ -121,6 +121,29 @@ if [ -d $environment_dir ]; then
     fi
   fi
 
+  colcon_dir=$environment_dir/colcon_ws
+  if [ -d $colcon_dir ]
+  then
+    if [ -f $colcon_dir/install/setup.$shell_type ]
+    then
+      source $colcon_dir/install/
+      echo "Sourced colcon workspace"
+    fi
+    num_ros_distros=$(find /opt/ros -maxdepth 1 -mindepth 1 -type d | wc -l)
+    if [[ $num_ros_distros -gt 1 ]]; then
+      echo "Found more than one ros_distribution:"
+      echo $(ls /opt/ros/)
+      echo "Please insert the distro that should be used:"
+      read ros_distro
+    else
+      ros_distro=$(ls /opt/ros/)
+    fi
+    setup_file=/opt/ros/$ros_distro/setup.$shell_type
+    source $setup_file
+    echo "sourced $setup_file"
+
+  fi
+
   # Run ic_workspace initialization if available
   ic_dir=$environment_dir/ic_workspace
   if [ -d $ic_dir ]

@@ -26,6 +26,8 @@ class WorkspaceChooser(click.MultiCommand):
             cmds.append('ic')
         if 'mca_workspace' in workspaces:
             cmds.append('mca')
+        if 'colcon_ws' in workspaces:
+            cmds.append('colcon')
         if os.path.exists(get_catkin_dir()):
             cmds.append('ros')
 
