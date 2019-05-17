@@ -184,6 +184,15 @@ class CatkinBuilder(Builder):
                 else:
                     generator_cmd = "--use-ninja"
 
+
+        install_cmd = ""
+        if self.should_install():
+            if build_cmd == "catkin_make":
+                install_cmd = "install"
+            elif build_cmd == "catkin_make_isolated":
+                install_cmd = "--install"
+
+
         ros_global_dir = "/opt/ros/{}".format(ros_distro)
 
         if os.path.isdir(ros_global_dir):
@@ -191,10 +200,6 @@ class CatkinBuilder(Builder):
                                     .format(ros_global_dir, build_cmd)
             build_cmd = build_cmd_with_source
 
-        install_cmd = ""
-        if self.should_install():
-            if build_cmd != "catkin build":
-                install_cmd = "--install"
 
         final_cmd = " ".join([build_cmd, generator_cmd, install_cmd, get_ros_cmake_flags()])
         click.echo("Building with command " + final_cmd)
