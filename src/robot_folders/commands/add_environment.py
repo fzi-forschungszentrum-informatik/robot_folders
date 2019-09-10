@@ -187,6 +187,11 @@ class EnvCreator(object):
                                             "setup_local.sh"),
                                'w')
         env_source_file.write("#This file is for custom source commands in this environment.\n")
+        env_source_file.write('# zsh\nif [ -n "${ZSH_VERSION+1}" ]; then\n  # Get the base directory where the install script is located\n' \
+                                '  setup_local_dir="$( cd "$( dirname "${(%):-%N}" )" && pwd )"\nfi\n\n' \
+                                '# bash\nif [ -n "${BASH_VERSION+1}" ]; then\n' \
+                                '  # Get the base directory where the install script is located\n' \
+                                '  setup_local_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"\nfi\n')
         env_source_file.close()
 
         os.symlink(os.path.join(dir_helpers.get_base_dir(), "bin", "source_environment.sh"),
