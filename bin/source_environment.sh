@@ -118,7 +118,7 @@ if [ -d $environment_dir ]; then
 
   # Run ic_workspace initialization if available
   ic_dir=$environment_dir/ic_workspace
-  if [ -f $ic_dir/CMakeLists.txt ]
+  if [ -d $ic_dir ]
   then
     if [[ ! "$LD_LIBRARY_PATH" =~ "$ic_dir/export/lib" ]]; then
       export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
