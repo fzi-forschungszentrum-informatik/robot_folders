@@ -99,6 +99,11 @@ if [ -d $environment_dir ]; then
       source $catkin_dir/devel/setup.$shell_type
 
       echo "Sourced catkin_workspace"
+
+    elif [ -f $catkin_dir/install/setup.$shell_type ]
+    then 
+      echo "Only found installed workspace. Sourcing $catkin_dir/install/setup.$shell_type"
+      source $catkin_dir/install/setup.$shell_type
     else
       echo "no setup.$shell_type for the ROS workspace found. Sourcing global ROS"
       num_ros_distros=$(find /opt/ros -maxdepth 1 -mindepth 1 -type d | wc -l)
