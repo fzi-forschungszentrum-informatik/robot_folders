@@ -8,8 +8,6 @@ then
   # Get the base directory where the install script is located
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${(%):-%N}" )/.." && pwd )"
   eval "$(_ROB_FOLDERS_COMPLETE=source_zsh rob_folders)"
-  # autoload bashcompinit if using zsh
-  #autoload -U bashcompinit && bashcompinit
 fi
 
 # bash
@@ -43,8 +41,6 @@ suppress this warning. e.g.
 fi
 
 
-# sourcing alias
-source ${ROB_FOLDERS_BASE_DIR}/bin/rob_folders-complete.sh
 
 # define some legacy aliases from old robot_folders
 alias ce="fzirob change_environment"
@@ -170,3 +166,6 @@ fzirob()
     rob_folders --help
   fi
 }
+
+# sourcing alias
+source ${ROB_FOLDERS_BASE_DIR}/bin/rob_folders-complete.sh
