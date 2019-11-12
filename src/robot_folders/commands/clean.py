@@ -32,7 +32,7 @@ class CleanChooser(WorkspaceChooser):
         return self
 
 
-@click.command(cls=CleanChooser, invoke_without_command=True,
+@click.command('clean', cls=CleanChooser, invoke_without_command=True,
                short_help='Cleans an environment')
 @click.pass_context
 def cli(ctx):

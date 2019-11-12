@@ -104,7 +104,8 @@ class EnvironmentChooser(click.MultiCommand):
             return None
 
 
-@click.command(cls=EnvironmentChooser,
+@click.command('scrape_environment',
+               cls=EnvironmentChooser,
                short_help='Scrape an environment config to a config file',
                invoke_without_command=True)
 @click.option('--use_commit_id', is_flag=True, default=False,

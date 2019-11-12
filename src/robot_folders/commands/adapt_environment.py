@@ -284,7 +284,7 @@ class EnvironmentChooser(click.MultiCommand):
             return None
 
 
-@click.command(cls=EnvironmentChooser,
+@click.command('adapt_environment', cls=EnvironmentChooser,
                short_help='Adapt an environment to a config file',
                invoke_without_command=True)
 @click.option("--local_delete_policy",

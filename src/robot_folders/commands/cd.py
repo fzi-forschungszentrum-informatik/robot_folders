@@ -33,7 +33,7 @@ environment '{}'".format(dir_helpers.get_last_activated_env()))
         return self
 
 
-@click.command(cls=CdChooser, invoke_without_command=True,
+@click.command('cd', cls=CdChooser, invoke_without_command=True,
                short_help='CDs to a workspace inside the active environment')
 @click.pass_context
 def cli(ctx):

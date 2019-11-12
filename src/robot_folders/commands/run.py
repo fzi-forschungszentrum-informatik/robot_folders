@@ -42,7 +42,7 @@ class ScriptSelector(click.MultiCommand):
             return None
 
 
-@click.command(cls=ScriptSelector, short_help='Run a demo script', invoke_without_command=True)
+@click.command('run', cls=ScriptSelector, short_help='Run a demo script', invoke_without_command=True)
 @click.pass_context
 def cli(ctx):
     '''Runs an executable script inside the environment's 'demos' directory.'''

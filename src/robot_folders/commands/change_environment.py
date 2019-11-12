@@ -39,7 +39,7 @@ class EnvironmentChooser(click.MultiCommand):
             raise(ModuleException(str(err), 'change'))
 
 
-@click.command(cls=EnvironmentChooser, short_help='Source an existing environment',
+@click.command('change_environment', cls=EnvironmentChooser, short_help='Source an existing environment',
                invoke_without_command=True)
 @click.pass_context
 def cli(ctx):
