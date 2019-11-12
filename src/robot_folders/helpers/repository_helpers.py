@@ -1,21 +1,45 @@
 """
 This module contains helper functions around managing git repositories
 """
-import vcstools
+import git
+import click
 
 
 def parse_repository(repo_path, use_commit_id):
     """
     Parses a repository path and returns the remote URL and the version (branch/commit)
     """
-    client = vcstools.git.GitClient(repo_path)
-    url = client.get_url()
-    # If a tag is checked out (or the HEAD is detached for other reasons),
-    # the current version label returns <detached>.
-    # In that case we will use the SHA-ID of the checked out commit.
-    version = client.get_current_version_label()
-    if version == "<detached>" or use_commit_id:
-        version = client.get_version()
+    repo = git.Repo(repo_path)
+    remotes = repo.remotes
+    choice = 0
+    if len(remotes) > 1:
+        click.echo("Found multiple remotes for repo {}.".format(repo_path))
+        upstream_branch = repo.active_branch.tracking_branch()
+        upstream_remote = upstream_branch.name.split('/')[0]
+        default = None
+        for index, remote in enumerate(remotes):
+            click.echo("{}: {} ({})".format(index, remote.name, remote.url))
+            if remote.name == upstream_remote:
+                default = index
+        valid_choice = -1
+        while valid_choice < 0:
+            choice = click.prompt("Which one do you want to use?",
+                                  type=int,
+                                  default=default,
+                                  show_default=True)
+            if choice >= 0 and choice < len(remotes):
+                valid_choice = choice
+            else:
+                click.echo("Invalid choice: '{}'".format(choice))
+        click.echo("Selected remote {} ({})".format(remotes[choice].name, remotes[choice].url))
+    url = remotes[choice].url
+
+    detached_head = repo.head.is_detached
+
+    if detached_head or use_commit_id:
+        version = repo.head.commit.hexsha
+    else:
+        version = repo.active_branch.name
     return url, version
 
 
