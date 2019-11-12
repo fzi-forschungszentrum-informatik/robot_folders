@@ -1,10 +1,15 @@
 # zsh
+if [ -d "$HOME/.local/bin" ] ; then
+    PATH="$HOME/.local/bin:$PATH"
+fi
+
 if [ -n "${ZSH_VERSION+1}" ];
 then
   # Get the base directory where the install script is located
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${(%):-%N}" )/.." && pwd )"
+  eval "$(_ROB_FOLDERS_COMPLETE=source_zsh rob_folders)"
   # autoload bashcompinit if using zsh
-  autoload -U bashcompinit && bashcompinit
+  #autoload -U bashcompinit && bashcompinit
 fi
 
 # bash
@@ -12,11 +17,9 @@ if [ -n "${BASH_VERSION+1}" ];
 then
   # Get the base directory where the install script is located
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
+  eval "$(_ROB_FOLDERS_COMPLETE=source rob_folders)"
 fi
 
-if [ -d "$HOME/.local/bin" ] ; then
-    PATH="$HOME/.local/bin:$PATH"
-fi
 
 export ROB_FOLDERS_EMPTY_CMAKE_PATH=${CMAKE_PREFIX_PATH}
 export ROB_FOLDERS_EMPTY_PATH=${PATH}
