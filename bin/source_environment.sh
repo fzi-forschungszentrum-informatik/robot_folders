@@ -124,9 +124,9 @@ if [ -d $environment_dir ]; then
   colcon_dir=$environment_dir/colcon_ws
   if [ -d $colcon_dir ]
   then
-    if [ -f $colcon_dir/install/setup.$shell_type ]
+    if [ -f $colcon_dir/install/local_setup.$shell_type ]
     then
-      source $colcon_dir/install/
+      source $colcon_dir/install/local_setup.$shell_type
       echo "Sourced colcon workspace"
     fi
     num_ros_distros=$(find /opt/ros -maxdepth 1 -mindepth 1 -type d | wc -l)
