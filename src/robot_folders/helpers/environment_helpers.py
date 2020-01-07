@@ -24,8 +24,9 @@ class IcCreator(object):
                  build_directory,
                  packages=None,
                  package_versions=None,
-                 rosinstall=None):
-        self.ic_grab_flags = None
+                 rosinstall=None,
+                 grab_flags=None):
+        self.ic_grab_flags = grab_flags
         base_url = config_helpers.get_value_safe_default("repositories", "ic_workspace_grab_base_url", "")
         # Check if there is a valid base url given for the i workspace.
         if base_url != "":
