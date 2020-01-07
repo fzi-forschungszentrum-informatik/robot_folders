@@ -112,7 +112,7 @@ class EnvCreator(object):
             click.echo("Available ROS distributions: {}".format(installed_ros_distros))
             self.ros_distro = installed_ros_distros[0]
             if len(installed_ros_distros) > 1:
-                ros_distro = click.prompt('Which ROS distribution would you like to use?',
+                self.ros_distro = click.prompt('Which ROS distribution would you like to use?',
                                           type=click.Choice(installed_ros_distros),
                                           default=installed_ros_distros[0])
             click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
