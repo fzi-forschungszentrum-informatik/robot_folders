@@ -52,8 +52,7 @@ class RobotFolders(click.MultiCommand):
                 err.module_name, err))
             os._exit(err.return_code)
         except UsageError as err:
-            click.echo("ERROR: Invalid use of robot_folders: %s\n" % err)
-            click.echo(self.get_help(ctx))
+            click.echo(err.show())
         except SystemExit as err:
             # If a SystemExit comes from inside click, simply execute it.
             pass
