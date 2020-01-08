@@ -24,6 +24,15 @@ bin/install_robot_folders.sh
 and follow the instructions on the screen. If you don't know whether you should
 select 'bash' or 'zsh', you might want to select 'bash'
 
+### Updating
+To update robot_folders, simply pull from the repository and execute the installation script
+afterwards.
+
+```bash
+cd <robot_folders_dir>
+git pull
+bin/install_robot_folders.sh
+```
 
 ## Basic usage
 After installation open up a new terminal to use robot_folders. The main command
