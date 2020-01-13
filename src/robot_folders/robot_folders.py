@@ -57,6 +57,10 @@ class RobotFolders(click.MultiCommand):
             # If a SystemExit comes from inside click, simply execute it.
             pass
             # click.echo("A system exit was triggered from inside robot_folders.")
+        except click.exceptions.Exit as err:
+            # If an Exit comes from inside click(v7), simply execute it.
+            pass
+            # click.echo("A exit was triggered from inside robot_folders.")
         except:
             click.echo("Execution of an unknown module failed. Exit with code 1.")
             click.echo("Here's a traceback for debugging purposes:")

@@ -6,6 +6,19 @@ from helpers.workspace_chooser import WorkspaceChooser
 import helpers.directory_helpers as dir_helpers
 
 
+class CdCommand(click.Command):
+    """Command to output a cd command"""
+    def __init__(self, name=None, target_dir=None, **attrs):
+        click.Command.__init__(self, name, **attrs)
+
+        self.short_help = target_dir
+        self.target_dir = target_dir
+
+    def invoke(self, ctx):
+        """Prints a cd command to the output"""
+        click.echo("cd {}".format(self.target_dir))
+
+
 class CdChooser(WorkspaceChooser):
     """Class implementing the cd command"""
 
@@ -29,11 +42,10 @@ environment '{}'".format(dir_helpers.get_last_activated_env()))
                        'current environment < {} >.'.format(name, env))
             return self
 
-        click.echo("cd {}".format(target_dir))
-        return self
+        return CdCommand(name=name, target_dir=target_dir)
 
 
-@click.command(cls=CdChooser, invoke_without_command=True,
+@click.command('cd', cls=CdChooser, invoke_without_command=True,
                short_help='CDs to a workspace inside the active environment')
 @click.pass_context
 def cli(ctx):

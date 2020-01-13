@@ -34,7 +34,7 @@ class BuildChooser(WorkspaceChooser):
         ### may raise an error.
         super(BuildChooser, self).invoke(ctx)
 
-@click.command(cls=BuildChooser, invoke_without_command=True,
+@click.command('make', cls=BuildChooser, invoke_without_command=True,
                short_help='Builds an environment')
 @click.pass_context
 def cli(ctx):

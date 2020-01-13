@@ -3,7 +3,7 @@ import click
 from helpers.directory_helpers import get_checkout_dir
 
 
-@click.command()
+@click.command("get_checkout_base_dir")
 def cli():
     """Command implementation to get the checkout directory"""
     click.echo(get_checkout_dir())

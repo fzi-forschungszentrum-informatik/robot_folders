@@ -124,7 +124,7 @@ class EnvironmentChooser(click.MultiCommand):
             return None
 
 
-@click.command(cls=EnvironmentChooser,
+@click.command('delete_environment', cls=EnvironmentChooser,
                short_help='Deletes an environment from the checkout folder.',
                invoke_without_command=True)
 @click.pass_context

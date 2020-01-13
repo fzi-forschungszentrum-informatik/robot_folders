@@ -17,13 +17,10 @@ class CleanChooser(WorkspaceChooser):
 
         if name in self.list_commands(ctx):
             if name == 'ic':
-                click.echo('========== Cleaning ic workspace ==========')
                 return clean.IcCleaner(name=name, add_help_option=False)
             elif name == 'ros':
-                click.echo('========== Cleaning ros workspace ==========')
                 return clean.CatkinCleaner(name=name, add_help_option=False)
             elif name == 'mca':
-                click.echo('========== Cleaning mca workspace ==========')
                 return clean.McaCleaner(name=name, add_help_option=False)
         else:
             click.echo('Did not find a workspace with the key < {} >.'.format(name))
@@ -32,7 +29,7 @@ class CleanChooser(WorkspaceChooser):
         return self
 
 
-@click.command(cls=CleanChooser, invoke_without_command=True,
+@click.command('clean', cls=CleanChooser, invoke_without_command=True,
                short_help='Cleans an environment')
 @click.pass_context
 def cli(ctx):

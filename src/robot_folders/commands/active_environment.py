@@ -3,7 +3,7 @@
 import click
 from helpers.directory_helpers import get_active_env, get_last_activated_env
 
-@click.command()
+@click.command('active_environment')
 def cli():
     """Prints out the current environment. If none
 is sourced right now, it tells which was the last active

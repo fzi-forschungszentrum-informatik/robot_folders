@@ -54,6 +54,7 @@ class Cleaner(click.Command):
 class IcCleaner(Cleaner):
     """Cleaner class for an ic workspace"""
     def invoke(self, ctx):
+        click.echo('========== Cleaning ic workspace ==========')
         ic_dir = os.path.realpath(os.path.join(get_active_env_path(), 'ic_workspace'))
         self.clean_list.append(os.path.realpath(os.path.join(ic_dir, 'build')))
         self.clean_list.append(os.path.realpath(os.path.join(ic_dir, 'export')))
@@ -63,6 +64,7 @@ class IcCleaner(Cleaner):
 class CatkinCleaner(Cleaner):
     """Cleaner class for catkin workspace"""
     def invoke(self, ctx):
+        click.echo('========== Cleaning catkin workspace ==========')
         catkin_dir = get_catkin_dir()
         self.clean_list.append(os.path.join(catkin_dir, 'build'))
         self.clean_list.append(os.path.join(catkin_dir, 'build_isolated'))
@@ -76,6 +78,7 @@ class CatkinCleaner(Cleaner):
 class McaCleaner(Cleaner):
     """Cleaner class for an mca workspace"""
     def invoke(self, ctx):
+        click.echo('========== Cleaning mca workspace ==========')
         mca_dir = os.path.realpath(os.path.join(get_active_env_path(), 'mca_workspace'))
         build_dir = os.path.realpath(os.path.join(mca_dir, 'build'))
         self.clean_list.append(build_dir)

@@ -260,7 +260,7 @@ class EnvCreator(object):
             out_file.write(docstring)
 
 
-@click.command(short_help='Add a new environment')
+@click.command('add_environment', short_help='Add a new environment')
 @click.option('--config_file', help='Create an environment from a given config file.')
 @click.option('--no_build', is_flag=True, default=False,
               help='Do not perform an initial build.')
