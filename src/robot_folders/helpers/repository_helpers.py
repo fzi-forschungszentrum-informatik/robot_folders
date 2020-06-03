@@ -3,7 +3,7 @@ This module contains helper functions around managing git repositories
 """
 import git
 import click
-
+from exceptions import ModuleException
 
 def parse_repository(repo_path, use_commit_id):
     """
@@ -15,6 +15,9 @@ def parse_repository(repo_path, use_commit_id):
     if len(remotes) > 1:
         click.echo("Found multiple remotes for repo {}.".format(repo_path))
         upstream_branch = repo.active_branch.tracking_branch()
+        if upstream_branch == None:
+            raise ModuleException('Branch \"{}\" from repository \"{}\" does not have a tracking branch configured. Cannot scrape environment.'.format(repo.active_branch, repo_path), 'repository_helpers', 1)
+
         upstream_remote = upstream_branch.name.split('/')[0]
         default = None
         for index, remote in enumerate(remotes):
