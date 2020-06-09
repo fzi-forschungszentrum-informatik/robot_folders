@@ -1,8 +1,10 @@
 """implements the add functionality"""
 import os
 import stat
-import click
 import subprocess
+import sys
+
+import click
 
 import helpers.directory_helpers as dir_helpers
 import helpers.build_helpers as build
@@ -239,7 +241,12 @@ class EnvCreator(object):
         lib_path = os.path.join(ic_dir, "export", "lib")
         os.environ['LD_LIBRARY_PATH'] = os.pathsep.join([lib_path,
                                                          os.getenv('LD_LIBRARY_PATH', '')])
-        python_path = os.path.join(ic_dir, "export", "lib", "python2.7", "site_packages")
+        python_path = os.path.join(
+            ic_dir,
+            "export",
+            "lib",
+            "python%i.%i" % (sys.version_info.major, sys.version_info.minor),
+            "site_packages")
         os.environ['PYTHONPATH'] = os.pathsep.join([python_path, os.getenv('PYTHONPATH', '')])
         path = os.path.join(ic_dir, "export", "bin")
         os.environ['PATH'] = os.pathsep.join([path, os.getenv('PATH', '')])
