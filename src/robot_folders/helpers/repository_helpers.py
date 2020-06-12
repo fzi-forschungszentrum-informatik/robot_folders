@@ -3,7 +3,7 @@ This module contains helper functions around managing git repositories
 """
 import git
 import click
-from exceptions import ModuleException
+from helpers.exceptions import ModuleException
 
 def parse_repository(repo_path, use_commit_id):
     """
