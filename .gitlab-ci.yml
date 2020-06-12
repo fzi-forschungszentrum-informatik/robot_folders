@@ -1,0 +1,7 @@
+image: ids-git.fzi.de:5555/continuous_integration/ci_docker_images/ubuntu_18.04_workstation
+
+install_robot_folders:
+  script:
+    - bin/install_robot_folders.sh -q
+    - echo 'source $( dirname "${BASH_SOURCE[0]}" )/.." && pwd )/bin/fzirob_source.sh' >> ~/.bashrc
+    - source ~/.bashrc
