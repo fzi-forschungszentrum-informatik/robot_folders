@@ -13,7 +13,6 @@ run_tests:
     - sed -ri "s/^(\s*checkout_dir\s*:)(.*,\s*$)/\1 \"\/builds\/core\/robot_folders\/checkout\",/" config/userconfig.yaml
     - source $(pwd)/bin/fzirob_source.sh
     - fzirob get_checkout_base_dir
-    - pip3 install nose
-    - pip3 install rednose
+    - pip3 install pytest-cov
     - cd src/robot_folders
-    - nosetests3 test
+    - py.test . -rA --cov

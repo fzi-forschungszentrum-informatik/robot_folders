@@ -4,7 +4,6 @@ import unittest
 
 import os
 
-import commands.active_environment
 import helpers.config_helpers as config_helpers
 
 class TestCLI(unittest.TestCase):
