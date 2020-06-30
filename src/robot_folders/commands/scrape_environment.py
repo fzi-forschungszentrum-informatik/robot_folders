@@ -65,7 +65,7 @@ class EnvironmentScraper(click.Command):
                     yaml_data['demos'][script] = filecontent.read()
                     filecontent.close()
 
-        yaml_stream = file(ctx.params['out_file'], 'w')
+        yaml_stream = open(ctx.params['out_file'], 'w')
         yaml_safe_dump(yaml_data, stream=yaml_stream, encoding='utf-8', allow_unicode=True)
 
     def parse_folder(self, folder):
@@ -74,7 +74,7 @@ class EnvironmentScraper(click.Command):
         files = os.walk(folder)
         for elem in files:
             try:
-                subfolder = elem[0].decode('utf-8')
+                subfolder = elem[0]
             except UnicodeDecodeError:
                 click.echo("Unicode parsing error within folder {}".format(folder))
                 continue
