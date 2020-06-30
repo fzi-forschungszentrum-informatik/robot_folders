@@ -1,3 +1,6 @@
+[![pipeline status](https://ids-git.fzi.de/core/robot_folders/badges/master/pipeline.svg)](https://ids-git.fzi.de/core/robot_folders/-/commits/master)
+[![coverage report](https://ids-git.fzi.de/core/robot_folders/badges/master/coverage.svg)](https://ids-git.fzi.de/core/robot_folders/-/commits/master)
+
 # Robot Folders
 Welcome to robot_folders! robot_folders helps you
 keeping track of different environment setups including multiple workspaces
