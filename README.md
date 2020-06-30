@@ -11,11 +11,11 @@ You can source, create or build environments very easy.
 ## Installation
 ### Required packages
 To use robot_folders you must have the following requirements installed:
- * python-pip
+ * python3-pip
 
 To install them on a ubuntu system just call
 ```bash
-sudo apt-get install python-pip
+sudo apt-get install python3-pip
 ```
 
 ### Initial setup
