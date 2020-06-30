@@ -1,0 +1,4 @@
+[report]
+include = ./*
+omit = test/*
+show_missing = true

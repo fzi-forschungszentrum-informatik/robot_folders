@@ -2,13 +2,12 @@
 import os
 
 
+def is_exe(fpath):
+    """Checks whether a path points to an executable file"""
+    return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
+
 def which(program):
     """Defines a 'which' function similar to the linux command"""
-
-    def is_exe(fpath):
-        """Checks whether a path points to an executable file"""
-        return os.path.isfile(fpath) and os.access(fpath, os.X_OK)
-
     fpath, fname = os.path.split(program)
     if fpath:
         if is_exe(program):
@@ -18,6 +17,7 @@ def which(program):
             path = path.strip('"')
             exe_file = os.path.join(path, program)
             if is_exe(exe_file):
+                # We should never end up here probably. This is hard to unit-test
                 return exe_file
 
     return None

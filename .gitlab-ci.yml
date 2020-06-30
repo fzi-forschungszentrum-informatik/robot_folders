@@ -1,0 +1,18 @@
+image: ids-git.fzi.de:5555/continuous_integration/ci_docker_images/ubuntu_18.04_workstation
+
+install_robot_folders:
+  script:
+    - bin/install_robot_folders.sh -q
+
+run_tests:
+  script:
+    - export LC_ALL=C.UTF-8
+    - export LC_LANG=C.UTF-8
+    - bin/install_robot_folders.sh -q
+    - cp config/userconfig_distribute.yaml config/userconfig.yaml
+    - sed -ri "s/^(\s*checkout_dir\s*:)(.*,\s*$)/\1 \"\/builds\/core\/robot_folders\/checkout\",/" config/userconfig.yaml
+    - source $(pwd)/bin/fzirob_source.sh
+    - fzirob get_checkout_base_dir
+    - pip3 install pytest-cov
+    - cd src/robot_folders
+    - py.test . -rA --cov
