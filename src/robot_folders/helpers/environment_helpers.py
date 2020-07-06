@@ -125,6 +125,46 @@ class IcCreator(object):
         os.makedirs(self.build_directory)
         os.makedirs(export_directory)
 
+class MiscCreator(object):
+    """
+    Class to create a misc workspace
+    """
+
+    def __init__(self,
+                 misc_ws_directory,
+                 build_root,
+                 rosinstall=None):
+
+        self.misc_ws_directory = misc_ws_directory
+        self.build_root = build_root
+
+        self.create_build_folders()
+        self.add_rosinstall(rosinstall)
+
+    def add_rosinstall(self, rosinstall):
+        if rosinstall:
+            # Dump the rosinstall to a file and use wstool for getting the packages
+            rosinstall_filename = '/tmp/rob_folders_rosinstall'
+            with open(rosinstall_filename, 'w') as rosinstall_content:
+                yaml_dump(rosinstall, rosinstall_content)
+
+            process = subprocess.check_call(["wstool", "init", ".", rosinstall_filename],
+                                            cwd=self.misc_ws_directory)
+            os.remove(rosinstall_filename)
+
+    def create_build_folders(self):
+        """
+        Creates the necessary export directory of the misc workspace in the file system. If a remote build is used (e.g.
+        no_backup) then symlinks are created automatically.
+        """
+        export_directory = os.path.join(self.build_root, "export")
+        local_export_dir_name = os.path.join(self.misc_ws_directory, "export")
+
+        if local_export_dir_name != export_directory:
+            os.symlink(export_directory, local_export_dir_name)
+
+        os.makedirs(export_directory)
+
 
 class CatkinCreator(object):
     """

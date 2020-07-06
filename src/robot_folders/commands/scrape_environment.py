@@ -19,6 +19,7 @@ class EnvironmentScraper(click.Command):
     def invoke(self, ctx):
         env_dir = os.path.join(get_checkout_dir(), self.name)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
+        misc_ws_pkg_dir = os.path.join(env_dir, 'misc_ws')
         catkin_dir = get_catkin_dir(env_dir)
         catkin_src_dir = os.path.join(catkin_dir, 'src')
         mca_library_dir = os.path.join(env_dir, 'mca_workspace', 'libraries')
@@ -34,6 +35,11 @@ class EnvironmentScraper(click.Command):
             click.echo("Scraping IC workspace")
             yaml_data['ic_workspace'] = dict()
             yaml_data['ic_workspace']['rosinstall'] = self.parse_folder(ic_pkg_dir)
+
+        if os.path.isdir(misc_ws_pkg_dir):
+            click.echo("Scraping misc_ws_dir")
+            yaml_data['misc_ws'] = dict()
+            yaml_data['misc_ws']['rosinstall'] = self.parse_folder(misc_ws_pkg_dir)
 
         if os.path.isdir(catkin_src_dir):
             click.echo("Scraping catkin workspace")

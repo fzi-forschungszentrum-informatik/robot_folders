@@ -33,6 +33,13 @@ class EnvCreator(object):
         self.ic_build_directory = 'to_be_set'
         self.ic_flags = []
 
+        self.misc_ws_directory = os.path.join(
+            dir_helpers.get_checkout_dir(),
+            self.env_name,
+            "misc_ws")
+        self.misc_ws_build_directory = 'to_be_set'
+        self.misc_ws_rosinstall = None
+
         self.catkin_directory = os.path.join(
             dir_helpers.get_checkout_dir(), self.env_name, "catkin_ws")
         self.catkin_build_directory = 'to_be_set'
@@ -53,11 +60,13 @@ class EnvCreator(object):
         self.create_ic = False
         self.create_catkin = False
         self.create_mca = False
+        self.create_misc_ws = False
 
     def create_new_environment(self,
                                config_file,
                                no_build,
                                create_ic,
+                               create_misc_ws,
                                create_catkin,
                                create_mca,
                                copy_cmake_lists,
@@ -77,6 +86,9 @@ class EnvCreator(object):
                                                self.env_name,
                                                "ic_workspace",
                                                "build")
+        self.misc_ws_build_directory = os.path.join(self.build_base_dir,
+                                                    self.env_name,
+                                                    "misc_ws")
         self.catkin_build_directory = os.path.join(self.build_base_dir,
                                                    self.env_name,
                                                    "catkin_ws",
@@ -96,6 +108,12 @@ class EnvCreator(object):
                                                default=True)
             else:
                 self.create_ic = dir_helpers.yes_no_to_bool(create_ic)
+
+            if create_misc_ws == 'ask':
+                self.create_misc_ws = click.confirm("Would you like to create a misc workspace?",
+                                                    default=True)
+            else:
+                self.create_misc_ws = dir_helpers.yes_no_to_bool(create_misc_ws)
 
             if create_catkin == 'ask':
                 self.create_catkin = click.confirm("Would you like to create a catkin_ws?",
@@ -142,6 +160,14 @@ class EnvCreator(object):
                                           package_versions=self.ic_package_versions)
         else:
             click.echo("Requested to not create an ic_workspace")
+
+        if self.create_misc_ws:
+            click.echo("Creating misc workspace")
+            environment_helpers.MiscCreator(misc_ws_directory=self.misc_ws_directory,
+                                            rosinstall=self.misc_ws_rosinstall,
+                                            build_root=self.misc_ws_build_directory)
+        else:
+            click.echo("Requested to not create a misc workspace")
 
         # Check if we should create a catkin workspace and create one if desired
         if self.create_catkin:
@@ -210,6 +236,8 @@ class EnvCreator(object):
          self.ic_package_versions,
          self.ic_flags) = parser.parse_ic_config()
 
+        (self.create_misc_ws, self.misc_ws_rosinstall) = parser.parse_misc_ws_config()
+
         # Parse catkin_workspace packages
         self.create_catkin, self.catkin_rosinstall = parser.parse_ros_config()
 
@@ -273,6 +301,8 @@ class EnvCreator(object):
               help='Do not perform an initial build.')
 @click.option('--create_ic', type=click.Choice(['yes', 'no', 'ask']), default='ask',
               help='If set to \'yes\', an ic-workspace is created without asking for it again.')
+@click.option('--create_misc_ws', type=click.Choice(['yes', 'no', 'ask']), default='ask',
+              help='If set to \'yes\', a folder for miscellaneous projects like "fla"-libraries or plain cmake projects is created and its export path is added to the environment.')
 @click.option('--create_catkin', type=click.Choice(['yes', 'no', 'ask']), default='ask',
               help='If set to \'yes\', a catkin-workspace is created without asking for it again.')
 @click.option('--create_mca', type=click.Choice(['yes', 'no', 'ask']), default='ask',
@@ -288,6 +318,7 @@ def cli(env_name,
         config_file,
         no_build,
         create_ic,
+        create_misc_ws,
         create_catkin,
         create_mca,
         copy_cmake_lists,
@@ -307,6 +338,7 @@ def cli(env_name,
         environment_creator.create_new_environment(config_file,
                                                    no_build,
                                                    create_ic,
+                                                   create_misc_ws,
                                                    create_catkin,
                                                    create_mca,
                                                    copy_cmake_lists,

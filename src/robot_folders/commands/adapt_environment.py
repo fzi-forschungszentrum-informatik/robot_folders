@@ -30,6 +30,7 @@ class EnvironmentAdapter(click.Command):
         """
         env_dir = os.path.join(dir_helpers.get_checkout_dir(), self.name)
         ic_dir = os.path.join(env_dir, "ic_workspace")
+        misc_ws_dir = os.path.join(env_dir, "misc_ws")
         mca_dir = os.path.join(env_dir, "mca_workspace")
         catkin_dir = dir_helpers.get_catkin_dir(env_dir)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
@@ -45,6 +46,7 @@ class EnvironmentAdapter(click.Command):
         has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
             config_file_parser.parse_ic_config()
         has_catkin, ros_rosinstall = config_file_parser.parse_ros_config()
+        has_misc_ws, misc_ws_rosinstall = config_file_parser.parse_misc_ws_config()
         has_mca, mca_additional_repos = config_file_parser.parse_mca_config()
         os.environ['ROB_FOLDERS_ACTIVE_ENV'] = self.name
 
@@ -75,6 +77,23 @@ class EnvironmentAdapter(click.Command):
                                               packages=ic_packages,
                                               package_versions=ic_package_versions,
                                               grab_flags=ic_flags)
+
+        if has_misc_ws:
+            if os.path.isdir(misc_ws_dir):
+                click.echo("Adapting misc workspace")
+                if misc_ws_rosinstall:
+                    self.adapt_rosinstall(misc_ws_rosinstall, misc_ws_dir)
+            else:
+                click.echo("Creating misc workspace")
+                has_nobackup = dir_helpers.check_nobackup()
+                build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
+                misc_ws_build_root = os.path.join(build_base_dir, self.name, 'misc_ws')
+
+                environment_helpers.MiscCreator(misc_ws_dir,
+                                                rosinstall=misc_ws_rosinstall,
+                                                build_root=misc_ws_build_root)
+
+
 
         if has_catkin:
             if os.path.isdir(catkin_src_dir):
