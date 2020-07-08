@@ -64,4 +64,32 @@ class TestCLI(unittest.TestCase):
             (etype, evalue, etrace) = sys.exc_info()
             self.fail("Failed with %s" % evalue)
 
+    def test_add_ic_only(self):
+        try:
+            process_result = subprocess.check_call(
+                ["rob_folders",
+                 "add_environment",
+                 "--create_ic=yes",
+                 "--create_mca=no",
+                 "--create_catkin=no",
+                 "--copy_cmake_lists=no",
+                 "testing_ws"])
+        except:
+            (etype, evalue, etrace) = sys.exc_info()
+            self.fail("Failed with %s" % evalue)
 
+        ic_dir = os.path.join(directory_helpers.get_checkout_dir(), "testing_ws", "ic_workspace")
+
+        self.assertTrue(os.path.isdir(ic_dir))
+        self.assertTrue(os.path.exists(os.path.join(ic_dir, "CMakeLists.txt")))
+
+        # cleanup
+        try:
+            process_result = subprocess.check_call(
+                ["rob_folders",
+                 "delete_environment",
+                 "--force",
+                 "testing_ws"])
+        except:
+            (etype, evalue, etrace) = sys.exc_info()
+            self.fail("Failed with %s" % evalue)
