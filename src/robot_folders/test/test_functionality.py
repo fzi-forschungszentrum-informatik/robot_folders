@@ -53,15 +53,15 @@ class TestCLI(unittest.TestCase):
         self.assertTrue(os.path.isdir(catkin_dir))
         self.assertTrue(os.path.exists(os.path.join(catkin_dir, "src", "CMakeLists.txt")))
 
-        # Cleanup is currently skipped as the delete command doesn't support a headless call
-        # # cleanup
-        # try:
-            # process_result = subprocess.check_call(
-                # ["rob_folders",
-                 # "delete_environment",
-                 # "testing_ws"])
-        # except:
-            # (etype, evalue, etrace) = sys.exc_info()
-            # self.fail("Failed with %s" % evalue)
+        # cleanup
+        try:
+            process_result = subprocess.check_call(
+                ["rob_folders",
+                 "delete_environment",
+                 "--force",
+                 "testing_ws"])
+        except:
+            (etype, evalue, etrace) = sys.exc_info()
+            self.fail("Failed with %s" % evalue)
 
 
