@@ -41,6 +41,11 @@ def delete_folder(path):
 class EnvironmentDeleter(click.Command):
     """Command that deletes an environment"""
 
+    def __init__(self, name=None, **attrs):
+        click.Command.__init__(self, name, **attrs)
+
+        self.force = False
+
     def invoke(self, ctx):
         env_dir = os.path.join(directory_helpers.get_checkout_dir(), self.name)
         catkin_dir = directory_helpers.get_catkin_dir(env_dir)
@@ -48,6 +53,8 @@ class EnvironmentDeleter(click.Command):
         mca_dir = os.path.join(env_dir, 'mca_workspace')
 
         delete_list = list()
+
+        self.force = ctx.parent.params['force']
 
         # Catkin workspace
         if catkin_dir is not None:
@@ -88,15 +95,21 @@ class EnvironmentDeleter(click.Command):
         append_to_list_if_folder(os.path.join(build_base_dir, self.name), delete_list)
 
         click.echo('Going to delete the following paths:\n{}'.format('\n'.join(delete_list)))
+        confirmed = False
+        if self.force:
+            confirmed = True
+        else:
+            confirm = click.prompt(
+                "Please confirm by typing in the environment name '{}' once again.\nWARNING: "
+                "After this all environment files will be deleted and cannot be recovered! "
+                "If you wish to abort your delete request, type 'abort'".format(
+                    self.name),
+                type=click.Choice([self.name, 'abort']),
+                default='abort')
+            if confirm == self.name:
+                confirmed = True
 
-        confirm = click.prompt(
-            "Please confirm by typing in the environment name '{}' once again.\nWARNING: "
-            "After this all environment files will be deleted and cannot be recovered! "
-            "If you wish to abort your delete request, type 'abort'".format(
-                self.name),
-            type=click.Choice([self.name, 'abort']),
-            default='abort')
-        if confirm == self.name:
+        if confirmed:
             click.echo('performing deletion!')
             for folder in delete_list:
                 click.echo('Deleting {}'.format(folder))
@@ -127,8 +140,10 @@ class EnvironmentChooser(click.MultiCommand):
 @click.command('delete_environment', cls=EnvironmentChooser,
                short_help='Deletes an environment from the checkout folder.',
                invoke_without_command=True)
+@click.option('--force', default=False, is_flag=True,
+              help='Skip confirmation and delete directly. This is meant for automated runs only.')
 @click.pass_context
-def cli(ctx):
+def cli(ctx, force):
     """Removes an existing environment. This means that all files from this environments
     will be deleted from the checkout folder. If build or install directories are symlinked
     to another location (e.g. because it was build on no_backup), those will be deleted as well."""
