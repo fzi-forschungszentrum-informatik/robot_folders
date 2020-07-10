@@ -144,6 +144,22 @@ if [ -d $environment_dir ]; then
     echo "Sourced ic_workspace from $ic_dir"
   fi
 
+  # source misc_ws environment if existing.
+  misc_ws_dir=$environment_dir/misc_ws
+  if [ -d $misc_ws_dir ]
+  then
+    if [[ ! "$LD_LIBRARY_PATH" =~ "$misc_ws_dir/export/lib" ]]; then
+      export LD_LIBRARY_PATH=$misc_ws_dir/export/lib/:$LD_LIBRARY_PATH
+    fi
+    if [[ ! "$PATH" =~ "$misc_ws_dir/export/bin" ]]; then
+      export PATH=$misc_ws_dir/export/bin:${PATH}
+    fi
+    if [[ ! "$CMAKE_PREFIX_PATH" =~ "$misc_ws_dir/export/" ]]; then
+      export CMAKE_PREFIX_PATH=$misc_ws_dir/export:$CMAKE_PREFIX_PATH
+    fi
+    echo "Sourced misc_ws workspace from $misc_ws_dir"
+  fi
+
   # source mca environment
   mca_dir=$environment_dir/mca_workspace
   if [ -d $mca_dir ]

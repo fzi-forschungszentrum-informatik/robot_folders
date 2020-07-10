@@ -42,6 +42,16 @@ class ConfigFileParser(object):
                 ic_rosinstall = None
         return has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_grab_flags
 
+    def parse_misc_ws_config(self):
+        """Parses the misc_ws part of the data"""
+        has_misc_ws = False
+        misc_ws_rosinstall = None
+        if 'misc_ws' in self.data:
+            has_misc_ws = True
+            if 'rosinstall' in self.data['misc_ws']:
+                misc_ws_rosinstall = self.data['misc_ws']['rosinstall']
+        return has_misc_ws, misc_ws_rosinstall
+
     def parse_ros_config(self):
         """Parses the catkin_workspace part of the data"""
         ros_rosinstall = None

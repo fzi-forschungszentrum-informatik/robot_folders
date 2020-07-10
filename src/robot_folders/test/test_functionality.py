@@ -41,6 +41,7 @@ class TestCLI(unittest.TestCase):
                  "--create_ic=no",
                  "--create_mca=no",
                  "--create_catkin=yes",
+                 "--create_misc_ws=no",
                  "--copy_cmake_lists=no",
                  "testing_ws"])
         except:
