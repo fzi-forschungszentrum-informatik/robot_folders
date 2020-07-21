@@ -28,7 +28,7 @@ echo "Installing robot_folders"
 { # try
     pip3 install --user --editable robot_folders
 } || { # catch
-    echo -e "\n----------\nError!\nDid you forget to install the python-pip package?\nExiting...\n----------"
+    echo -e "\n----------\nError!\nDid you forget to install the python3-pip package?\nExiting...\n----------"
     exit
 }
 
