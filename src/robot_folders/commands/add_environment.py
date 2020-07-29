@@ -70,7 +70,8 @@ class EnvCreator(object):
                                create_catkin,
                                create_mca,
                                copy_cmake_lists,
-                               local_build):
+                               local_build,
+                               ros_distro):
         """Worker method that does the actual job"""
         if os.path.exists(os.path.join(dir_helpers.get_checkout_dir(), self.env_name)):
             # click.echo("An environment with the name \"{}\" already exists. Exiting now."
@@ -128,13 +129,16 @@ class EnvCreator(object):
                 self.create_mca = dir_helpers.yes_no_to_bool(create_mca)
 
         if self.create_catkin:
-            installed_ros_distros = os.listdir("/opt/ros")
-            click.echo("Available ROS distributions: {}".format(installed_ros_distros))
-            self.ros_distro = installed_ros_distros[0]
-            if len(installed_ros_distros) > 1:
-                self.ros_distro = click.prompt('Which ROS distribution would you like to use?',
-                                          type=click.Choice(installed_ros_distros),
-                                          default=installed_ros_distros[0])
+            if ros_distro == 'ask':
+                installed_ros_distros = os.listdir("/opt/ros")
+                click.echo("Available ROS distributions: {}".format(installed_ros_distros))
+                self.ros_distro = installed_ros_distros[0]
+                if len(installed_ros_distros) > 1:
+                    self.ros_distro = click.prompt('Which ROS distribution would you like to use?',
+                                              type=click.Choice(installed_ros_distros),
+                                              default=installed_ros_distros[0])
+            else:
+                self.ros_distro = ros_distro
             click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
             if copy_cmake_lists == 'ask':
                 copy_cmake_lists = click.confirm("Would you like to copy the top-level "
@@ -177,7 +181,8 @@ class EnvCreator(object):
                 environment_helpers.CatkinCreator(catkin_directory=self.catkin_directory,
                                                   build_directory=self.catkin_build_directory,
                                                   rosinstall=self.catkin_rosinstall,
-                                                  copy_cmake_lists=copy_cmake_lists)
+                                                  copy_cmake_lists=copy_cmake_lists,
+                                                  ros_distro=self.ros_distro)
         else:
             click.echo("Requested to not create a catkin_ws")
 
@@ -313,6 +318,8 @@ class EnvCreator(object):
 @click.option('--local_build', type=click.Choice(['yes', 'no', 'ask']), default='ask',
               help=('If set to \'yes\', the local build options is set and the build is '
                     'executed in the folder ic_workspace/build.'))
+@click.option('--ros_distro', default='ask',
+              help=('If set, use this ROS distro instead of asking when multiple ROS distros are present on the system.'))
 @click.argument('env_name', nargs=1)
 def cli(env_name,
         config_file,
@@ -322,7 +329,8 @@ def cli(env_name,
         create_catkin,
         create_mca,
         copy_cmake_lists,
-        local_build):
+        local_build,
+        ros_distro):
     # Set the ic_workspace root 
     """Adds a new environment and creates the basic needed folders,
     e.g. a ic_workspace and a catkin_ws."""
@@ -342,7 +350,8 @@ def cli(env_name,
                                                    create_catkin,
                                                    create_mca,
                                                    copy_cmake_lists,
-                                                   local_build)
+                                                   local_build,
+                                                   ros_distro)
     except subprocess.CalledProcessError as err:
         raise(ModuleException(str(err), 'add'))
     except Exception as err:

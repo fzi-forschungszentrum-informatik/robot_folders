@@ -175,11 +175,12 @@ class CatkinCreator(object):
                  catkin_directory,
                  build_directory,
                  rosinstall,
-                 copy_cmake_lists='ask'):
+                 copy_cmake_lists='ask',
+                 ros_distro='ask'):
         self.catkin_directory = catkin_directory
         self.build_directory = build_directory
         self.copy_cmake_lists = copy_cmake_lists
-        self.ros_distro = ''
+        self.ros_distro = ros_distro
 
         self.ask_questions()
         ros_global_dir = "/opt/ros/{}".format(self.ros_distro)
@@ -198,13 +199,14 @@ class CatkinCreator(object):
         When creating a catkin workspace some questions need to be answered such as which ros
         version to use and whether to copy the CMakeLists.txt
         """
-        installed_ros_distros = os.listdir("/opt/ros")
-        click.echo("Available ROS distributions: {}".format(installed_ros_distros))
-        self.ros_distro = installed_ros_distros[0]
-        if len(installed_ros_distros) > 1:
-            self.ros_distro = click.prompt('Which ROS distribution would you like to use?',
-                                           type=click.Choice(installed_ros_distros),
-                                           default=installed_ros_distros[0])
+        if self.ros_distro == 'ask':
+            installed_ros_distros = os.listdir("/opt/ros")
+            click.echo("Available ROS distributions: {}".format(installed_ros_distros))
+            self.ros_distro = installed_ros_distros[0]
+            if len(installed_ros_distros) > 1:
+                self.ros_distro = click.prompt('Which ROS distribution would you like to use?',
+                                               type=click.Choice(installed_ros_distros),
+                                               default=installed_ros_distros[0])
         click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
         if self.copy_cmake_lists == 'ask':
             self.copy_cmake_lists = click.confirm("Would you like to copy the top-level "
