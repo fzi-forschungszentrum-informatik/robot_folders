@@ -127,7 +127,7 @@ class IcBuilder(Builder):
             process = subprocess.check_call(["bash", "-c", self.get_build_command()],
                                    cwd=self.build_dir)
         except subprocess.CalledProcessError as err:
-            raise(ModuleException(err.message, "build_ic", err.returncode))
+            raise(ModuleException(err.output, "build_ic", err.returncode))
 
     def get_install_key(self):
         return 'install_ic'
@@ -217,7 +217,7 @@ class CatkinBuilder(Builder):
                                          self.get_build_command(catkin_dir, self.name)],
                                         cwd=catkin_dir)
         except subprocess.CalledProcessError as err:
-            raise(ModuleException(err.message, "build_ros", err.returncode))
+            raise(ModuleException(err.output, "build_ros", err.returncode))
 
     def get_install_key(self):
         return 'install_catkin'
@@ -236,7 +236,7 @@ class McaBuilder(Builder):
             process = subprocess.check_call(["bash", "-c", self.get_build_command()],
                                         cwd=self.build_dir)
         except subprocess.CalledProcessError as err:
-            raise(ModuleException(err.message, "build_mca", err.returncode))
+            raise(ModuleException(err.output, "build_mca", err.returncode))
 
     def get_install_default(self):
         return '' # don't install by default
