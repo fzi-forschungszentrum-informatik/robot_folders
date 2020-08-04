@@ -11,6 +11,9 @@ run_tests:
     - bin/install_robot_folders.sh -q
     - cp config/userconfig_distribute.yaml config/userconfig.yaml
     - sed -ri "s/^(\s*checkout_dir\s*:)(.*,\s*$)/\1 \"\/builds\/core\/robot_folders\/checkout\",/" config/userconfig.yaml
+    - sed -ri "s/^(\s*ic_workspace_repo\s*:)(.*,\s*$)/\1 \"https:\/\/gitlab-ci-token:${CI_JOB_TOKEN}@ids-git\.fzi\.de\/core\/ic_workspace.git\",/" config/userconfig.yaml
+    - sed -ri "s/^(\s*ic_workspace_grab_base_url\s*:)(.*,\s*$)/\1 \"https:\/\/gitlab-ci-token:${CI_JOB_TOKEN}@ids-git\.fzi\.de\/\",/" config/userconfig.yaml
+    - sed -ri "s/^(\s*mca_workspace_repo\s*:)(.*$)/\1 \"https:\/\/gitlab-ci-token:${CI_JOB_TOKEN}@ids-git\.fzi\.de\/mca2\/mca2.git\"/" config/userconfig.yaml
     - source $(pwd)/bin/fzirob_source.sh
     - fzirob get_checkout_base_dir
     - pip3 install pytest-cov
