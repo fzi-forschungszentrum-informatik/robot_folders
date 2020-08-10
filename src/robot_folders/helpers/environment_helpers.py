@@ -271,6 +271,84 @@ class CatkinCreator(object):
                                             cwd=self.catkin_directory)
             os.remove(rosinstall_filename)
 
+class ColconCreator(object):
+    """
+    Creates a colcon workspace
+    """
+
+    def __init__(self,
+                 colcon_directory,
+                 build_directory,
+                 rosinstall):
+        self.colcon_directory = colcon_directory
+        self.build_directory = build_directory
+        self.ros2_distro = ''
+
+        self.ask_questions()
+        ros_global_dir = "/opt/ros/{}".format(self.ros2_distro)
+        self.create_colcon_skeleton()
+        self.build()
+        #TODO Parsing
+#        self.clone_packages(rosinstall)
+
+    def ask_questions(self):
+        """
+        When creating a colcon workspace some questions need to be answered such as which ros
+        version to use
+        """
+        installed_ros_distros = os.listdir("/opt/ros")
+        click.echo("Available ROS distributions: {}".format(installed_ros_distros))
+        self.ros2_distro = installed_ros_distros[0]
+        if len(installed_ros_distros) > 1:
+            self.ros2_distro = click.prompt('Which ROS2 distribution would you like to use for the '
+                                           'colcon_ws ?',
+                                           type=click.Choice(installed_ros_distros),
+                                           default=installed_ros_distros[0])
+        click.echo("Using ROS2 distribution \'{}\'".format(self.ros2_distro))
+
+    def build(self):
+        """
+        Launch the build process
+        """
+        # We abuse the name parameter to code the ros distribution
+        # if we're building for the first time.
+        ros2_builder = build_helpers.ColconBuilder(name=self.ros2_distro,
+                                                  add_help_option=False)
+        ros2_builder.invoke(None)
+
+    def create_colcon_skeleton(self):
+        """
+        Creates the workspace skeleton and if necessary the relevant folders for remote build (e.g.
+        no_backup)
+        """
+        # Create directories and symlinks, if necessary
+        os.mkdir(self.colcon_directory)
+        os.mkdir(os.path.join(self.colcon_directory, "src"))
+        os.makedirs(self.build_directory)
+
+        local_build_dir_name = os.path.join(self.colcon_directory, "build")
+        (colcon_base_dir, _) = os.path.split(self.build_directory)
+
+        colcon_log_directory = os.path.join(colcon_base_dir, "log")
+        local_log_dir_name = os.path.join(self.colcon_directory, "log")
+        click.echo("log_dir: {}".format(colcon_log_directory))
+
+        colcon_install_directory = os.path.join(colcon_base_dir, "install")
+        local_install_dir_name = os.path.join(self.colcon_directory, "install")
+        click.echo("install_dir: {}".format(colcon_install_directory))
+
+        if local_build_dir_name != self.build_directory:
+            os.symlink(self.build_directory, local_build_dir_name)
+            os.makedirs(colcon_log_directory)
+            os.symlink(catkin_log_directory, local_log_dir_name)
+            os.makedirs(colcon_install_directory)
+            os.symlink(colcon_install_directory, local_install_dir_name)
+
+    def clone_packages(self, rosinstall):
+        """
+        Clone in packages froma rosinstall structure
+        """
+        #TODO
 
 class MCACreator(object):
     """
