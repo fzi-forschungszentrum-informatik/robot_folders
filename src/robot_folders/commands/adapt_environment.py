@@ -38,8 +38,10 @@ class EnvironmentAdapter(click.Command):
         misc_ws_dir = os.path.join(env_dir, "misc_ws")
         mca_dir = os.path.join(env_dir, "mca_workspace")
         catkin_dir = dir_helpers.get_catkin_dir(env_dir)
+        colcon_dir = dir_helpers.get_colcon_dir(env_dir)
         ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
         catkin_src_dir = os.path.join(catkin_dir, 'src')
+        colcon_src_dir = os.path.join(colcon_dir, 'src')
         mca_library_dir = os.path.join(mca_dir, 'libraries')
         mca_project_dir = os.path.join(mca_dir, 'projects')
         mca_tool_dir = os.path.join(mca_dir, 'tools')
@@ -56,6 +58,7 @@ class EnvironmentAdapter(click.Command):
         has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
             config_file_parser.parse_ic_config()
         has_catkin, ros_rosinstall = config_file_parser.parse_ros_config()
+        has_colcon, ros2_rosinstall = config_file_parser.parse_ros2_config()
         has_misc_ws, misc_ws_rosinstall = config_file_parser.parse_misc_ws_config()
         has_mca, mca_additional_repos = config_file_parser.parse_mca_config()
         os.environ['ROB_FOLDERS_ACTIVE_ENV'] = self.name
@@ -123,6 +126,24 @@ class EnvironmentAdapter(click.Command):
                                                   build_directory=catkin_build_dir,
                                                   rosinstall=ros_rosinstall)
 
+        if has_colcon:
+            if os.path.isdir(colcon_src_dir):
+                click.echo("Adapting colcon workspace")
+                self.rosinstall = dict()
+                self.parse_folder(colcon_src_dir)
+                if ros2_rosinstall:
+                    self.adapt_rosinstall(ros2_rosinstall, colcon_src_dir)
+            else:
+                click.echo("Creating colcon workspace")
+                has_nobackup = dir_helpers.check_nobackup()
+                colcon_dir = os.path.join(env_dir, "colcon_ws")
+                build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
+                colcon_build_dir = os.path.join(build_base_dir, self.name, 'colcon_ws', 'build')
+
+                environment_helpers.ColconCreator(colcon_directory=colcon_dir,
+                                                  build_directory=colcon_build_dir,
+                                                  rosinstall=ros2_rosinstall)
+        
         if has_mca and (not self.ignore_mca):
             if os.path.isdir(mca_library_dir):
                 click.echo("Adapting mca libraries")
