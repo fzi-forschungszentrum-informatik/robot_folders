@@ -104,6 +104,23 @@ def get_catkin_dir(env_dir=''):
     # print "No catkin workspace was found in the current environment"
     return os.path.join(cur_env_path, "catkin_ws")
 
+def get_colcon_dir(env_dir=''):
+    """Tries to find the right colcon workspace in the Currently \
+    sourced environment."""
+
+    path = ''
+    cur_env_path = env_dir
+    if env_dir == '':
+        cur_env_path = get_active_env_path()
+
+    valid_names = config_helpers.get_value_safe_default(
+        'directories', 'colcon_names', ["colcon_workspace", "colcon_ws"], debug=False)
+    for path_name in valid_names:
+        path = os.path.join(cur_env_path, path_name)
+        if os.path.exists(path):
+            return path
+    # print "No catkin workspace was found in the current environment"
+    return os.path.join(cur_env_path, "colcon_ws")
 
 def yes_no_to_bool(bool_str):
     """
