@@ -25,10 +25,6 @@ class TestCLI(unittest.TestCase):
             (etype, evalue, etrace) = sys.exc_info()
             self.fail("Failed with %s" % evalue)
 
-        expected = config_helpers.get_value_safe("directories", "checkout_dir")
+        expected = directory_helpers.get_checkout_dir()
 
-        if expected:
-            self.assertEqual(process_result.stdout.strip(), bytes(expected, 'utf-8'))
-        else:
-            self.assertEqual(process_result.stdout.strip(),
-                             os.path.expanduser(b"~/robot_folders/checkout"))
+        self.assertEqual(process_result.stdout.strip(), bytes(expected, 'utf-8'))
