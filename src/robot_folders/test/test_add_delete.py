@@ -10,6 +10,9 @@ import helpers.directory_helpers as directory_helpers
 
 class TestCLI(unittest.TestCase):
     def test_add_catkin_only(self):
+        installed_ros_distros = sorted(os.listdir("/opt/ros"))
+        print("Available ROS distributions: {}".format(installed_ros_distros))
+        ros_distro = installed_ros_distros[-1]
         try:
             process_result = subprocess.check_call(
                 ["rob_folders",
@@ -19,6 +22,7 @@ class TestCLI(unittest.TestCase):
                  "--create_catkin=yes",
                  "--create_misc_ws=no",
                  "--copy_cmake_lists=no",
+                 "--ros_distro={}".format(ros_distro),
                  "testing_ws"])
         except:
             (etype, evalue, etrace) = sys.exc_info()
