@@ -3,7 +3,7 @@ import os
 import shutil
 import click
 
-from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir
+from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir, get_colcon_dir
 from helpers.which import which
 from helpers import config_helpers
 
@@ -73,6 +73,17 @@ class CatkinCleaner(Cleaner):
         self.clean_list.append(os.path.join(catkin_dir, 'install'))
         self.clean_list.append(os.path.join(catkin_dir, 'install_isolated'))
         click.echo("Cleaning catkin_workspace in {}".format(catkin_dir))
+        self.clean()
+
+class ColconCleaner(Cleaner):
+    """Cleaner class for colcon workspace"""
+    def invoke(self, ctx):
+        click.echo('========== Cleaning colcon workspace ==========')
+        colcon_dir = get_colcon_dir()
+        self.clean_list.append(os.path.join(colcon_dir, 'build'))
+        self.clean_list.append(os.path.join(colcon_dir, 'log'))
+        self.clean_list.append(os.path.join(colcon_dir, 'install'))
+        click.echo("Cleaning colcon_workspace in {}".format(colcon_dir))
         self.clean()
 
 class McaCleaner(Cleaner):
