@@ -105,7 +105,7 @@ if [ -d $environment_dir ]; then
       echo "Only found installed workspace. Sourcing $catkin_dir/install/setup.$shell_type"
       source $catkin_dir/install/setup.$shell_type
     else
-      echo "no setup.$shell_type for the ROS workspace found. Sourcing global ROS"
+      echo "no setup.$shell_type for the catkin workspace found. Sourcing global ROS"
       num_ros_distros=$(find /opt/ros -maxdepth 1 -mindepth 1 -type d | wc -l)
       if [[ $num_ros_distros -gt 1 ]]; then
         echo "Found more than one ros_distribution:"
@@ -133,7 +133,7 @@ if [ -d $environment_dir ]; then
       source $colcon_dir/install/local_setup.$shell_type
       echo "Sourced colcon workspace"
     else
-      echo "no setup.$shell_type for the ROS workspace found. Sourcing global ROS"
+      echo "no setup.$shell_type for the colcon workspace found. Sourcing global ROS2"
       num_ros_distros=$(find /opt/ros -maxdepth 1 -mindepth 1 -type d | wc -l)
       if [[ $num_ros_distros -gt 1 ]]; then
         echo "Found more than one ros_distribution:"
