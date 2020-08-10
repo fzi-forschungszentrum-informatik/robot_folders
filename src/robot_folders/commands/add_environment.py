@@ -152,8 +152,13 @@ class EnvCreator(object):
                 click.echo("Available ROS distributions: {}".format(installed_ros_distros))
                 self.ros_distro = installed_ros_distros[0]
                 if len(installed_ros_distros) > 1:
+<<<<<<< HEAD
                 self.ros_distro = click.prompt('Which ROS distribution would you like to use for '
                                                'the catkin_ws?',
+=======
+                    self.ros_distro = click.prompt('Which ROS distribution would you like to use'
+                                                   'for catkin?',
+>>>>>>> prompting only once for ros2 version as well and clarified promtps
                                               type=click.Choice(installed_ros_distros),
                                               default=installed_ros_distros[0])
             else:
@@ -171,8 +176,8 @@ class EnvCreator(object):
             click.echo("Available ROS2 distributions: {}".format(installed_ros_distros))
             self.ros2_distro = installed_ros_distros[0]
             if len(installed_ros_distros) > 1:
-                self.ros2_distro = click.prompt('Which ROS distribution would you like to use for '
-                                                'the colcon_ws?',
+                self.ros2_distro = click.prompt('Which ROS2 distribution would you like to use for '
+                                                'colcon?',
                                                 type=click.Choice(installed_ros_distros),
                                                 default=installed_ros_distros[0])
             click.echo("Using ROS distribution \'{}\'".format(self.ros2_distro))
@@ -221,7 +226,8 @@ class EnvCreator(object):
             colcon_creator = \
                 environment_helpers.ColconCreator(colcon_directory=self.colcon_directory,
                                                   build_directory=self.colcon_build_directory,
-                                                  rosinstall=self.colcon_rosinstall)
+                                                  rosinstall=self.colcon_rosinstall,
+                                                  ros2_distro = self.ros2_distro)
                                                   #copy_cmake_lists=copy_cmake_lists)
         else:
             click.echo("Requested to not create a colcon_ws")

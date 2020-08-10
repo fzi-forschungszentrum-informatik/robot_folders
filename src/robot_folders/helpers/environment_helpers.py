@@ -204,7 +204,8 @@ class CatkinCreator(object):
             click.echo("Available ROS distributions: {}".format(installed_ros_distros))
             self.ros_distro = installed_ros_distros[0]
             if len(installed_ros_distros) > 1:
-                self.ros_distro = click.prompt('Which ROS distribution would you like to use?',
+                self.ros_distro = click.prompt('Which ROS distribution would you like to use for'
+                                               'catkin?',
                                                type=click.Choice(installed_ros_distros),
                                                default=installed_ros_distros[0])
         click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
@@ -279,10 +280,11 @@ class ColconCreator(object):
     def __init__(self,
                  colcon_directory,
                  build_directory,
-                 rosinstall):
+                 rosinstall,
+                 ros2_distro='ask'):
         self.colcon_directory = colcon_directory
         self.build_directory = build_directory
-        self.ros2_distro = ''
+        self.ros2_distro = ros2_distro
 
         self.ask_questions()
         ros_global_dir = "/opt/ros/{}".format(self.ros2_distro)
@@ -295,14 +297,15 @@ class ColconCreator(object):
         When creating a colcon workspace some questions need to be answered such as which ros
         version to use
         """
-        installed_ros_distros = os.listdir("/opt/ros")
-        click.echo("Available ROS distributions: {}".format(installed_ros_distros))
-        self.ros2_distro = installed_ros_distros[0]
-        if len(installed_ros_distros) > 1:
-            self.ros2_distro = click.prompt('Which ROS2 distribution would you like to use for the '
-                                           'colcon_ws ?',
-                                           type=click.Choice(installed_ros_distros),
-                                           default=installed_ros_distros[0])
+        if self.ros2_distro == 'ask':
+            installed_ros_distros = os.listdir("/opt/ros")
+            click.echo("Available ROS distributions: {}".format(installed_ros_distros))
+            self.ros2_distro = installed_ros_distros[0]
+            if len(installed_ros_distros) > 1:
+                self.ros2_distro = click.prompt('Which ROS2 distribution would you like to use for '
+                                                'colcon?',
+                                               type=click.Choice(installed_ros_distros),
+                                               default=installed_ros_distros[0])
         click.echo("Using ROS2 distribution \'{}\'".format(self.ros2_distro))
 
     def build(self):
