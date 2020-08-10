@@ -21,6 +21,7 @@ class TestCLI(unittest.TestCase):
                  "--create_mca=no",
                  "--create_catkin=yes",
                  "--create_misc_ws=no",
+                 "--create_colcon=no",
                  "--copy_cmake_lists=no",
                  "--ros_distro={}".format(ros_distro),
                  "testing_ws"])
@@ -54,6 +55,7 @@ class TestCLI(unittest.TestCase):
                  "--create_mca=no",
                  "--create_catkin=no",
                  "--create_misc_ws=no",
+                 "--create_colcon=no",
                  "--copy_cmake_lists=no",
                  "testing_ws"])
         except:
