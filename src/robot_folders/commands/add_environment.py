@@ -289,6 +289,9 @@ class EnvCreator(object):
         # Parse catkin_workspace packages
         self.create_catkin, self.catkin_rosinstall = parser.parse_ros_config()
 
+        # Parse colcon_workspace packages
+        self.create_colcon, self.colcon_rosinstall = parser.parse_ros2_config()
+
         # Parse mca_workspace packages
         self.create_mca, self.mca_additional_repos = parser.parse_mca_config()
 

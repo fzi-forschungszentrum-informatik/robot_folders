@@ -288,8 +288,7 @@ class ColconCreator(object):
         ros_global_dir = "/opt/ros/{}".format(self.ros2_distro)
         self.create_colcon_skeleton()
         self.build()
-        #TODO Parsing
-#        self.clone_packages(rosinstall)
+        self.clone_packages(rosinstall)
 
     def ask_questions(self):
         """
@@ -348,7 +347,16 @@ class ColconCreator(object):
         """
         Clone in packages froma rosinstall structure
         """
-        #TODO
+        # copy packages
+        if rosinstall != "":
+            # Dump the rosinstall to a file and use wstool for getting the packages
+            rosinstall_filename = '/tmp/rob_folders_rosinstall'
+            with open(rosinstall_filename, 'w') as rosinstall_content:
+                yaml_dump(rosinstall, rosinstall_content)
+
+            process = subprocess.check_call(["wstool", "init", "src", rosinstall_filename],
+                                            cwd=self.colcon_directory)
+            os.remove(rosinstall_filename)
 
 class MCACreator(object):
     """
