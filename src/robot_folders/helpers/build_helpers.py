@@ -137,7 +137,7 @@ class IcBuilder(Builder):
 
 class ColconBuilder(Builder):
     """Builder class for colcon workspace"""
-    def get_build_command(self):
+    def get_build_command(self, ros_distro):
         build_cmd = "colcon build"
 
         colcon_options = config_helpers.get_value_safe_default(
@@ -152,6 +152,13 @@ class ColconBuilder(Builder):
             default='make')
         if generator == "ninja":
             generator_flag = "-GNinja"
+        
+        ros_global_dir = "/opt/ros/{}".format(ros_distro)
+
+        if os.path.isdir(ros_global_dir):
+            build_cmd_with_source = "source {}/setup.bash && {}"\
+                                    .format(ros_global_dir, build_cmd)
+            build_cmd = build_cmd_with_source
 
         final_cmd = " ".join([build_cmd, colcon_options, "--cmake-args ",
                               generator_flag, get_cmake_flags()])
@@ -162,8 +169,9 @@ class ColconBuilder(Builder):
     def invoke(self, ctx):
         colcon_dir = os.path.realpath(os.path.join(get_active_env_path(), 'colcon_ws'))
         click.echo("Building colcon_ws in {}".format(colcon_dir))
+        # We abuse the name to code the ros distribution if we're building for the first time.
         try:
-            process = subprocess.check_call(["bash", "-c", self.get_build_command()],
+            process = subprocess.check_call(["bash", "-c", self.get_build_command(self.name)],
                                    cwd=colcon_dir)
         except subprocess.CalledProcessError as err:
             raise(ModuleException(err.message, "build_colcon", err.returncode))
