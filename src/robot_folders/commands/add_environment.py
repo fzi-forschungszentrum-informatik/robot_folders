@@ -145,10 +145,14 @@ class EnvCreator(object):
             else:
                 self.create_mca = dir_helpers.yes_no_to_bool(create_mca)
 
-        #TODO this probably needs some cleanup regarding ROS1 and ROS2
         if self.create_catkin:
             if ros_distro == 'ask':
-                installed_ros_distros = os.listdir("/opt/ros")
+                #Check the setup if it contains catkin the ROS Build system
+                temp_installed_ros_distros = os.listdir("/opt/ros")
+                installed_ros_distros = []
+                for distro in temp_installed_ros_distros:
+                    if 'catkin' in open('/opt/ros/' + distro + '/setup.sh').read():
+                        installed_ros_distros.append(distro)
                 click.echo("Available ROS distributions: {}".format(installed_ros_distros))
                 self.ros_distro = installed_ros_distros[0]
                 if len(installed_ros_distros) > 1:
@@ -172,7 +176,12 @@ class EnvCreator(object):
                                                  "QtCreator.)",
                                                  default=True)
         if self.create_colcon:
-            installed_ros_distros = os.listdir("/opt/ros")
+            #Check the setup if it contains ament the ROS2 Build system
+            temp_installed_ros_distros = os.listdir("/opt/ros")
+            installed_ros_distros = []
+            for distro in temp_installed_ros_distros:
+                if 'ament' in open('/opt/ros/' + distro + '/setup.sh').read():
+                    installed_ros_distros.append(distro)
             click.echo("Available ROS2 distributions: {}".format(installed_ros_distros))
             self.ros2_distro = installed_ros_distros[0]
             if len(installed_ros_distros) > 1:
