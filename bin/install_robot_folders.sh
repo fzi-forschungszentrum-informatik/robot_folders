@@ -13,12 +13,8 @@ function manual_setup_instructions
 
 shell_setup ()
 {
-  # if the command hasn't been added already
-  if ! grep -q "$SOURCE_CMD" $1;
-  then
-    echo "# robot_folders setup" >> $1
-    echo $SOURCE_CMD >> $1
-  fi
+  echo "# robot_folders setup" >> $1
+  echo $SOURCE_CMD >> $1
 }
 
 pushd $ROB_FOLDERS_BASE_DIR/src
