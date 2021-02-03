@@ -17,6 +17,16 @@ shell_setup ()
   echo $SOURCE_CMD >> $1
 }
 
+check_for_existing_setup ()
+{
+  RES=$(grep "$SOURCE_CMD" "$HOME/.bashrc" "$HOME/.zshrc")
+  if [ -n "$RES" ]; then
+    echo "Found correct robot folders setup in ${RES%%:*}"
+    return
+  fi
+  false
+}
+
 pushd $ROB_FOLDERS_BASE_DIR/src
 
 echo "Installing robot_folders"
@@ -33,32 +43,31 @@ popd
 mkdir -p ${ROB_FOLDERS_BASE_DIR}/checkout
 
 # perform shell setup, if not done previously
-RES=$(grep "$SOURCE_CMD" "$HOME/.bashrc" "$HOME/.zshrc")
-if [ -n "$RES" ];
+echo "Preparing setup of .bashrc/.zshrc"
+check_for_existing_setup
+exists=$?
+if ! $(exit $exists);
 then
-  echo "Found existing robot folders setup in ${RES%%:*}"
-  exit
-fi
-
-if [ "$1" != "-q"  ]; then
-  read -p "Do you want me to perform the .bashrc setup automatically? [Y/n] " -r do_setup
-
-  if [[ "$do_setup" =~ ^[Yy]?$ ]]
-  then
-    read -p "Which shell are you running? Press enter for default bash: [bash/zsh] " -r shell_type
-    # if running bash
-    if [[ $shell_type == "bash" || $shell_type == "" ]]; then
-      shell_setup "$HOME/.bashrc"
-      echo "Added necessary parts to .bashrc"
-    elif [[ $shell_type == zsh ]]; then
-      shell_setup "$HOME/.zshrc"
-      echo "Added necessary parts to .zshrc."
+  if [ "$1" != "-q"  ]; then
+    read -p "Do you want me to perform the .bashrc setup automatically? [Y/n] " -r do_setup
+  
+    if [[ "$do_setup" =~ ^[Yy]?$ ]]
+    then
+      read -p "Which shell are you running? Press enter for default bash: [bash/zsh] " -r shell_type
+      # if running bash
+      if [[ $shell_type == "bash" || $shell_type == "" ]]; then
+        shell_setup "$HOME/.bashrc"
+        echo "Added necessary parts to .bashrc"
+      elif [[ $shell_type == zsh ]]; then
+        shell_setup "$HOME/.zshrc"
+        echo "Added necessary parts to .zshrc."
+      else
+        echo "Could not determine your shell type. Please perform manual setup:"
+        manual_setup_instructions
+      fi
     else
-      echo "Could not determine your shell type. Please perform manual setup:"
+      echo "You chose manual setup."
       manual_setup_instructions
     fi
-  else
-    echo "You chose manual setup."
-    manual_setup_instructions
   fi
 fi
