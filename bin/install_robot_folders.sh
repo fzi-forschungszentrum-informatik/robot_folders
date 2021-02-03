@@ -37,6 +37,13 @@ popd
 mkdir -p ${ROB_FOLDERS_BASE_DIR}/checkout
 
 # perform shell setup, if not done previously
+RES=$(grep "$SOURCE_CMD" "$HOME/.bashrc" "$HOME/.zshrc")
+if [ -n "$RES" ];
+then
+  echo "Found existing robot folders setup in ${RES%%:*}"
+  exit
+fi
+
 if [ "$1" != "-q"  ]; then
   read -p "Do you want me to perform the .bashrc setup automatically? [Y/n] " -r do_setup
 
