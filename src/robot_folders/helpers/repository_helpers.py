@@ -12,13 +12,18 @@ def parse_repository(repo_path, use_commit_id):
     repo = git.Repo(repo_path)
     remotes = repo.remotes
     choice = 0
+
+    detached_head = repo.head.is_detached
+
     if len(remotes) > 1:
         click.echo("Found multiple remotes for repo {}.".format(repo_path))
-        upstream_branch = repo.active_branch.tracking_branch()
-        if upstream_branch == None:
-            raise ModuleException('Branch \"{}\" from repository \"{}\" does not have a tracking branch configured. Cannot scrape environment.'.format(repo.active_branch, repo_path), 'repository_helpers', 1)
+        upstream_remote = None
+        if not detached_head:
+            upstream_branch = repo.active_branch.tracking_branch()
+            if upstream_branch == None:
+                raise ModuleException('Branch \"{}\" from repository \"{}\" does not have a tracking branch configured. Cannot scrape environment.'.format(repo.active_branch, repo_path), 'repository_helpers', 1)
 
-        upstream_remote = upstream_branch.name.split('/')[0]
+            upstream_remote = upstream_branch.name.split('/')[0]
         default = None
         for index, remote in enumerate(remotes):
             click.echo("{}: {} ({})".format(index, remote.name, remote.url))
@@ -37,7 +42,6 @@ def parse_repository(repo_path, use_commit_id):
         click.echo("Selected remote {} ({})".format(remotes[choice].name, remotes[choice].url))
     url = remotes[choice].url
 
-    detached_head = repo.head.is_detached
 
     if detached_head or use_commit_id:
         version = repo.head.commit.hexsha
