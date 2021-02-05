@@ -20,11 +20,7 @@ shell_setup ()
 check_for_existing_setup ()
 {
   RES=$(grep "$SOURCE_CMD" "$HOME/.bashrc" "$HOME/.zshrc")
-  if [ -n "$RES" ]; then
-    echo "Found correct robot folders setup in ${RES%%:*}"
-    return
-  fi
-  false
+  [ -n "$RES" ]
 }
 
 pushd $ROB_FOLDERS_BASE_DIR/src
@@ -46,6 +42,7 @@ mkdir -p ${ROB_FOLDERS_BASE_DIR}/checkout
 echo "Preparing setup of .bashrc/.zshrc"
 check_for_existing_setup
 exists=$?
+echo $exists
 if ! $(exit $exists);
 then
   if [ "$1" != "-q"  ]; then
