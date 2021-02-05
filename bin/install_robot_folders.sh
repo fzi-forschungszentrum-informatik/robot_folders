@@ -40,11 +40,10 @@ mkdir -p ${ROB_FOLDERS_BASE_DIR}/checkout
 
 # perform shell setup, if not done previously
 echo "Preparing setup of .bashrc/.zshrc"
-check_for_existing_setup
-exists=$?
-echo $exists
-if ! $(exit $exists);
+if check_for_existing_setup ; 
 then
+  echo "Found a correct setup. No further setup needed."
+else
   if [ "$1" != "-q"  ]; then
     read -p "Do you want me to perform the .bashrc setup automatically? [Y/n] " -r do_setup
   
