@@ -156,13 +156,8 @@ class EnvCreator(object):
                 click.echo("Available ROS distributions: {}".format(installed_ros_distros))
                 self.ros_distro = installed_ros_distros[0]
                 if len(installed_ros_distros) > 1:
-<<<<<<< HEAD
-                self.ros_distro = click.prompt('Which ROS distribution would you like to use for '
-                                               'the catkin_ws?',
-=======
                     self.ros_distro = click.prompt('Which ROS distribution would you like to use'
                                                    'for catkin?',
->>>>>>> prompting only once for ros2 version as well and clarified promtps
                                               type=click.Choice(installed_ros_distros),
                                               default=installed_ros_distros[0])
             else:
