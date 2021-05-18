@@ -22,6 +22,7 @@ class EnvironmentAdapter(click.Command):
         click.Command.__init__(self, name, **attrs)
 
         self.local_delete_policy = 'ask'
+        self.local_override_policy = 'ask'
         self.ignore_ic = False
         self.ignore_catkin = False        
         self.ignore_mca = False
@@ -45,6 +46,7 @@ class EnvironmentAdapter(click.Command):
         demos_dir = os.path.join(env_dir, 'demos')
 
         self.local_delete_policy = ctx.parent.params['local_delete_policy']
+        self.local_override_policy = ctx.parent.params['local_override_policy']
         self.ignore_ic = ctx.parent.params['ignore_ic']
         self.ignore_catkin = ctx.parent.params['ignore_catkin']        
         self.ignore_mca = ctx.parent.params['ignore_mca']
@@ -213,6 +215,10 @@ class EnvironmentAdapter(click.Command):
                 local_repo = self.rosinstall[local_name]
                 if version == '' or version == local_repo["git"]["version"]:
                     version_update_required = False
+                elif(self.local_override_policy == "keep_local"):
+                    version_update_required = False
+                elif(self.local_override_policy == "override"):
+                    version_update_required = True
                 else:
                     click.echo("Package '{}' version differs from local version. "
                                .format(local_name))
@@ -225,6 +231,10 @@ class EnvironmentAdapter(click.Command):
 
                 if uri == local_repo["git"]["uri"]:
                     uri_update_required = False
+                elif(self.local_override_policy == "keep_local"):
+                    uri_update_required = False
+                elif(self.local_override_policy == "override"):
+                    uri_update_required = True
                 else:
                     click.echo("Package '{}' uri differs from local version. "
                                .format(local_name))
@@ -317,9 +327,16 @@ class EnvironmentChooser(click.MultiCommand):
 @click.option("--local_delete_policy",
               type=click.Choice(['delete_all', 'keep_all', 'ask']),
               default='ask',
-              help=('Defines whether repositories existing local, but not '
-                    'in the config file should be kept, deleted or the '
-                    'user should be asked. Asking is the default behavior.'))
+              help=('Defines whether repositories existing local, but NOT '
+                    'in the config file should be kept or deleted. '
+                    'Asking the user is the default behavior.'))
+@click.option("--local_override_policy",
+              type=click.Choice(['keep_local', 'override', 'ask']),
+              default='ask',
+              help=('Defines whether repositories existing locally AND '
+                    'in different version or with different URI in the config file,'
+                    'should be kept in local version or be overridden'
+                    'Asking the user is the default behavior.'))                    
 
 @click.option('--ignore_ic', default=False, is_flag=True,
               help='Prevent ic workspace from getting adapted')
@@ -330,12 +347,12 @@ class EnvironmentChooser(click.MultiCommand):
 @click.option('--ignore_misc', default=False, is_flag=True,
               help='Prevent misc workspace from getting adapted')                                                                             
 @click.pass_context
-def cli(ctx, local_delete_policy, ignore_ic, ignore_catkin, ignore_mca, ignore_misc):
+def cli(ctx, local_delete_policy, ignore_ic, ignore_catkin, ignore_mca, ignore_misc, local_override_policy):
     """Adapts an environment to ica config file.
        New repositories will be added, versions/branches will be changed and
        deleted repositories will/may be removed.
     """  
-    
+
     print("The policy for deleting repos only existing locally is: '{}'"
           .format(local_delete_policy))                                       
 
