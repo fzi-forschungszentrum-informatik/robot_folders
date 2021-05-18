@@ -22,6 +22,10 @@ class EnvironmentAdapter(click.Command):
         click.Command.__init__(self, name, **attrs)
 
         self.local_delete_policy = 'ask'
+        self.ignore_ic = False
+        self.ignore_catkin = False        
+        self.ignore_mca = False
+        self.ignore_misc = False                
         self.rosinstall = dict()
 
     def invoke(self, ctx):
@@ -41,6 +45,10 @@ class EnvironmentAdapter(click.Command):
         demos_dir = os.path.join(env_dir, 'demos')
 
         self.local_delete_policy = ctx.parent.params['local_delete_policy']
+        self.ignore_ic = ctx.parent.params['ignore_ic']
+        self.ignore_catkin = ctx.parent.params['ignore_catkin']        
+        self.ignore_mca = ctx.parent.params['ignore_mca']
+        self.ignore_misc = ctx.parent.params['ignore_misc']    
 
         config_file_parser = ConfigFileParser(ctx.params['in_file'])
         has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
@@ -50,7 +58,7 @@ class EnvironmentAdapter(click.Command):
         has_mca, mca_additional_repos = config_file_parser.parse_mca_config()
         os.environ['ROB_FOLDERS_ACTIVE_ENV'] = self.name
 
-        if has_ic:
+        if has_ic and (not self.ignore_ic):
             if os.path.isdir(ic_pkg_dir):
                 click.echo("Adapting IC workspace")
                 self.parse_folder(ic_pkg_dir)
@@ -78,7 +86,7 @@ class EnvironmentAdapter(click.Command):
                                               package_versions=ic_package_versions,
                                               grab_flags=ic_flags)
 
-        if has_misc_ws:
+        if has_misc_ws and (not self.ignore_misc):
             if os.path.isdir(misc_ws_dir):
                 click.echo("Adapting misc workspace")
                 if misc_ws_rosinstall:
@@ -95,7 +103,7 @@ class EnvironmentAdapter(click.Command):
 
 
 
-        if has_catkin:
+        if has_catkin and (not self.ignore_catkin):
             if os.path.isdir(catkin_src_dir):
                 click.echo("Adapting catkin workspace")
                 self.rosinstall = dict()
@@ -113,7 +121,7 @@ class EnvironmentAdapter(click.Command):
                                                   build_directory=catkin_build_dir,
                                                   rosinstall=ros_rosinstall)
 
-        if has_mca:
+        if has_mca and (not self.ignore_mca):
             if os.path.isdir(mca_library_dir):
                 click.echo("Adapting mca libraries")
                 self.rosinstall = dict()
@@ -312,14 +320,24 @@ class EnvironmentChooser(click.MultiCommand):
               help=('Defines whether repositories existing local, but not '
                     'in the config file should be kept, deleted or the '
                     'user should be asked. Asking is the default behavior.'))
+
+@click.option('--ignore_ic', default=False, is_flag=True,
+              help='Prevent ic workspace from getting adapted')
+@click.option('--ignore_catkin', default=False, is_flag=True,
+              help='Prevent catkin workspace from getting adapted') 
+@click.option('--ignore_mca', default=False, is_flag=True,
+              help='Prevent mca workspace from getting adapted') 
+@click.option('--ignore_misc', default=False, is_flag=True,
+              help='Prevent misc workspace from getting adapted')                                                                             
 @click.pass_context
-def cli(ctx, local_delete_policy):
-    """Adapts an environment to a config file.
+def cli(ctx, local_delete_policy, ignore_ic, ignore_catkin, ignore_mca, ignore_misc):
+    """Adapts an environment to ica config file.
        New repositories will be added, versions/branches will be changed and
        deleted repositories will/may be removed.
-    """
+    """  
+    
     print("The policy for deleting repos only existing locally is: '{}'"
-          .format(local_delete_policy))
+          .format(local_delete_policy))                                       
 
     if ctx.invoked_subcommand is None:
         click.echo('No environment specified. Please choose one '
