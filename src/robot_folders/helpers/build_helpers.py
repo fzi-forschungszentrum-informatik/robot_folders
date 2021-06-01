@@ -174,7 +174,8 @@ class ColconBuilder(Builder):
             process = subprocess.check_call(["bash", "-c", self.get_build_command(self.name)],
                                    cwd=colcon_dir)
         except subprocess.CalledProcessError as err:
-            raise(ModuleException(err.message, "build_colcon", err.returncode))
+            raise(ModuleException(err.output, "build_colcon", err.returncode))
+        
 
 class CatkinBuilder(Builder):
     """Builder class for catkin workspace"""
