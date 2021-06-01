@@ -126,10 +126,6 @@ if [ -d $environment_dir ]; then
   then
     if [ -f $colcon_dir/install/local_setup.$shell_type ]
     then
-      # Find underlay workspace
-      ros2_version=$(grep "COLCON_CURRENT_PREFIX=\"/opt/ros" $colcon_dir/install/setup.sh | cut -d '"' -f2)
-      echo "Sourcing ${ros2_version}/setup.${shell_type}"
-      source "${ros2_version}/setup.${shell_type}"
       source $colcon_dir/install/local_setup.$shell_type
       echo "Sourced colcon workspace"
     else
