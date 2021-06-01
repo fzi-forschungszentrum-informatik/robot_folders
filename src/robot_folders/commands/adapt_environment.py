@@ -24,9 +24,10 @@ class EnvironmentAdapter(click.Command):
         self.local_delete_policy = 'ask'
         self.local_override_policy = 'ask'
         self.ignore_ic = False
-        self.ignore_catkin = False        
+        self.ignore_catkin = False
+        self.ignore_colcon = False
         self.ignore_mca = False
-        self.ignore_misc = False                
+        self.ignore_misc = False
         self.rosinstall = dict()
 
     def invoke(self, ctx):
@@ -50,9 +51,10 @@ class EnvironmentAdapter(click.Command):
         self.local_delete_policy = ctx.parent.params['local_delete_policy']
         self.local_override_policy = ctx.parent.params['local_override_policy']
         self.ignore_ic = ctx.parent.params['ignore_ic']
-        self.ignore_catkin = ctx.parent.params['ignore_catkin']        
+        self.ignore_catkin = ctx.parent.params['ignore_catkin']
+        self.ignore_colcon = ctx.parent.params['ignore_colcon']
         self.ignore_mca = ctx.parent.params['ignore_mca']
-        self.ignore_misc = ctx.parent.params['ignore_misc']    
+        self.ignore_misc = ctx.parent.params['ignore_misc']
 
         config_file_parser = ConfigFileParser(ctx.params['in_file'])
         has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
@@ -126,7 +128,7 @@ class EnvironmentAdapter(click.Command):
                                                   build_directory=catkin_build_dir,
                                                   rosinstall=ros_rosinstall)
 
-        if has_colcon:
+        if has_colcon and (not self.ignore_colcon):
             if os.path.isdir(colcon_src_dir):
                 click.echo("Adapting colcon workspace")
                 self.rosinstall = dict()
@@ -143,7 +145,7 @@ class EnvironmentAdapter(click.Command):
                 environment_helpers.ColconCreator(colcon_directory=colcon_dir,
                                                   build_directory=colcon_build_dir,
                                                   rosinstall=ros2_rosinstall)
-        
+ 
         if has_mca and (not self.ignore_mca):
             if os.path.isdir(mca_library_dir):
                 click.echo("Adapting mca libraries")
@@ -363,12 +365,14 @@ class EnvironmentChooser(click.MultiCommand):
               help='Prevent ic workspace from getting adapted')
 @click.option('--ignore_catkin', default=False, is_flag=True,
               help='Prevent catkin workspace from getting adapted') 
+@click.option('--ignore_colcon', default=False, is_flag=True,
+              help='Prevent ccolcon workspace from getting adapted') 
 @click.option('--ignore_mca', default=False, is_flag=True,
               help='Prevent mca workspace from getting adapted') 
 @click.option('--ignore_misc', default=False, is_flag=True,
               help='Prevent misc workspace from getting adapted')                                                                             
 @click.pass_context
-def cli(ctx, local_delete_policy, ignore_ic, ignore_catkin, ignore_mca, ignore_misc, local_override_policy):
+def cli(ctx, local_delete_policy, ignore_ic, ignore_catkin, ignore_colcon, ignore_mca, ignore_misc, local_override_policy):
     """Adapts an environment to ica config file.
        New repositories will be added, versions/branches will be changed and
        deleted repositories will/may be removed.
