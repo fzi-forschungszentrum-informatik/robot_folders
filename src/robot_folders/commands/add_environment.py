@@ -232,7 +232,6 @@ class EnvCreator(object):
                                                   build_directory=self.colcon_build_directory,
                                                   rosinstall=self.colcon_rosinstall,
                                                   ros2_distro = self.ros2_distro)
-                                                  #copy_cmake_lists=copy_cmake_lists)
         else:
             click.echo("Requested to not create a colcon_ws")
         # Check if we should create an mca workspace and create one if desired

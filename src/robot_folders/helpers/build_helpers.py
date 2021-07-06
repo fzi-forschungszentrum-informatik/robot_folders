@@ -145,7 +145,7 @@ class ColconBuilder(Builder):
             value='colcon_build_options',
             default='')
 
-        generator_flag=""
+        generator_flag = ""
         generator = config_helpers.get_value_safe_default(
             section='build',
             value='generator',

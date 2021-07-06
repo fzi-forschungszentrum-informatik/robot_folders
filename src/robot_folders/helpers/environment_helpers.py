@@ -358,7 +358,7 @@ class ColconCreator(object):
 
     def clone_packages(self, rosinstall):
         """
-        Clone in packages froma rosinstall structure
+        Clone packages from rosinstall structure
         """
         # copy packages
         if rosinstall != "":

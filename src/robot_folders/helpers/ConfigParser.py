@@ -65,7 +65,6 @@ class ConfigFileParser(object):
 
     def parse_ros2_config(self):
         """Parses the colcon_workspace part of the data"""
-        print("enter parse ROS2")
         ros2_rosinstall = None
         has_colcon = False
         if "colcon_workspace" in self.data:

@@ -101,7 +101,6 @@ def get_catkin_dir(env_dir=''):
         path = os.path.join(cur_env_path, path_name)
         if os.path.exists(path):
             return path
-    # print "No catkin workspace was found in the current environment"
     return os.path.join(cur_env_path, "catkin_ws")
 
 def get_colcon_dir(env_dir=''):
@@ -119,7 +118,6 @@ def get_colcon_dir(env_dir=''):
         path = os.path.join(cur_env_path, path_name)
         if os.path.exists(path):
             return path
-    # print "No catkin workspace was found in the current environment"
     return os.path.join(cur_env_path, "colcon_ws")
 
 def yes_no_to_bool(bool_str):
