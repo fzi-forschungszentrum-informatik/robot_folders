@@ -13,7 +13,10 @@ def clean_folder(folder):
     if os.path.isdir(folder):
         for the_file in os.listdir(folder):
             file_path = os.path.join(folder, the_file)
-            if os.path.isfile(file_path):
+            if os.path.islink(file_path):
+                click.echo('Deleting symlink {}'.format(file_path))
+                os.unlink(file_path)
+            elif os.path.isfile(file_path):
                 click.echo('Deleting file {}'.format(file_path))
                 os.unlink(file_path)
             elif os.path.isdir(file_path):
