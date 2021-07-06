@@ -45,6 +45,11 @@ class EnvCreator(object):
         self.catkin_build_directory = 'to_be_set'
         self.cama_flags = ""
         self.catkin_rosinstall = ""
+        
+        self.colcon_directory = os.path.join(
+            dir_helpers.get_checkout_dir(), self.env_name, "colcon_ws")
+        self.colcon_build_directory = 'to_be_set'
+        self.colcon_rosinstall = ""
 
         self.mca_directory = os.path.join(
             dir_helpers.get_checkout_dir(),
@@ -59,6 +64,7 @@ class EnvCreator(object):
 
         self.create_ic = False
         self.create_catkin = False
+        self.create_colcon = False
         self.create_mca = False
         self.create_misc_ws = False
 
@@ -68,6 +74,7 @@ class EnvCreator(object):
                                create_ic,
                                create_misc_ws,
                                create_catkin,
+                               create_colcon,
                                create_mca,
                                copy_cmake_lists,
                                local_build,
@@ -93,6 +100,10 @@ class EnvCreator(object):
         self.catkin_build_directory = os.path.join(self.build_base_dir,
                                                    self.env_name,
                                                    "catkin_ws",
+                                                   "build")
+        self.colcon_build_directory = os.path.join(self.build_base_dir,
+                                                   self.env_name,
+                                                   "colcon_ws",
                                                    "build")
         self.mca_build_directory = os.path.join(self.build_base_dir,
                                                 self.env_name,
@@ -121,6 +132,12 @@ class EnvCreator(object):
                                                    default=True)
             else:
                 self.create_catkin = dir_helpers.yes_no_to_bool(create_catkin)
+            
+            if create_colcon == 'ask':
+                self.create_colcon = click.confirm("Would you like to create a colcon_ws?",
+                                                   default=True)
+            else:
+                self.create_colcon = dir_helpers.yes_no_to_bool(create_colcon)
 
             if create_mca == 'ask':
                 self.create_mca = click.confirm("Would you like to create an mca_workspace?",
@@ -130,11 +147,17 @@ class EnvCreator(object):
 
         if self.create_catkin:
             if ros_distro == 'ask':
-                installed_ros_distros = os.listdir("/opt/ros")
+                #Check the setup if it contains catkin the ROS Build system
+                temp_installed_ros_distros = os.listdir("/opt/ros")
+                installed_ros_distros = []
+                for distro in temp_installed_ros_distros:
+                    if 'catkin' in open('/opt/ros/' + distro + '/setup.sh').read():
+                        installed_ros_distros.append(distro)
                 click.echo("Available ROS distributions: {}".format(installed_ros_distros))
                 self.ros_distro = installed_ros_distros[0]
                 if len(installed_ros_distros) > 1:
-                    self.ros_distro = click.prompt('Which ROS distribution would you like to use?',
+                    self.ros_distro = click.prompt('Which ROS distribution would you like to use'
+                                                   'for catkin?',
                                               type=click.Choice(installed_ros_distros),
                                               default=installed_ros_distros[0])
             else:
@@ -147,6 +170,21 @@ class EnvCreator(object):
                                                  "(This is incredibly useful when using the "
                                                  "QtCreator.)",
                                                  default=True)
+        if self.create_colcon:
+            #Check the setup if it contains ament the ROS2 Build system
+            temp_installed_ros_distros = os.listdir("/opt/ros")
+            installed_ros_distros = []
+            for distro in temp_installed_ros_distros:
+                if 'ament' in open('/opt/ros/' + distro + '/setup.sh').read():
+                    installed_ros_distros.append(distro)
+            click.echo("Available ROS2 distributions: {}".format(installed_ros_distros))
+            self.ros2_distro = installed_ros_distros[0]
+            if len(installed_ros_distros) > 1:
+                self.ros2_distro = click.prompt('Which ROS2 distribution would you like to use for '
+                                                'colcon?',
+                                                type=click.Choice(installed_ros_distros),
+                                                default=installed_ros_distros[0])
+            click.echo("Using ROS distribution \'{}\'".format(self.ros2_distro))
 
         click.echo("Creating environment with name \"{}\"".format(self.env_name))
 
@@ -186,6 +224,16 @@ class EnvCreator(object):
         else:
             click.echo("Requested to not create a catkin_ws")
 
+        if self.create_colcon:
+            click.echo("Creating colcon_ws")
+
+            colcon_creator = \
+                environment_helpers.ColconCreator(colcon_directory=self.colcon_directory,
+                                                  build_directory=self.colcon_build_directory,
+                                                  rosinstall=self.colcon_rosinstall,
+                                                  ros2_distro = self.ros2_distro)
+        else:
+            click.echo("Requested to not create a colcon_ws")
         # Check if we should create an mca workspace and create one if desired
         if self.create_mca:
             click.echo("Creating mca_workspace")
@@ -201,10 +249,14 @@ class EnvCreator(object):
                 ic_builder = build.IcBuilder(name="ic_builder", add_help_option=False)
                 ic_builder.invoke(None)
                 self.source_ic_workspace()
-            if self.create_catkin:
+            if self.create_catkin and self.catkin_rosinstall != "":
                 ros_builder = build.CatkinBuilder(
                     name=catkin_creator.ros_distro, add_help_option=False)
                 ros_builder.invoke(None)
+            if self.create_colcon and self.colcon_rosinstall != "":
+                ros2_builder = build.ColconBuilder(
+                    name=colcon_creator.ros2_distro, add_help_option=False)
+                ros2_builder.invoke(None)
             if self.create_mca:
                 mca_builder = build.McaBuilder(name="mca_builder", add_help_option=False)
                 mca_builder.invoke(None)
@@ -245,6 +297,9 @@ class EnvCreator(object):
 
         # Parse catkin_workspace packages
         self.create_catkin, self.catkin_rosinstall = parser.parse_ros_config()
+
+        # Parse colcon_workspace packages
+        self.create_colcon, self.colcon_rosinstall = parser.parse_ros2_config()
 
         # Parse mca_workspace packages
         self.create_mca, self.mca_additional_repos = parser.parse_mca_config()
@@ -310,6 +365,8 @@ class EnvCreator(object):
               help='If set to \'yes\', a folder for miscellaneous projects like "fla"-libraries or plain cmake projects is created and its export path is added to the environment.')
 @click.option('--create_catkin', type=click.Choice(['yes', 'no', 'ask']), default='ask',
               help='If set to \'yes\', a catkin-workspace is created without asking for it again.')
+@click.option('--create_colcon', type=click.Choice(['yes', 'no', 'ask']), default='ask',
+              help='If set to \'yes\', a colcon-workspace is created without asking for it again.')
 @click.option('--create_mca', type=click.Choice(['yes', 'no', 'ask']), default='ask',
               help='If set to \'yes\', a mca-workspace is created without asking for it again.')
 @click.option('--copy_cmake_lists', type=click.Choice(['yes', 'no', 'ask']), default='ask',
@@ -327,6 +384,7 @@ def cli(env_name,
         create_ic,
         create_misc_ws,
         create_catkin,
+        create_colcon,
         create_mca,
         copy_cmake_lists,
         local_build,
@@ -348,6 +406,7 @@ def cli(env_name,
                                                    create_ic,
                                                    create_misc_ws,
                                                    create_catkin,
+                                                   create_colcon,
                                                    create_mca,
                                                    copy_cmake_lists,
                                                    local_build,

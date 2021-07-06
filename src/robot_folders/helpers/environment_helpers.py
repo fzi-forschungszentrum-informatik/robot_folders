@@ -200,11 +200,17 @@ class CatkinCreator(object):
         version to use and whether to copy the CMakeLists.txt
         """
         if self.ros_distro == 'ask':
-            installed_ros_distros = os.listdir("/opt/ros")
+            #Check the setup if it contains catkin the ROS Build system
+            temp_installed_ros_distros = os.listdir("/opt/ros")
+            installed_ros_distros = []
+            for distro in temp_installed_ros_distros:
+                if 'catkin' in open('/opt/ros/' + distro + '/setup.sh').read():
+                    installed_ros_distros.append(distro)
             click.echo("Available ROS distributions: {}".format(installed_ros_distros))
             self.ros_distro = installed_ros_distros[0]
             if len(installed_ros_distros) > 1:
-                self.ros_distro = click.prompt('Which ROS distribution would you like to use?',
+                self.ros_distro = click.prompt('Which ROS distribution would you like to use for'
+                                               'catkin?',
                                                type=click.Choice(installed_ros_distros),
                                                default=installed_ros_distros[0])
         click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
@@ -271,6 +277,99 @@ class CatkinCreator(object):
                                             cwd=self.catkin_directory)
             os.remove(rosinstall_filename)
 
+class ColconCreator(object):
+    """
+    Creates a colcon workspace
+    """
+
+    def __init__(self,
+                 colcon_directory,
+                 build_directory,
+                 rosinstall,
+                 ros2_distro='ask'):
+        self.colcon_directory = colcon_directory
+        self.build_directory = build_directory
+        self.ros2_distro = ros2_distro
+
+        self.ask_questions()
+        ros_global_dir = "/opt/ros/{}".format(self.ros2_distro)
+        self.create_colcon_skeleton()
+        self.build()
+        self.clone_packages(rosinstall)
+
+    def ask_questions(self):
+        """
+        When creating a colcon workspace some questions need to be answered such as which ros
+        version to use
+        """
+        if self.ros2_distro == 'ask':
+            #Check the setup if it contains ament the ROS2 Build system
+            temp_installed_ros_distros = os.listdir("/opt/ros")
+            installed_ros_distros = []
+            for distro in temp_installed_ros_distros:
+                if 'ament' in open('/opt/ros/' + distro + '/setup.sh').read():
+                    installed_ros_distros.append(distro)
+            click.echo("Available ROS2 distributions: {}".format(installed_ros_distros))
+            self.ros2_distro = installed_ros_distros[0]
+            if len(installed_ros_distros) > 1:
+                self.ros2_distro = click.prompt('Which ROS2 distribution would you like to use for '
+                                                'colcon?',
+                                               type=click.Choice(installed_ros_distros),
+                                               default=installed_ros_distros[0])
+        click.echo("Using ROS2 distribution \'{}\'".format(self.ros2_distro))
+
+    def build(self):
+        """
+        Launch the build process
+        """
+        # We abuse the name parameter to code the ros distribution
+        # if we're building for the first time.
+        ros2_builder = build_helpers.ColconBuilder(name=self.ros2_distro,
+                                                  add_help_option=False)
+        ros2_builder.invoke(None)
+
+    def create_colcon_skeleton(self):
+        """
+        Creates the workspace skeleton and if necessary the relevant folders for remote build (e.g.
+        no_backup)
+        """
+        # Create directories and symlinks, if necessary
+        os.mkdir(self.colcon_directory)
+        os.mkdir(os.path.join(self.colcon_directory, "src"))
+        os.makedirs(self.build_directory)
+
+        local_build_dir_name = os.path.join(self.colcon_directory, "build")
+        (colcon_base_dir, _) = os.path.split(self.build_directory)
+
+        colcon_log_directory = os.path.join(colcon_base_dir, "log")
+        local_log_dir_name = os.path.join(self.colcon_directory, "log")
+        click.echo("log_dir: {}".format(colcon_log_directory))
+
+        colcon_install_directory = os.path.join(colcon_base_dir, "install")
+        local_install_dir_name = os.path.join(self.colcon_directory, "install")
+        click.echo("install_dir: {}".format(colcon_install_directory))
+
+        if local_build_dir_name != self.build_directory:
+            os.symlink(self.build_directory, local_build_dir_name)
+            os.makedirs(colcon_log_directory)
+            os.symlink(catkin_log_directory, local_log_dir_name)
+            os.makedirs(colcon_install_directory)
+            os.symlink(colcon_install_directory, local_install_dir_name)
+
+    def clone_packages(self, rosinstall):
+        """
+        Clone packages from rosinstall structure
+        """
+        # copy packages
+        if rosinstall != "":
+            # Dump the rosinstall to a file and use wstool for getting the packages
+            rosinstall_filename = '/tmp/rob_folders_rosinstall'
+            with open(rosinstall_filename, 'w') as rosinstall_content:
+                yaml_dump(rosinstall, rosinstall_content)
+
+            process = subprocess.check_call(["wstool", "init", "src", rosinstall_filename],
+                                            cwd=self.colcon_directory)
+            os.remove(rosinstall_filename)
 
 class MCACreator(object):
     """

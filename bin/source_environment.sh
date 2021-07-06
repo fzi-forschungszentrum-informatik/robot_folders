@@ -105,7 +105,49 @@ if [ -d $environment_dir ]; then
       echo "Only found installed workspace. Sourcing $catkin_dir/install/setup.$shell_type"
       source $catkin_dir/install/setup.$shell_type
     else
-      echo "no setup.$shell_type for the ROS workspace found. Sourcing global ROS"
+      echo "no setup.$shell_type for the catkin workspace found. Sourcing global ROS"
+      num_ros_distros=$(find /opt/ros -maxdepth 1 -mindepth 1 -type d | wc -l)
+      if [[ $num_ros_distros -gt 1 ]]; then
+        echo "Found more than one ros_distribution:"
+        echo $(ls /opt/ros/)
+        echo "Please insert the distro that should be used:"
+        read ros_distro
+      else
+        ros_distro=$(ls /opt/ros/)
+      fi
+      setup_file=/opt/ros/$ros_distro/setup.$shell_type
+      source $setup_file
+      echo "sourced $setup_file"
+    fi
+  fi
+
+  colcon_dir_long=$environment_dir/colcon_workspace
+  colcon_dir_short=$environment_dir/colcon_ws
+  colcon_dir_dev_ws=$environment_dir/dev_ws
+
+  # check if colcon_ws is used
+  if [ -d $colcon_dir_short ]
+  then
+    colcon_dir=$colcon_dir_short
+  elif [ -d $colcon_dir_long ]
+  then
+    colcon_dir=$colcon_dir_long
+  else
+    colcon_dir=$colcon_dir_dev_ws
+  fi
+
+  if [ -d $colcon_dir ]
+  then
+    if [ -f $colcon_dir/install/local_setup.$shell_type ]
+    then
+      # Find underlay workspace
+      ros2_version=$(grep "COLCON_CURRENT_PREFIX=\"/opt/ros" $colcon_dir/install/setup.sh | cut -d '"' -f2)
+      echo "Sourcing ${ros2_version}/setup.${shell_type}"
+      source "${ros2_version}/setup.${shell_type}"
+      source $colcon_dir/install/local_setup.$shell_type
+      echo "Sourced colcon workspace"
+    else
+      echo "no setup.$shell_type for the colcon workspace found. Sourcing global ROS2"
       num_ros_distros=$(find /opt/ros -maxdepth 1 -mindepth 1 -type d | wc -l)
       if [[ $num_ros_distros -gt 1 ]]; then
         echo "Found more than one ros_distribution:"

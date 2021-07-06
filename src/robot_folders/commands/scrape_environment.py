@@ -4,12 +4,12 @@ import click
 
 from yaml import safe_dump as yaml_safe_dump
 
-from helpers.directory_helpers import get_checkout_dir, get_catkin_dir, list_environments
+from helpers.directory_helpers import get_checkout_dir, get_catkin_dir, get_colcon_dir, list_environments
 from helpers.repository_helpers import create_rosinstall_entry
 
 
 class EnvironmentScraper(click.Command):
-    """Class thath implements the command"""
+    """Class that implements the command"""
 
     def __init__(self, name=None, **attrs):
         click.Command.__init__(self, name, **attrs)
@@ -22,6 +22,8 @@ class EnvironmentScraper(click.Command):
         misc_ws_pkg_dir = os.path.join(env_dir, 'misc_ws')
         catkin_dir = get_catkin_dir(env_dir)
         catkin_src_dir = os.path.join(catkin_dir, 'src')
+        colcon_dir = get_colcon_dir(env_dir)
+        colcon_src_dir = os.path.join(colcon_dir, 'src')
         mca_library_dir = os.path.join(env_dir, 'mca_workspace', 'libraries')
         mca_project_dir = os.path.join(env_dir, 'mca_workspace', 'projects')
         mca_tool_dir = os.path.join(env_dir, 'mca_workspace', 'tools')
@@ -45,6 +47,11 @@ class EnvironmentScraper(click.Command):
             click.echo("Scraping catkin workspace")
             yaml_data['catkin_workspace'] = dict()
             yaml_data['catkin_workspace']['rosinstall'] = self.parse_folder(catkin_src_dir)
+        
+        if os.path.isdir(colcon_src_dir):
+            click.echo("Scraping colcon workspace")
+            yaml_data['colcon_workspace'] = dict()
+            yaml_data['colcon_workspace']['rosinstall'] = self.parse_folder(colcon_src_dir)
 
         if os.path.isdir(mca_library_dir):
             yaml_data['mca_workspace'] = dict()

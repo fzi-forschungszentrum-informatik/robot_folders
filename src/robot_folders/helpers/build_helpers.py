@@ -3,7 +3,7 @@ import os
 import subprocess
 import click
 
-from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir
+from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir, get_colcon_dir
 from helpers.which import which
 from helpers import config_helpers
 from helpers.exceptions import ModuleException
@@ -31,7 +31,7 @@ def get_cmake_flags():
         cmake_flags = ''
     return cmake_flags
 
-def get_ros_cmake_flags():
+def get_cmake_flags():
     cmake_flags = config_helpers.get_value_safe_default(
         section='build',
         value='cmake_flags',
@@ -135,6 +135,48 @@ class IcBuilder(Builder):
     def get_install_default(self):
         return True
 
+class ColconBuilder(Builder):
+    """Builder class for colcon workspace"""
+    def get_build_command(self, ros_distro):
+        build_cmd = "colcon build"
+
+        colcon_options = config_helpers.get_value_safe_default(
+            section='build',
+            value='colcon_build_options',
+            default='')
+
+        generator_flag = ""
+        generator = config_helpers.get_value_safe_default(
+            section='build',
+            value='generator',
+            default='make')
+        if generator == "ninja":
+            generator_flag = "-GNinja"
+        
+        ros_global_dir = "/opt/ros/{}".format(ros_distro)
+
+        if os.path.isdir(ros_global_dir):
+            build_cmd_with_source = "source {}/setup.bash && {}"\
+                                    .format(ros_global_dir, build_cmd)
+            build_cmd = build_cmd_with_source
+
+        final_cmd = " ".join([build_cmd, colcon_options, "--cmake-args ",
+                              generator_flag, get_cmake_flags()])
+
+        click.echo("Building with command " + final_cmd)
+        return final_cmd
+
+    def invoke(self, ctx):
+        colcon_dir = get_colcon_dir()
+        click.echo("Building colcon_ws in {}".format(colcon_dir))
+        # We abuse the name to code the ros distribution if we're building for the first time.
+        try:
+            process = subprocess.check_call(["bash", "-c", self.get_build_command(self.name)],
+                                   cwd=colcon_dir)
+        except subprocess.CalledProcessError as err:
+            raise(ModuleException(err.output, "build_colcon", err.returncode))
+        
+
 class CatkinBuilder(Builder):
     """Builder class for catkin workspace"""
     def get_build_command(self, catkin_dir, ros_distro):
@@ -201,7 +243,7 @@ class CatkinBuilder(Builder):
             build_cmd = build_cmd_with_source
 
 
-        final_cmd = " ".join([build_cmd, generator_cmd, install_cmd, get_ros_cmake_flags()])
+        final_cmd = " ".join([build_cmd, generator_cmd, install_cmd, get_cmake_flags()])
         click.echo("Building with command " + final_cmd)
         return final_cmd
 

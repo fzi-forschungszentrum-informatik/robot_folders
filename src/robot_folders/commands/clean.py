@@ -20,6 +20,8 @@ class CleanChooser(WorkspaceChooser):
                 return clean.IcCleaner(name=name, add_help_option=False)
             elif name == 'ros':
                 return clean.CatkinCleaner(name=name, add_help_option=False)
+            elif name == 'colcon':
+                return clean.ColconCleaner(name=name, add_help_option=False)
             elif name == 'mca':
                 return clean.McaCleaner(name=name, add_help_option=False)
         else:

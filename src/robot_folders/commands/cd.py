@@ -35,6 +35,8 @@ environment '{}'".format(dir_helpers.get_last_activated_env()))
                 target_dir = os.path.join(target_dir, 'ic_workspace')
             elif name == 'ros':
                 target_dir = dir_helpers.get_catkin_dir()
+            elif name == 'colcon':
+                target_dir = dir_helpers.get_colcon_dir()
             elif name == 'mca':
                 target_dir = os.path.join(target_dir, 'mca_workspace')
         else:

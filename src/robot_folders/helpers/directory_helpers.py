@@ -101,9 +101,24 @@ def get_catkin_dir(env_dir=''):
         path = os.path.join(cur_env_path, path_name)
         if os.path.exists(path):
             return path
-    # print "No catkin workspace was found in the current environment"
     return os.path.join(cur_env_path, "catkin_ws")
 
+def get_colcon_dir(env_dir=''):
+    """Tries to find the right colcon workspace in the Currently \
+    sourced environment."""
+
+    path = ''
+    cur_env_path = env_dir
+    if env_dir == '':
+        cur_env_path = get_active_env_path()
+
+    valid_names = config_helpers.get_value_safe_default(
+        'directories', 'colcon_names', ["colcon_workspace", "colcon_ws", "dev_ws"], debug=False)
+    for path_name in valid_names:
+        path = os.path.join(cur_env_path, path_name)
+        if os.path.exists(path):
+            return path
+    return os.path.join(cur_env_path, "colcon_ws")
 
 def yes_no_to_bool(bool_str):
     """
@@ -174,6 +189,11 @@ def is_fzirob_environment(checkout_folder, env_dir):
             section='directories',
             value='catkin_names',
             default=["catkin_workspace"])
+    environment_folders = environment_folders + \
+        config_helpers.get_value_safe_default(
+            section='directories',
+            value='colcon_names',
+            default=["colcon_workspace"])
     environment_files = ['setup.bash', 'setup.zsh', 'setup.sh']
 
     possible_env = os.path.join(checkout_folder, env_dir)

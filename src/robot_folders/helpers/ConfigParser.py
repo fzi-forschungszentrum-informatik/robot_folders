@@ -63,6 +63,17 @@ class ConfigFileParser(object):
 
         return has_catkin, ros_rosinstall
 
+    def parse_ros2_config(self):
+        """Parses the colcon_workspace part of the data"""
+        ros2_rosinstall = None
+        has_colcon = False
+        if "colcon_workspace" in self.data:
+            has_colcon = True
+            if "rosinstall" in self.data["colcon_workspace"]:
+                ros2_rosinstall = self.data["colcon_workspace"]["rosinstall"]
+
+        return has_colcon, ros2_rosinstall
+    
     def parse_mca_config(self):
         """Parses the mca_workspace part of the data"""
         has_mca = False

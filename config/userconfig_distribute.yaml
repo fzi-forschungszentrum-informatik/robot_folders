@@ -4,7 +4,8 @@ build: {
     make_threads: 4,
     install_ic: True,
     install_catkin: False,
-    catkin_make_cmd: catkin_make
+    catkin_make_cmd: catkin_make,
+    colcon_build_options: "--symlink-install"
 }
 
 repositories: {
@@ -16,5 +17,6 @@ repositories: {
 directories: {
     # if left blank, the default robot_folders/checkout will be used
     checkout_dir: ,
-    catkin_names: ["catkin_workspace", "catkin_ws"]
+    catkin_names: ["catkin_workspace", "catkin_ws"],
+    colcon_names: ["colcon_workspace", "colcon_ws", "dev_ws"]
 }
