@@ -5,11 +5,17 @@ workspaces inside an environment.
 
 import os
 import click
-from helpers.directory_helpers import get_base_dir, get_active_env_path, get_catkin_dir
+from helpers.directory_helpers import (
+    get_base_dir,
+    get_active_env_path,
+    get_catkin_dir,
+    get_colcon_dir)
+
 class WorkspaceChooser(click.MultiCommand):
     """
     The workspace chooser finds all existing environments.
     """
+
     def get_workspaces(self):
         """Searches all environments inside the checkout folder"""
         checkout_folder = os.path.join(get_base_dir(), 'checkout')
@@ -26,7 +32,7 @@ class WorkspaceChooser(click.MultiCommand):
             cmds.append('ic')
         if 'mca_workspace' in workspaces:
             cmds.append('mca')
-        if 'colcon_ws' in workspaces:
+        if os.path.exists(get_colcon_dir()):
             cmds.append('colcon')
         if os.path.exists(get_catkin_dir()):
             cmds.append('ros')

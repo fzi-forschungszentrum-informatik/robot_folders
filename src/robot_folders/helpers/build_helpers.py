@@ -3,7 +3,7 @@ import os
 import subprocess
 import click
 
-from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir
+from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir, get_colcon_dir
 from helpers.which import which
 from helpers import config_helpers
 from helpers.exceptions import ModuleException
@@ -167,7 +167,7 @@ class ColconBuilder(Builder):
         return final_cmd
 
     def invoke(self, ctx):
-        colcon_dir = os.path.realpath(os.path.join(get_active_env_path(), 'colcon_ws'))
+        colcon_dir = get_colcon_dir()
         click.echo("Building colcon_ws in {}".format(colcon_dir))
         # We abuse the name to code the ros distribution if we're building for the first time.
         try:

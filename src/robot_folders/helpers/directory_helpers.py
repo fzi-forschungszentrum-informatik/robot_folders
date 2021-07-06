@@ -113,7 +113,7 @@ def get_colcon_dir(env_dir=''):
         cur_env_path = get_active_env_path()
 
     valid_names = config_helpers.get_value_safe_default(
-        'directories', 'colcon_names', ["colcon_workspace", "colcon_ws"], debug=False)
+        'directories', 'colcon_names', ["colcon_workspace", "colcon_ws", "dev_ws"], debug=False)
     for path_name in valid_names:
         path = os.path.join(cur_env_path, path_name)
         if os.path.exists(path):

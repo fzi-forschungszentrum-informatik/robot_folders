@@ -121,7 +121,21 @@ if [ -d $environment_dir ]; then
     fi
   fi
 
-  colcon_dir=$environment_dir/colcon_ws
+  colcon_dir_long=$environment_dir/colcon_workspace
+  colcon_dir_short=$environment_dir/colcon_ws
+  colcon_dir_dev_ws=$environment_dir/dev_ws
+
+  # check if colcon_ws is used
+  if [ -d $colcon_dir_short ]
+  then
+    colcon_dir=$colcon_dir_short
+  elif [ -d $colcon_dir_long ]
+  then
+    colcon_dir=$colcon_dir_long
+  else
+    colcon_dir=$colcon_dir_dev_ws
+  fi
+
   if [ -d $colcon_dir ]
   then
     if [ -f $colcon_dir/install/local_setup.$shell_type ]
