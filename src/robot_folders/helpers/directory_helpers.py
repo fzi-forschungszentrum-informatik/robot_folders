@@ -189,6 +189,11 @@ def is_fzirob_environment(checkout_folder, env_dir):
             section='directories',
             value='catkin_names',
             default=["catkin_workspace"])
+    environment_folders = environment_folders + \
+        config_helpers.get_value_safe_default(
+            section='directories',
+            value='colcon_names',
+            default=["colcon_workspace"])
     environment_files = ['setup.bash', 'setup.zsh', 'setup.sh']
 
     possible_env = os.path.join(checkout_folder, env_dir)
