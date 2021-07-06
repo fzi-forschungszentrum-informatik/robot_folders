@@ -249,11 +249,11 @@ class EnvCreator(object):
                 ic_builder = build.IcBuilder(name="ic_builder", add_help_option=False)
                 ic_builder.invoke(None)
                 self.source_ic_workspace()
-            if self.create_catkin:
+            if self.create_catkin and self.catkin_rosinstall != "":
                 ros_builder = build.CatkinBuilder(
                     name=catkin_creator.ros_distro, add_help_option=False)
                 ros_builder.invoke(None)
-            if self.create_colcon:
+            if self.create_colcon and self.colcon_rosinstall != "":
                 ros2_builder = build.ColconBuilder(
                     name=colcon_creator.ros2_distro, add_help_option=False)
                 ros2_builder.invoke(None)
