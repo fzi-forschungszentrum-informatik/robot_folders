@@ -7,7 +7,7 @@ if [ -n "${ZSH_VERSION+1}" ];
 then
   # Get the base directory where the install script is located
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${(%):-%N}" )/.." && pwd )"
-  my_source_zsh=$(python ${ROB_FOLDERS_BASE_DIR}/bin/get_zsh_source_command.py)
+  my_source_zsh=$(python3 ${ROB_FOLDERS_BASE_DIR}/bin/get_zsh_source_command.py)
   eval "$(_ROB_FOLDERS_COMPLETE=${my_source_zsh} rob_folders)"
 fi
 
