@@ -45,6 +45,42 @@ class TestCLI(unittest.TestCase):
         except:
             (etype, evalue, etrace) = sys.exc_info()
             self.fail("Failed with %s" % evalue)
+    
+    def test_add_colcon_only(self):
+        installed_ros_distros = sorted(os.listdir("/opt/ros"))
+        print("Available ROS distributions: {}".format(installed_ros_distros))
+        ros_distro = installed_ros_distros[0]
+        try:
+            process_result = subprocess.check_call(
+                ["rob_folders",
+                 "add_environment",
+                 "--create_ic=no",
+                 "--create_mca=no",
+                 "--create_catkin=no",
+                 "--create_misc_ws=no",
+                 "--create_colcon=yes",
+                 "--copy_cmake_lists=no",
+                 "--ros_distro={}".format(ros_distro),
+                 "testing_ws"])
+        except:
+            (etype, evalue, etrace) = sys.exc_info()
+            self.fail("Failed with %s" % evalue)
+
+        colcon_dir = directory_helpers.get_colcon_dir(
+            os.path.join(directory_helpers.get_checkout_dir(), "testing_ws"))
+
+        self.assertTrue(os.path.isdir(colcon_dir))
+
+        # cleanup
+        try:
+            process_result = subprocess.check_call(
+                ["rob_folders",
+                 "delete_environment",
+                 "--force",
+                 "testing_ws"])
+        except:
+            (etype, evalue, etrace) = sys.exc_info()
+            self.fail("Failed with %s" % evalue)
 
     def test_add_ic_only(self):
         try:
