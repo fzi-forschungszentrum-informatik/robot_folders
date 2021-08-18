@@ -1,4 +1,4 @@
-image: ids-git.fzi.de:5555/continuous_integration/ci_docker_images/ubuntu_18.04_workstation
+image: ids-git.fzi.de:5555/continuous_integration/ci_docker_images/ubuntu_20.04_workstation
 
 install_robot_folders:
   script:
@@ -16,6 +16,5 @@ run_tests:
     - sed -ri "s/^(\s*mca_workspace_repo\s*:)(.*$)/\1 \"https:\/\/gitlab-ci-token:${CI_JOB_TOKEN}@ids-git\.fzi\.de\/mca2\/mca2.git\"/" config/userconfig.yaml
     - source $(pwd)/bin/fzirob_source.sh
     - fzirob get_checkout_base_dir
-    - pip3 install pytest-cov
     - cd src/robot_folders
-    - py.test . -rA --cov
+    - pytest-3 . -rA --cov
