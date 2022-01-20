@@ -172,7 +172,7 @@ class ColconBuilder(Builder):
         # We abuse the name to code the ros distribution if we're building for the first time.
         try:
             process = subprocess.check_call(["bash", "-c", self.get_build_command(self.name)],
-                                   cwd=colcon_dir)
+                                   cwd=colcon_dir, env={})
         except subprocess.CalledProcessError as err:
             raise(ModuleException(err.output, "build_colcon", err.returncode))
         
