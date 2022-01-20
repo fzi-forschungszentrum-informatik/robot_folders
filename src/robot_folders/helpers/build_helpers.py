@@ -1,5 +1,6 @@
 """Module that helps building workspaces"""
 import os
+import re
 import subprocess
 import click
 
@@ -169,10 +170,15 @@ class ColconBuilder(Builder):
     def invoke(self, ctx):
         colcon_dir = get_colcon_dir()
         click.echo("Building colcon_ws in {}".format(colcon_dir))
+        my_env = os.environ.copy()
+        keys_with_colcon_dir = [key for key,val in my_env.items() if colcon_dir in val]
+        for key in keys_with_colcon_dir:
+            my_env[key] = re.sub(colcon_dir + r'[^:]*', '', my_env[key])
+
         # We abuse the name to code the ros distribution if we're building for the first time.
         try:
             process = subprocess.check_call(["bash", "-c", self.get_build_command(self.name)],
-                                   cwd=colcon_dir, env={})
+                                   cwd=colcon_dir, env=my_env)
         except subprocess.CalledProcessError as err:
             raise(ModuleException(err.output, "build_colcon", err.returncode))
         
