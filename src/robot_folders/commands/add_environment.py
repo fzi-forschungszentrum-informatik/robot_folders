@@ -79,7 +79,8 @@ class EnvCreator(object):
                                create_mca,
                                copy_cmake_lists,
                                local_build,
-                               ros_distro):
+                               ros_distro,
+                               ros2_distro):
         """Worker method that does the actual job"""
         if os.path.exists(os.path.join(dir_helpers.get_checkout_dir(), self.env_name)):
             # click.echo("An environment with the name \"{}\" already exists. Exiting now."
@@ -161,7 +162,8 @@ class EnvCreator(object):
             colcon_creator = \
                 environment_helpers.ColconCreator(colcon_directory=self.colcon_directory,
                                                   build_directory=self.colcon_build_directory,
-                                                  rosinstall=self.colcon_rosinstall)
+                                                  rosinstall=self.colcon_rosinstall,
+                                                  ros2_distro=ros2_distro)
 
         # Let's get down to business
         self.create_directories()
@@ -340,7 +342,9 @@ class EnvCreator(object):
               help=('If set to \'yes\', the local build options is set and the build is '
                     'executed in the folder ic_workspace/build.'))
 @click.option('--ros_distro', default='ask',
-              help=('If set, use this ROS distro instead of asking when multiple ROS distros are present on the system.'))
+              help=('If set, use this ROS1 distro instead of asking when multiple ROS1 distros are present on the system.'))
+@click.option('--ros2_distro', default='ask',
+              help=('If set, use this ROS2 distro instead of asking when multiple ROS2 distros are present on the system.'))
 @click.argument('env_name', nargs=1)
 def cli(env_name,
         config_file,
@@ -352,7 +356,8 @@ def cli(env_name,
         create_mca,
         copy_cmake_lists,
         local_build,
-        ros_distro):
+        ros_distro,
+        ros2_distro):
     # Set the ic_workspace root 
     """Adds a new environment and creates the basic needed folders,
     e.g. a ic_workspace and a catkin_ws."""
@@ -374,7 +379,8 @@ def cli(env_name,
                                                    create_mca,
                                                    copy_cmake_lists,
                                                    local_build,
-                                                   ros_distro)
+                                                   ros_distro,
+                                                   ros2_distro)
     except subprocess.CalledProcessError as err:
         raise(ModuleException(str(err), 'add'))
     except Exception as err:
