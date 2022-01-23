@@ -182,17 +182,20 @@ class CatkinCreator(object):
         self.build_directory = build_directory
         self.copy_cmake_lists = copy_cmake_lists
         self.ros_distro = ros_distro
+        self.rosinstall = rosinstall
 
         self.ask_questions()
-        ros_global_dir = "/opt/ros/{}".format(self.ros_distro)
+        self.ros_global_dir = "/opt/ros/{}".format(self.ros_distro)
+
+    def create(self):
         self.create_catkin_skeleton()
         self.build()
-        self.clone_packages(rosinstall)
+        self.clone_packages(self.rosinstall)
 
         if self.copy_cmake_lists:
             subprocess.check_call(["rm", "{}/src/CMakeLists.txt".format(self.catkin_directory)])
             subprocess.check_call(["cp",
-                                   "{}/share/catkin/cmake/toplevel.cmake".format(ros_global_dir),
+                                   "{}/share/catkin/cmake/toplevel.cmake".format(self.ros_global_dir),
                                    "{}/src/CMakeLists.txt".format(self.catkin_directory)])
 
     def ask_questions(self):
@@ -286,12 +289,15 @@ class ColconCreator(object):
         self.colcon_directory = colcon_directory
         self.build_directory = build_directory
         self.ros2_distro = ros2_distro
+        self.rosinstall = rosinstall
 
         self.ask_questions()
-        ros_global_dir = "/opt/ros/{}".format(self.ros2_distro)
+
+    def create(self):
+        """Actually creates the workspace"""
         self.create_colcon_skeleton()
         self.build()
-        self.clone_packages(rosinstall)
+        self.clone_packages(self.rosinstall)
 
     def ask_questions(self):
         """

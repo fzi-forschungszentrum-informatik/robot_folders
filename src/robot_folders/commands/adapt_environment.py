@@ -124,9 +124,11 @@ class EnvironmentAdapter(click.Command):
                 build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
                 catkin_build_dir = os.path.join(build_base_dir, self.name, 'catkin_ws', 'build')
 
-                environment_helpers.CatkinCreator(catkin_directory=catkin_dir,
-                                                  build_directory=catkin_build_dir,
-                                                  rosinstall=ros_rosinstall)
+                catkin_creator = \
+                    environment_helpers.CatkinCreator(catkin_directory=catkin_dir,
+                                                      build_directory=catkin_build_dir,
+                                                      rosinstall=ros_rosinstall)
+                catkin_creator.create()
 
         if has_colcon and (not self.ignore_colcon):
             if os.path.isdir(colcon_src_dir):
@@ -142,10 +144,12 @@ class EnvironmentAdapter(click.Command):
                 build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
                 colcon_build_dir = os.path.join(build_base_dir, self.name, 'colcon_ws', 'build')
 
-                environment_helpers.ColconCreator(colcon_directory=colcon_dir,
-                                                  build_directory=colcon_build_dir,
-                                                  rosinstall=ros2_rosinstall)
- 
+                colcon_creator = \
+                    environment_helpers.ColconCreator(colcon_directory=colcon_dir,
+                                                      build_directory=colcon_build_dir,
+                                                      rosinstall=ros2_rosinstall)
+                colcon_creator.create()
+
         if has_mca and (not self.ignore_mca):
             if os.path.isdir(mca_library_dir):
                 click.echo("Adapting mca libraries")
