@@ -11,6 +11,7 @@ import helpers.build_helpers as build
 import helpers.environment_helpers as environment_helpers
 from helpers.ConfigParser import ConfigFileParser
 from helpers.exceptions import ModuleException
+from helpers.ros_version_helpers import *
 
 
 class EnvCreator(object):
@@ -78,7 +79,8 @@ class EnvCreator(object):
                                create_mca,
                                copy_cmake_lists,
                                local_build,
-                               ros_distro):
+                               ros_distro,
+                               ros2_distro):
         """Worker method that does the actual job"""
         if os.path.exists(os.path.join(dir_helpers.get_checkout_dir(), self.env_name)):
             # click.echo("An environment with the name \"{}\" already exists. Exiting now."
@@ -145,48 +147,23 @@ class EnvCreator(object):
             else:
                 self.create_mca = dir_helpers.yes_no_to_bool(create_mca)
 
-        if self.create_catkin:
-            if ros_distro == 'ask':
-                #Check the setup if it contains catkin the ROS Build system
-                temp_installed_ros_distros = os.listdir("/opt/ros")
-                installed_ros_distros = []
-                for distro in temp_installed_ros_distros:
-                    if 'catkin' in open('/opt/ros/' + distro + '/setup.sh').read():
-                        installed_ros_distros.append(distro)
-                click.echo("Available ROS distributions: {}".format(installed_ros_distros))
-                self.ros_distro = installed_ros_distros[0]
-                if len(installed_ros_distros) > 1:
-                    self.ros_distro = click.prompt('Which ROS distribution would you like to use'
-                                                   'for catkin?',
-                                              type=click.Choice(installed_ros_distros),
-                                              default=installed_ros_distros[0])
-            else:
-                self.ros_distro = ros_distro
-            click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
-            if copy_cmake_lists == 'ask':
-                copy_cmake_lists = click.confirm("Would you like to copy the top-level "
-                                                 "CMakeLists.txt to the catkin"
-                                                 " src directory instead of using a symlink?\n"
-                                                 "(This is incredibly useful when using the "
-                                                 "QtCreator.)",
-                                                 default=True)
-        if self.create_colcon:
-            #Check the setup if it contains ament the ROS2 Build system
-            temp_installed_ros_distros = os.listdir("/opt/ros")
-            installed_ros_distros = []
-            for distro in temp_installed_ros_distros:
-                if 'ament' in open('/opt/ros/' + distro + '/setup.sh').read():
-                    installed_ros_distros.append(distro)
-            click.echo("Available ROS2 distributions: {}".format(installed_ros_distros))
-            self.ros2_distro = installed_ros_distros[0]
-            if len(installed_ros_distros) > 1:
-                self.ros2_distro = click.prompt('Which ROS2 distribution would you like to use for '
-                                                'colcon?',
-                                                type=click.Choice(installed_ros_distros),
-                                                default=installed_ros_distros[0])
-            click.echo("Using ROS distribution \'{}\'".format(self.ros2_distro))
-
         click.echo("Creating environment with name \"{}\"".format(self.env_name))
+
+        catkin_creator = None
+        if self.create_catkin:
+            catkin_creator = \
+                environment_helpers.CatkinCreator(catkin_directory=self.catkin_directory,
+                                                  build_directory=self.catkin_build_directory,
+                                                  rosinstall=self.catkin_rosinstall,
+                                                  copy_cmake_lists=copy_cmake_lists,
+                                                  ros_distro=ros_distro)
+        colcon_creator = None
+        if self.create_colcon:
+            colcon_creator = \
+                environment_helpers.ColconCreator(colcon_directory=self.colcon_directory,
+                                                  build_directory=self.colcon_build_directory,
+                                                  rosinstall=self.colcon_rosinstall,
+                                                  ros2_distro=ros2_distro)
 
         # Let's get down to business
         self.create_directories()
@@ -212,26 +189,15 @@ class EnvCreator(object):
             click.echo("Requested to not create a misc workspace")
 
         # Check if we should create a catkin workspace and create one if desired
-        if self.create_catkin:
+        if catkin_creator:
             click.echo("Creating catkin_ws")
-
-            catkin_creator = \
-                environment_helpers.CatkinCreator(catkin_directory=self.catkin_directory,
-                                                  build_directory=self.catkin_build_directory,
-                                                  rosinstall=self.catkin_rosinstall,
-                                                  copy_cmake_lists=copy_cmake_lists,
-                                                  ros_distro=self.ros_distro)
+            catkin_creator.create()
         else:
             click.echo("Requested to not create a catkin_ws")
 
-        if self.create_colcon:
+        if colcon_creator:
             click.echo("Creating colcon_ws")
-
-            colcon_creator = \
-                environment_helpers.ColconCreator(colcon_directory=self.colcon_directory,
-                                                  build_directory=self.colcon_build_directory,
-                                                  rosinstall=self.colcon_rosinstall,
-                                                  ros2_distro = self.ros2_distro)
+            colcon_creator.create()
         else:
             click.echo("Requested to not create a colcon_ws")
         # Check if we should create an mca workspace and create one if desired
@@ -376,7 +342,9 @@ class EnvCreator(object):
               help=('If set to \'yes\', the local build options is set and the build is '
                     'executed in the folder ic_workspace/build.'))
 @click.option('--ros_distro', default='ask',
-              help=('If set, use this ROS distro instead of asking when multiple ROS distros are present on the system.'))
+              help=('If set, use this ROS1 distro instead of asking when multiple ROS1 distros are present on the system.'))
+@click.option('--ros2_distro', default='ask',
+              help=('If set, use this ROS2 distro instead of asking when multiple ROS2 distros are present on the system.'))
 @click.argument('env_name', nargs=1)
 def cli(env_name,
         config_file,
@@ -388,7 +356,8 @@ def cli(env_name,
         create_mca,
         copy_cmake_lists,
         local_build,
-        ros_distro):
+        ros_distro,
+        ros2_distro):
     # Set the ic_workspace root 
     """Adds a new environment and creates the basic needed folders,
     e.g. a ic_workspace and a catkin_ws."""
@@ -410,7 +379,8 @@ def cli(env_name,
                                                    create_mca,
                                                    copy_cmake_lists,
                                                    local_build,
-                                                   ros_distro)
+                                                   ros_distro,
+                                                   ros2_distro)
     except subprocess.CalledProcessError as err:
         raise(ModuleException(str(err), 'add'))
     except Exception as err:
