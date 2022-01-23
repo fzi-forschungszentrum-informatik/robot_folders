@@ -10,6 +10,7 @@ import helpers.config_helpers as config_helpers
 import helpers.build_helpers as build_helpers
 import helpers.directory_helpers as dir_helpers
 from helpers import config_helpers
+from helpers.ros_version_helpers import *
 
 from yaml import dump as yaml_dump
 
@@ -200,19 +201,14 @@ class CatkinCreator(object):
         version to use and whether to copy the CMakeLists.txt
         """
         if self.ros_distro == 'ask':
-            #Check the setup if it contains catkin the ROS Build system
-            temp_installed_ros_distros = os.listdir("/opt/ros")
-            installed_ros_distros = []
-            for distro in temp_installed_ros_distros:
-                if 'catkin' in open('/opt/ros/' + distro + '/setup.sh').read():
-                    installed_ros_distros.append(distro)
+            installed_ros_distros = sorted(installed_ros_1_versions())
             click.echo("Available ROS distributions: {}".format(installed_ros_distros))
-            self.ros_distro = installed_ros_distros[0]
+            self.ros_distro = installed_ros_distros[-1]
             if len(installed_ros_distros) > 1:
                 self.ros_distro = click.prompt('Which ROS distribution would you like to use for'
                                                'catkin?',
                                                type=click.Choice(installed_ros_distros),
-                                               default=installed_ros_distros[0])
+                                               default=installed_ros_distros[-1])
         click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
         if self.copy_cmake_lists == 'ask':
             self.copy_cmake_lists = click.confirm("Would you like to copy the top-level "
@@ -303,19 +299,14 @@ class ColconCreator(object):
         version to use
         """
         if self.ros2_distro == 'ask':
-            #Check the setup if it contains ament the ROS2 Build system
-            temp_installed_ros_distros = os.listdir("/opt/ros")
-            installed_ros_distros = []
-            for distro in temp_installed_ros_distros:
-                if 'ament' in open('/opt/ros/' + distro + '/setup.sh').read():
-                    installed_ros_distros.append(distro)
+            installed_ros_distros = sorted(installed_ros_2_versions())
             click.echo("Available ROS2 distributions: {}".format(installed_ros_distros))
-            self.ros2_distro = installed_ros_distros[0]
+            self.ros2_distro = installed_ros_distros[-1]
             if len(installed_ros_distros) > 1:
                 self.ros2_distro = click.prompt('Which ROS2 distribution would you like to use for '
                                                 'colcon?',
                                                type=click.Choice(installed_ros_distros),
-                                               default=installed_ros_distros[0])
+                                               default=installed_ros_distros[-1])
         click.echo("Using ROS2 distribution \'{}\'".format(self.ros2_distro))
 
     def build(self):

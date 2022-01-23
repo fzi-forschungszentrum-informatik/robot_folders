@@ -7,10 +7,12 @@ import os
 
 import helpers.config_helpers as config_helpers
 import helpers.directory_helpers as directory_helpers
+import helpers.ros_version_helpers as ros_versions
+
 
 class TestCLI(unittest.TestCase):
     def test_add_catkin_only(self):
-        installed_ros_distros = sorted(os.listdir("/opt/ros"))
+        installed_ros_distros = sorted(ros_versions.installed_ros_1_versions())
         print("Available ROS distributions: {}".format(installed_ros_distros))
         ros_distro = installed_ros_distros[-1]
         try:
@@ -47,8 +49,7 @@ class TestCLI(unittest.TestCase):
             self.fail("Failed with %s" % evalue)
     
     def test_add_colcon_only(self):
-        installed_ros_distros = sorted(os.listdir("/opt/ros"))
-        print("Available ROS distributions: {}".format(installed_ros_distros))
+        installed_ros_distros = sorted(ros_versions.installed_ros_2_versions())
         ros_distro = installed_ros_distros[0]
         try:
             process_result = subprocess.check_call(

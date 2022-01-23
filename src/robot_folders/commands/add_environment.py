@@ -11,6 +11,7 @@ import helpers.build_helpers as build
 import helpers.environment_helpers as environment_helpers
 from helpers.ConfigParser import ConfigFileParser
 from helpers.exceptions import ModuleException
+from helpers.ros_version_helpers import *
 
 
 class EnvCreator(object):
@@ -147,19 +148,14 @@ class EnvCreator(object):
 
         if self.create_catkin:
             if ros_distro == 'ask':
-                #Check the setup if it contains catkin the ROS Build system
-                temp_installed_ros_distros = os.listdir("/opt/ros")
-                installed_ros_distros = []
-                for distro in temp_installed_ros_distros:
-                    if 'catkin' in open('/opt/ros/' + distro + '/setup.sh').read():
-                        installed_ros_distros.append(distro)
+                installed_ros_distros = sorted(installed_ros_1_versions())
                 click.echo("Available ROS distributions: {}".format(installed_ros_distros))
-                self.ros_distro = installed_ros_distros[0]
+                self.ros_distro = installed_ros_distros[-1]
                 if len(installed_ros_distros) > 1:
                     self.ros_distro = click.prompt('Which ROS distribution would you like to use'
                                                    'for catkin?',
                                               type=click.Choice(installed_ros_distros),
-                                              default=installed_ros_distros[0])
+                                              default=installed_ros_distros[-1])
             else:
                 self.ros_distro = ros_distro
             click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
@@ -171,19 +167,14 @@ class EnvCreator(object):
                                                  "QtCreator.)",
                                                  default=True)
         if self.create_colcon:
-            #Check the setup if it contains ament the ROS2 Build system
-            temp_installed_ros_distros = os.listdir("/opt/ros")
-            installed_ros_distros = []
-            for distro in temp_installed_ros_distros:
-                if 'ament' in open('/opt/ros/' + distro + '/setup.sh').read():
-                    installed_ros_distros.append(distro)
+            installed_ros_distros = sorted(installed_ros_2_versions())
             click.echo("Available ROS2 distributions: {}".format(installed_ros_distros))
-            self.ros2_distro = installed_ros_distros[0]
+            self.ros2_distro = installed_ros_distros[-1]
             if len(installed_ros_distros) > 1:
                 self.ros2_distro = click.prompt('Which ROS2 distribution would you like to use for '
                                                 'colcon?',
                                                 type=click.Choice(installed_ros_distros),
-                                                default=installed_ros_distros[0])
+                                                default=installed_ros_distros[-1])
             click.echo("Using ROS distribution \'{}\'".format(self.ros2_distro))
 
         click.echo("Creating environment with name \"{}\"".format(self.env_name))
