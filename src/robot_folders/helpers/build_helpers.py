@@ -170,6 +170,9 @@ class ColconBuilder(Builder):
     def invoke(self, ctx):
         colcon_dir = get_colcon_dir()
         click.echo("Building colcon_ws in {}".format(colcon_dir))
+
+        # Colcon needs to build in an env that does not have the current workspace sourced
+        # See https://docs.ros.org/en/galactic/Tutorials/Workspace/Creating-A-Workspace.html#source-the-overlay
         my_env = os.environ.copy()
         keys_with_colcon_dir = [key for key,val in my_env.items() if colcon_dir in val]
         for key in keys_with_colcon_dir:
