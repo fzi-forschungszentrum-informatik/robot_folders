@@ -9,7 +9,7 @@ setup(
         'Click>=7.0',
         'gitpython',
         'PyYaml',
-        'wstool'
+        'vcstool'
     ],
     entry_points='''
         [console_scripts]

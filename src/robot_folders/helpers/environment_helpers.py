@@ -89,13 +89,13 @@ class IcCreator(object):
         Adds packages from a rosinstall entry.
         """
         # if a rosinstall is specified, no base-grabbing is required
-        # Dump the rosinstall to a file and use wstool for getting the packages
+        # Dump the rosinstall to a file and use vcstool for getting the packages
         rosinstall_filename = '/tmp/rob_folders_rosinstall'
         with open(rosinstall_filename, 'w') as rosinstall_content:
             yaml_dump(rosinstall, rosinstall_content)
 
         # If something goes wrong here, this will throw an exception, which is fine, as it shoudln't
-        process = subprocess.check_call(["wstool", "init", "packages", rosinstall_filename],
+        process = subprocess.check_call(["vcs", "import", "--input", rosinstall_filename, "packages"],
                                         cwd=self.ic_directory)
         os.remove(rosinstall_filename)
 
@@ -144,12 +144,12 @@ class MiscCreator(object):
 
     def add_rosinstall(self, rosinstall):
         if rosinstall:
-            # Dump the rosinstall to a file and use wstool for getting the packages
+            # Dump the rosinstall to a file and use vcstool for getting the packages
             rosinstall_filename = '/tmp/rob_folders_rosinstall'
             with open(rosinstall_filename, 'w') as rosinstall_content:
                 yaml_dump(rosinstall, rosinstall_content)
 
-            process = subprocess.check_call(["wstool", "init", ".", rosinstall_filename],
+            process = subprocess.check_call(["vcs", "import", "--input", rosinstall_filename, "."],
                                             cwd=self.misc_ws_directory)
             os.remove(rosinstall_filename)
 
@@ -267,12 +267,12 @@ class CatkinCreator(object):
         """
         # copy packages
         if rosinstall != "":
-            # Dump the rosinstall to a file and use wstool for getting the packages
+            # Dump the rosinstall to a file and use vcstools for getting the packages
             rosinstall_filename = '/tmp/rob_folders_rosinstall'
             with open(rosinstall_filename, 'w') as rosinstall_content:
                 yaml_dump(rosinstall, rosinstall_content)
 
-            process = subprocess.check_call(["wstool", "init", "src", rosinstall_filename],
+            process = subprocess.check_call(["vcs", "import", "--input", rosinstall_filename, "src"],
                                             cwd=self.catkin_directory)
             os.remove(rosinstall_filename)
 
@@ -359,13 +359,15 @@ class ColconCreator(object):
         """
         # copy packages
         if rosinstall != "":
-            # Dump the rosinstall to a file and use wstool for getting the packages
+            # Dump the rosinstall to a file and use vcstool for getting the packages
             rosinstall_filename = '/tmp/rob_folders_rosinstall'
             with open(rosinstall_filename, 'w') as rosinstall_content:
                 yaml_dump(rosinstall, rosinstall_content)
 
-            process = subprocess.check_call(["wstool", "init", "src", rosinstall_filename],
-                                            cwd=self.colcon_directory)
+            process = subprocess.check_call(
+                ["vcs", "import", "--input", rosinstall_filename, "src"],
+                cwd=self.colcon_directory
+            )
             os.remove(rosinstall_filename)
 
 class MCACreator(object):
