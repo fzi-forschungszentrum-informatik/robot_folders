@@ -94,6 +94,8 @@ class IcCreator(object):
         with open(rosinstall_filename, 'w') as rosinstall_content:
             yaml_dump(rosinstall, rosinstall_content)
 
+        os.makedirs(os.path.join(self.ic_directory, "packages"), exist_ok=True)
+
         # If something goes wrong here, this will throw an exception, which is fine, as it shoudln't
         process = subprocess.check_call(["vcs", "import", "--input", rosinstall_filename, "packages"],
                                         cwd=self.ic_directory)
@@ -149,6 +151,7 @@ class MiscCreator(object):
             with open(rosinstall_filename, 'w') as rosinstall_content:
                 yaml_dump(rosinstall, rosinstall_content)
 
+            os.makedirs(self.misc_ws_directory, exist_ok=True)
             process = subprocess.check_call(["vcs", "import", "--input", rosinstall_filename, "."],
                                             cwd=self.misc_ws_directory)
             os.remove(rosinstall_filename)
@@ -272,6 +275,7 @@ class CatkinCreator(object):
             with open(rosinstall_filename, 'w') as rosinstall_content:
                 yaml_dump(rosinstall, rosinstall_content)
 
+            os.makedirs(os.path.join(self.catkin_directory, "src"), exist_ok=True)
             process = subprocess.check_call(["vcs", "import", "--input", rosinstall_filename, "src"],
                                             cwd=self.catkin_directory)
             os.remove(rosinstall_filename)
@@ -364,6 +368,7 @@ class ColconCreator(object):
             with open(rosinstall_filename, 'w') as rosinstall_content:
                 yaml_dump(rosinstall, rosinstall_content)
 
+            os.makedirs(os.path.join(self.colcon_directory, "src"), exist_ok=True)
             process = subprocess.check_call(
                 ["vcs", "import", "--input", rosinstall_filename, "src"],
                 cwd=self.colcon_directory
