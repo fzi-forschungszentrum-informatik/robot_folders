@@ -6,6 +6,7 @@ import click
 
 from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir, get_colcon_dir
 from helpers.which import which
+from helpers import compilation_db_helpers
 from helpers import config_helpers
 from helpers.exceptions import ModuleException
 
@@ -269,6 +270,10 @@ class CatkinBuilder(Builder):
                                         cwd=catkin_dir)
         except subprocess.CalledProcessError as err:
             raise(ModuleException(err.output, "build_ros", err.returncode))
+
+        compilation_db_helpers.merge_compile_commands(
+            self.build_dir, os.path.join(catkin_dir, "compile_commands.json")
+        )
 
     def get_install_key(self):
         return 'install_catkin'
