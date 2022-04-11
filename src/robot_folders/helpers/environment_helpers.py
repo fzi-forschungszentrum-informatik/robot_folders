@@ -196,10 +196,14 @@ class CatkinCreator(object):
         self.clone_packages(self.rosinstall)
 
         if self.copy_cmake_lists:
-            subprocess.check_call(["rm", "{}/src/CMakeLists.txt".format(self.catkin_directory)])
-            subprocess.check_call(["cp",
-                                   "{}/share/catkin/cmake/toplevel.cmake".format(self.ros_global_dir),
-                                   "{}/src/CMakeLists.txt".format(self.catkin_directory)])
+            if os.path.exists(os.path.join(self.catkin_directory, "src", "CMakeLists.txt")):
+                subprocess.check_call(["rm", "{}/src/CMakeLists.txt".format(self.catkin_directory)])
+                subprocess.check_call(
+                    [
+                        "cp",
+                        "{}/share/catkin/cmake/toplevel.cmake".format(self.ros_global_dir),
+                        "{}/src/CMakeLists.txt".format(self.catkin_directory)
+                    ])
 
     def ask_questions(self):
         """
