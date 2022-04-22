@@ -144,6 +144,15 @@ make
 make install
 ```
 
+### placement of `fzirob_source.sh`
+If you alter your `~.bashrc` file after you've unstalled `robot_folders`, make sure that the line
+
+```
+source ${HOME}/robot_folders/bin/fzirob_source.sh
+```
+
+is always the **last** line when setting up your environment. `robot_folders` caches a couple of environment variables to make transitioning between different environments easier. Therefore, most changes to the environment that are made after that line will get overwritten once an environment is sourced using `robot_folders`. See the cache variables with the names `$ROB_FOLDERS_EMPTY_*` for details on which variables are cached.
+
 ## Transitioning from old robot_folders
 If you used the old bash-based robot folders before, you might be happy to know
 that many of the old aliases exist here, as well. To see a list of available
