@@ -19,17 +19,19 @@ then
   eval "$(_ROB_FOLDERS_COMPLETE=source rob_folders)"
 fi
 
+# if there is alreay an active environment, refrain from scraping the empty paths
+# (they must already there)
+if [ -z "$ROB_FOLDERS_ACTIVE_ENV" ]; then
+  export ROB_FOLDERS_EMPTY_CMAKE_PATH=${CMAKE_PREFIX_PATH}
+  export ROB_FOLDERS_EMPTY_PATH=${PATH}
+  export ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
+  export ROB_FOLDERS_EMPTY_QML_IMPORT_PATH=${QML_IMPORT_PATH}
+  export ROB_FOLDERS_EMPTY_PYTHONPATH=${PYTHONPATH}
 
-export ROB_FOLDERS_EMPTY_CMAKE_PATH=${CMAKE_PREFIX_PATH}
-export ROB_FOLDERS_EMPTY_PATH=${PATH}
-export ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
-export ROB_FOLDERS_EMPTY_QML_IMPORT_PATH=${QML_IMPORT_PATH}
-export ROB_FOLDERS_EMPTY_PYTHONPATH=${PYTHONPATH}
-
-if [ ! -z "${ROB_FOLDERS_EMPTY_CMAKE_PATH}" ] && [ -z $ROB_FOLDERS_IGNORE_CMAKE_PREFIX_PATH ]
-then
-  echo "WARNING! WARNING! WARNING!"
-  echo "Your CMAKE_PREFIX_PATH is not empty. This probably means that you explicitly set your
+  if [ ! -z "${ROB_FOLDERS_EMPTY_CMAKE_PATH}" ] && [ -z $ROB_FOLDERS_IGNORE_CMAKE_PREFIX_PATH ]
+  then
+    echo "WARNING! WARNING! WARNING!"
+    echo "Your CMAKE_PREFIX_PATH is not empty. This probably means that you explicitly set your
 CMAKE_PREFIX_PATH to include some custom directory. If you want to keep this that way you can
 export the environment variable ROB_FOLDERS_IGNORE_CMAKE_PREFIX_PATH to some arbitrary value to
 suppress this warning. e.g.
@@ -37,8 +39,11 @@ suppress this warning. e.g.
     export ROB_FOLDERS_IGNORE_CMAKE_PREFIX_PATH=\":-)\"
     source /home/mauch/robot_folders/bin/fzirob_source.sh
 "
-  echo "By, the way your CMAKE_PREFIX_PATH is: \"${CMAKE_PREFIX_PATH}\""
-  echo "WARNING! WARNING! WARNING! END."
+    echo "By, the way your CMAKE_PREFIX_PATH is: \"${CMAKE_PREFIX_PATH}\""
+    echo "WARNING! WARNING! WARNING! END."
+  fi
+else
+  echo "Robot folder environment active: ($ROB_FOLDERS_ACTIVE_ENV)"
 fi
 
 
