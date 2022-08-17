@@ -96,6 +96,8 @@ class EnvironmentAdapter(click.Command):
         if has_misc_ws and (not self.ignore_misc):
             if os.path.isdir(misc_ws_dir):
                 click.echo("Adapting misc workspace")
+                self.rosinstall = dict()
+                self.parse_folder(misc_ws_dir)
                 if misc_ws_rosinstall:
                     self.adapt_rosinstall(misc_ws_rosinstall, misc_ws_dir)
             else:
