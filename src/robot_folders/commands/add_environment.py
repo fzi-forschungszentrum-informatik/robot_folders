@@ -17,8 +17,9 @@ from helpers.ros_version_helpers import *
 class EnvCreator(object):
     """Worker class that actually handles the environment creation"""
 
-    def __init__(self, name):
+    def __init__(self, name, no_submodules=False):
         self.env_name = name
+        self.no_submodules = no_submodules
         self.build_base_dir = dir_helpers.get_checkout_dir()
         self.demos_dir = os.path.join(dir_helpers.get_checkout_dir(), self.env_name, 'demos')
 
@@ -156,14 +157,16 @@ class EnvCreator(object):
                                                   build_directory=self.catkin_build_directory,
                                                   rosinstall=self.catkin_rosinstall,
                                                   copy_cmake_lists=copy_cmake_lists,
-                                                  ros_distro=ros_distro)
+                                                  ros_distro=ros_distro,
+                                                  no_submodules=self.no_submodules)
         colcon_creator = None
         if self.create_colcon:
             colcon_creator = \
                 environment_helpers.ColconCreator(colcon_directory=self.colcon_directory,
                                                   build_directory=self.colcon_build_directory,
                                                   rosinstall=self.colcon_rosinstall,
-                                                  ros2_distro=ros2_distro)
+                                                  ros2_distro=ros2_distro,
+                                                  no_submodules=self.no_submodules)
 
         # Let's get down to business
         self.create_directories()
@@ -176,7 +179,8 @@ class EnvCreator(object):
                                           build_directory=self.ic_build_directory,
                                           rosinstall=self.ic_rosinstall,
                                           packages=self.ic_packages,
-                                          package_versions=self.ic_package_versions)
+                                          package_versions=self.ic_package_versions,
+                                          no_submodules=self.no_submodules)
         else:
             click.echo("Requested to not create an ic_workspace")
 
@@ -184,7 +188,8 @@ class EnvCreator(object):
             click.echo("Creating misc workspace")
             environment_helpers.MiscCreator(misc_ws_directory=self.misc_ws_directory,
                                             rosinstall=self.misc_ws_rosinstall,
-                                            build_root=self.misc_ws_build_directory)
+                                            build_root=self.misc_ws_build_directory,
+                                            no_submodules=self.no_submodules)
         else:
             click.echo("Requested to not create a misc workspace")
 
@@ -206,7 +211,8 @@ class EnvCreator(object):
 
             environment_helpers.MCACreator(mca_directory=self.mca_directory,
                                            build_directory=self.mca_build_directory,
-                                           mca_additional_repos=self.mca_additional_repos)
+                                           mca_additional_repos=self.mca_additional_repos,
+                                           no_submodules=self.no_submodules)
         else:
             click.echo("Requested to not create an mca workspace")
 
@@ -345,6 +351,8 @@ class EnvCreator(object):
               help=('If set, use this ROS1 distro instead of asking when multiple ROS1 distros are present on the system.'))
 @click.option('--ros2_distro', default='ask',
               help=('If set, use this ROS2 distro instead of asking when multiple ROS2 distros are present on the system.'))
+@click.option('--no_submodules', default=False, is_flag=True,
+              help='Prevent git submodules from being cloned')
 @click.argument('env_name', nargs=1)
 def cli(env_name,
         config_file,
@@ -357,11 +365,12 @@ def cli(env_name,
         copy_cmake_lists,
         local_build,
         ros_distro,
-        ros2_distro):
+        ros2_distro,
+        no_submodules):
     # Set the ic_workspace root 
     """Adds a new environment and creates the basic needed folders,
     e.g. a ic_workspace and a catkin_ws."""
-    environment_creator = EnvCreator(env_name)
+    environment_creator = EnvCreator(env_name, no_submodules=no_submodules)
     environment_creator.build = not no_build
 
     is_env_active = False

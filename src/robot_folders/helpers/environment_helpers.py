@@ -26,8 +26,10 @@ class IcCreator(object):
                  packages=None,
                  package_versions=None,
                  rosinstall=None,
-                 grab_flags=None):
+                 grab_flags=None,
+                 no_submodules=False):
         self.ic_grab_flags = grab_flags
+        self.no_submodules = no_submodules
         base_url = config_helpers.get_value_safe_default("repositories", "ic_workspace_grab_base_url", "")
         # Check if there is a valid base url given for the i workspace.
         if base_url != "":
@@ -52,6 +54,7 @@ class IcCreator(object):
                                ic_workspace_version,
                                ic_repo_url,
                                ic_directory])
+
         if packages is not None:
             self.add_packages(packages, package_versions)
         else:
@@ -97,8 +100,15 @@ class IcCreator(object):
         os.makedirs(os.path.join(self.ic_directory, "packages"), exist_ok=True)
 
         # If something goes wrong here, this will throw an exception, which is fine, as it shoudln't
-        process = subprocess.check_call(["vcs", "import", "--input", rosinstall_filename, "packages"],
-                                        cwd=self.ic_directory)
+        if self.no_submodules:
+            process = subprocess.check_call(
+                ["vcs", "import", "--input", rosinstall_filename, "packages"],
+                cwd=self.ic_directory)
+        else:
+            process = subprocess.check_call(
+                ["vcs", "import", "--recursive", "--input", rosinstall_filename, "packages"],
+                cwd=self.ic_directory)
+
         os.remove(rosinstall_filename)
 
         # It is necessary to grab the base packages to get an icmaker
@@ -136,10 +146,12 @@ class MiscCreator(object):
     def __init__(self,
                  misc_ws_directory,
                  build_root,
-                 rosinstall=None):
+                 rosinstall=None,
+                 no_submodules=False):
 
         self.misc_ws_directory = misc_ws_directory
         self.build_root = build_root
+        self.no_submodules=no_submodules
 
         self.create_build_folders()
         self.add_rosinstall(rosinstall)
@@ -152,8 +164,15 @@ class MiscCreator(object):
                 yaml_dump(rosinstall, rosinstall_content)
 
             os.makedirs(self.misc_ws_directory, exist_ok=True)
-            process = subprocess.check_call(["vcs", "import", "--input", rosinstall_filename, "."],
-                                            cwd=self.misc_ws_directory)
+            if self.no_submodules:
+                process = subprocess.check_call(
+                    ["vcs", "import", "--input", rosinstall_filename, "."],
+                    cwd=self.misc_ws_directory)
+            else:
+                process = subprocess.check_call(
+                    ["vcs", "import", "--recursive", "--input", rosinstall_filename, "."],
+                    cwd=self.misc_ws_directory)
+
             os.remove(rosinstall_filename)
 
     def create_build_folders(self):
@@ -180,12 +199,14 @@ class CatkinCreator(object):
                  build_directory,
                  rosinstall,
                  copy_cmake_lists='ask',
-                 ros_distro='ask'):
+                 ros_distro='ask',
+                 no_submodules=False):
         self.catkin_directory = catkin_directory
         self.build_directory = build_directory
         self.copy_cmake_lists = copy_cmake_lists
         self.ros_distro = ros_distro
         self.rosinstall = rosinstall
+        self.no_submodules = no_submodules
 
         self.ask_questions()
         self.ros_global_dir = "/opt/ros/{}".format(self.ros_distro)
@@ -280,8 +301,15 @@ class CatkinCreator(object):
                 yaml_dump(rosinstall, rosinstall_content)
 
             os.makedirs(os.path.join(self.catkin_directory, "src"), exist_ok=True)
-            process = subprocess.check_call(["vcs", "import", "--input", rosinstall_filename, "src"],
-                                            cwd=self.catkin_directory)
+            if self.no_submodules:
+                process = subprocess.check_call(
+                    ["vcs", "import", "--input", rosinstall_filename, "src"],
+                    cwd=self.catkin_directory)
+            else:
+                process = subprocess.check_call(
+                    ["vcs", "import", "--recursive", "--input", rosinstall_filename, "src"],
+                    cwd=self.catkin_directory)
+
             os.remove(rosinstall_filename)
 
 class ColconCreator(object):
@@ -293,11 +321,13 @@ class ColconCreator(object):
                  colcon_directory,
                  build_directory,
                  rosinstall,
-                 ros2_distro='ask'):
+                 ros2_distro='ask',
+                 no_submodules=False):
         self.colcon_directory = colcon_directory
         self.build_directory = build_directory
         self.ros2_distro = ros2_distro
         self.rosinstall = rosinstall
+        self.no_submodules = no_submodules
 
         self.ask_questions()
 
@@ -373,10 +403,17 @@ class ColconCreator(object):
                 yaml_dump(rosinstall, rosinstall_content)
 
             os.makedirs(os.path.join(self.colcon_directory, "src"), exist_ok=True)
-            process = subprocess.check_call(
-                ["vcs", "import", "--input", rosinstall_filename, "src"],
-                cwd=self.colcon_directory
-            )
+            if self.no_submodules:
+                process = subprocess.check_call(
+                    ["vcs", "import", "--input", rosinstall_filename, "src"],
+                    cwd=self.colcon_directory
+                )
+            else:
+                process = subprocess.check_call(
+                    ["vcs", "import", "--recursive", "--input", rosinstall_filename, "src"],
+                    cwd=self.colcon_directory
+                )
+
             os.remove(rosinstall_filename)
 
 class MCACreator(object):
@@ -387,10 +424,15 @@ class MCACreator(object):
     def __init__(self,
                  mca_directory,
                  build_directory,
-                 mca_additional_repos):
+                 mca_additional_repos,
+                 no_submodules=False):
+        self.no_submodules = no_submodules
         mca_repo_url = config_helpers.get_value_safe('repositories', 'mca_workspace_repo')
 
-        subprocess.check_call(["git", "clone", mca_repo_url, mca_directory])
+        if self.no_submodules:
+            subprocess.check_call(["git", "clone", mca_repo_url, mca_directory])
+        else:
+            subprocess.check_call(["git", "clone", mca_repo_url, mca_directory, "--recurse-submodules"])
 
         self.mca_directory = mca_directory
         self.build_directory = build_directory
@@ -412,7 +454,12 @@ class MCACreator(object):
                 libraries_dir = os.path.join(self.mca_directory,
                                              'libraries',
                                              library['git']['local-name'])
-                subprocess.check_call(["git", "clone", library['git']['uri'], libraries_dir])
+                if self.no_submodules:
+                    subprocess.check_call(["git", "clone", library['git']['uri'], libraries_dir])
+                else:
+                    subprocess.check_call(
+                        ["git", "clone", "--recurse-submodules", library['git']['uri'], libraries_dir]
+                    )
                 if 'version' in library['git']:
                     package_version = library['git']['version']
                     click.echo("Checking out version {} of package {}".format(
@@ -426,7 +473,13 @@ class MCACreator(object):
                 projects_dir = os.path.join(self.mca_directory,
                                             'projects',
                                             project['git']['local-name'])
-                subprocess.check_call(["git", "clone", project['git']['uri'], projects_dir])
+
+                if self.no_submodules:
+                    subprocess.check_call(["git", "clone", project['git']['uri'], projects_dir])
+                else:
+                    subprocess.check_call(
+                        ["git", "clone", "--recurse-submodules", project['git']['uri'], projects_dir]
+                    )
                 if 'version' in project['git']:
                     package_version = project['git']['version']
                     click.echo("Checking out version {} of package {}".format(
@@ -439,7 +492,12 @@ class MCACreator(object):
                 tools_dir = os.path.join(self.mca_directory,
                                          'tools',
                                          tool['git']['local-name'])
-                subprocess.check_call(["git", "clone", tool['git']['uri'], tools_dir])
+                if self.no_submodules:
+                    subprocess.check_call(["git", "clone", tool['git']['uri'], tools_dir])
+                else:
+                    subprocess.check_call(
+                        ["git", "clone", "--recurse-submodules", tool['git']['uri'], tools_dir]
+                    )
                 if 'version' in tool['git']:
                     package_version = tool['git']['version']
                     click.echo("Checking out version {} of package {}".format(

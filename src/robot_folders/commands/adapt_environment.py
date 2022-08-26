@@ -28,6 +28,7 @@ class EnvironmentAdapter(click.Command):
         self.ignore_colcon = False
         self.ignore_mca = False
         self.ignore_misc = False
+        self.no_submodules = False
         self.rosinstall = dict()
 
     def invoke(self, ctx):
@@ -55,6 +56,7 @@ class EnvironmentAdapter(click.Command):
         self.ignore_colcon = ctx.parent.params['ignore_colcon']
         self.ignore_mca = ctx.parent.params['ignore_mca']
         self.ignore_misc = ctx.parent.params['ignore_misc']
+        self.no_submodules = ctx.parent.params['no_submodules']
 
         config_file_parser = ConfigFileParser(ctx.params['in_file'])
         has_ic, ic_rosinstall, ic_packages, ic_package_versions, ic_flags = \
@@ -91,7 +93,8 @@ class EnvironmentAdapter(click.Command):
                                               rosinstall=ic_rosinstall,
                                               packages=ic_packages,
                                               package_versions=ic_package_versions,
-                                              grab_flags=ic_flags)
+                                              grab_flags=ic_flags,
+                                              no_submodules=self.no_submodules)
 
         if has_misc_ws and (not self.ignore_misc):
             if os.path.isdir(misc_ws_dir):
@@ -108,7 +111,8 @@ class EnvironmentAdapter(click.Command):
 
                 environment_helpers.MiscCreator(misc_ws_dir,
                                                 rosinstall=misc_ws_rosinstall,
-                                                build_root=misc_ws_build_root)
+                                                build_root=misc_ws_build_root,
+                                                no_submodules=self.no_submodules)
 
 
 
@@ -129,7 +133,8 @@ class EnvironmentAdapter(click.Command):
                 catkin_creator = \
                     environment_helpers.CatkinCreator(catkin_directory=catkin_dir,
                                                       build_directory=catkin_build_dir,
-                                                      rosinstall=ros_rosinstall)
+                                                      rosinstall=ros_rosinstall,
+                                                      no_submodules=self.no_submodules)
                 catkin_creator.create()
 
         if has_colcon and (not self.ignore_colcon):
@@ -149,7 +154,8 @@ class EnvironmentAdapter(click.Command):
                 colcon_creator = \
                     environment_helpers.ColconCreator(colcon_directory=colcon_dir,
                                                       build_directory=colcon_build_dir,
-                                                      rosinstall=ros2_rosinstall)
+                                                      rosinstall=ros2_rosinstall,
+                                                      no_submodules=self.no_submodules)
                 colcon_creator.create()
 
         if has_mca and (not self.ignore_mca):
@@ -184,7 +190,8 @@ class EnvironmentAdapter(click.Command):
 
                 environment_helpers.MCACreator(mca_directory=mca_dir,
                                                build_directory=mca_build_dir,
-                                               mca_additional_repos=mca_additional_repos)
+                                               mca_additional_repos=mca_additional_repos,
+                                               no_submodules=self.no_submodules)
 
         click.echo('Looking for demo scripts')
         dir_helpers.mkdir_p(demos_dir)
@@ -288,7 +295,10 @@ class EnvironmentAdapter(click.Command):
                             grab_command.extend(ic_grab_flags)
                         process = subprocess.check_call(grab_command, cwd=workspace_dir)
                 else:
-                    subprocess.check_call(["git", "clone", uri, package_dir])
+                    if self.no_submodules:
+                        subprocess.check_call(["git", "clone", uri, package_dir])
+                    else:
+                        subprocess.check_call(["git", "clone", uri, package_dir, "--recurse-submodules"])
 
             # Change the origin to the uri specified
             if uri_update_required:
@@ -376,9 +386,12 @@ class EnvironmentChooser(click.MultiCommand):
 @click.option('--ignore_mca', default=False, is_flag=True,
               help='Prevent mca workspace from getting adapted') 
 @click.option('--ignore_misc', default=False, is_flag=True,
-              help='Prevent misc workspace from getting adapted')                                                                             
+              help='Prevent misc workspace from getting adapted')
+@click.option('--no_submodules', default=False, is_flag=True,
+              help='Prevent git submodules from being cloned')
+
 @click.pass_context
-def cli(ctx, local_delete_policy, ignore_ic, ignore_catkin, ignore_colcon, ignore_mca, ignore_misc, local_override_policy):
+def cli(ctx, local_delete_policy, ignore_ic, ignore_catkin, ignore_colcon, ignore_mca, ignore_misc, no_submodules, local_override_policy):
     """Adapts an environment to ica config file.
        New repositories will be added, versions/branches will be changed and
        deleted repositories will/may be removed.
