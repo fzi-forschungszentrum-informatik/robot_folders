@@ -74,6 +74,9 @@ The configuration is split into different sections which will be explained in th
 
   <dt>install_catkin</dt>
   <dd>If set to true, the build command will also install the catkin_workspace (into the catkin_ws/install folder by default).</dd>
+
+  <dt>catkin_make_cmd</dt>
+  <dd>Set to <em>catkin_make</em> by default but can be changed to <em>catkin build</em>.</dd>
 </dl>
 
 ### Directory options
