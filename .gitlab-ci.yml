@@ -8,4 +8,4 @@ run_tests:
     - source $(pwd)/bin/fzirob_source.sh
     - fzirob get_checkout_base_dir
     - pytest-3 . -rA --cov robot_folders
-  coverage: (?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/.
+  coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
