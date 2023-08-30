@@ -1,20 +1,10 @@
 image: ids-git.fzi.de:5555/continuous_integration/ci_docker_images/ubuntu_20.04_workstation
 
-install_robot_folders:
-  script:
-    - bin/install_robot_folders.sh -q
-
 run_tests:
   script:
     - export LC_ALL=C.UTF-8
     - export LC_LANG=C.UTF-8
-    - bin/install_robot_folders.sh -q
-    - cp config/userconfig_distribute.yaml config/userconfig.yaml
-    - sed -ri "s/^(\s*checkout_dir\s*:)(.*,\s*$)/\1 \"\/builds\/core\/robot_folders\/checkout\",/" config/userconfig.yaml
-    - sed -ri "s/^(\s*ic_workspace_repo\s*:)(.*,\s*$)/\1 \"https:\/\/gitlab-ci-token:${CI_JOB_TOKEN}@ids-git\.fzi\.de\/core\/ic_workspace.git\",/" config/userconfig.yaml
-    - sed -ri "s/^(\s*ic_workspace_grab_base_url\s*:)(.*,\s*$)/\1 \"https:\/\/gitlab-ci-token:${CI_JOB_TOKEN}@ids-git\.fzi\.de\/\",/" config/userconfig.yaml
-    - sed -ri "s/^(\s*mca_workspace_repo\s*:)(.*$)/\1 \"https:\/\/gitlab-ci-token:${CI_JOB_TOKEN}@ids-git\.fzi\.de\/mca2\/mca2.git\"/" config/userconfig.yaml
+    - pip install .
     - source $(pwd)/bin/fzirob_source.sh
     - fzirob get_checkout_base_dir
-    - cd src/robot_folders
     - pytest-3 . -rA --cov
