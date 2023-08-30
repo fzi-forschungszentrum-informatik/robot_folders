@@ -24,3 +24,6 @@ script-files = [
     "bin/source_environment.sh",
 ]
 include-package-data = true
+
+[tool.setuptools.package-data]
+"robot_folders.helpers.resources" = ["*.yaml"]
