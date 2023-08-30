@@ -7,4 +7,4 @@ run_tests:
     - pip install .
     - source $(pwd)/bin/fzirob_source.sh
     - fzirob get_checkout_base_dir
-    - pytest-3 . -rA --cov
+    - pytest-3 . -rA --cov robot_folders
