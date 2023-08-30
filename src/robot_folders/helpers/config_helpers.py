@@ -40,7 +40,8 @@ class Userconfig(object):
         except (IOError, FileNotFoundError) as exc:
             print("Did not find userconfig file. Copying the distribution file.")
             Userconfig.config = Userconfig.config_fallback
-            os.makedirs(XDG_CONFIG_HOME)
+            if not os.path.exists(XDG_CONFIG_HOME):
+                os.makedirs(XDG_CONFIG_HOME)
             shutil.copy(filename_distribute, FILENAME_USERCONFIG)
         Userconfig.initialized = True
 
