@@ -6,11 +6,11 @@ import subprocess
 
 import click
 
-import helpers.config_helpers as config_helpers
-import helpers.build_helpers as build_helpers
-import helpers.directory_helpers as dir_helpers
-from helpers import config_helpers
-from helpers.ros_version_helpers import *
+import robot_folders.helpers.config_helpers as config_helpers
+import robot_folders.helpers.build_helpers as build_helpers
+import robot_folders.helpers.directory_helpers as dir_helpers
+from robot_folders.helpers import config_helpers
+from robot_folders.helpers.ros_version_helpers import *
 
 from yaml import dump as yaml_dump
 

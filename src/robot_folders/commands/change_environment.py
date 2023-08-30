@@ -3,8 +3,8 @@ import os
 import click
 import subprocess
 
-import helpers.directory_helpers as dir_helpers
-from helpers.exceptions import ModuleException
+import robot_folders.helpers.directory_helpers as dir_helpers
+from robot_folders.helpers.exceptions import ModuleException
 
 class EnvironmentChoice(click.Command):
     """

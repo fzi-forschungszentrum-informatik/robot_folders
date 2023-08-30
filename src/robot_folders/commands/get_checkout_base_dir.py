@@ -1,6 +1,6 @@
 """Command to reveive the real checkout base directory"""
 import click
-from helpers.directory_helpers import get_checkout_dir
+from robot_folders.helpers.directory_helpers import get_checkout_dir
 
 
 @click.command("get_checkout_base_dir")

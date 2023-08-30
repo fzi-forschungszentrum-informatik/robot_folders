@@ -4,8 +4,8 @@ import click
 
 from yaml import safe_dump as yaml_safe_dump
 
-from helpers.directory_helpers import get_checkout_dir, get_catkin_dir, get_colcon_dir, list_environments
-from helpers.repository_helpers import create_rosinstall_entry
+from robot_folders.helpers.directory_helpers import get_checkout_dir, get_catkin_dir, get_colcon_dir, list_environments
+from robot_folders.helpers.repository_helpers import create_rosinstall_entry
 
 
 class EnvironmentScraper(click.Command):

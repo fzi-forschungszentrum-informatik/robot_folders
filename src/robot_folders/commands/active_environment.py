@@ -1,7 +1,7 @@
 """Prints the currently sourced environment"""
 
 import click
-from helpers.directory_helpers import get_active_env, get_last_activated_env
+from robot_folders.helpers.directory_helpers import get_active_env, get_last_activated_env
 
 @click.command('active_environment')
 def cli():

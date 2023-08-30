@@ -1,9 +1,9 @@
 """Command to perform environment builds"""
 import click
 
-from helpers.workspace_chooser import WorkspaceChooser
-import helpers.clean_helpers as clean
-from helpers.directory_helpers import get_active_env
+from robot_folders.helpers.workspace_chooser import WorkspaceChooser
+import robot_folders.helpers.clean_helpers as clean
+from robot_folders.helpers.directory_helpers import get_active_env
 
 
 class CleanChooser(WorkspaceChooser):

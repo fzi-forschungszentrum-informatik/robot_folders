@@ -4,11 +4,11 @@ import re
 import subprocess
 import click
 
-from helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir, get_colcon_dir
-from helpers.which import which
-from helpers import compilation_db_helpers
-from helpers import config_helpers
-from helpers.exceptions import ModuleException
+from robot_folders.helpers.directory_helpers import get_active_env_path, mkdir_p, get_catkin_dir, get_colcon_dir
+from robot_folders.helpers.which import which
+from robot_folders.helpers import compilation_db_helpers
+from robot_folders.helpers import config_helpers
+from robot_folders.helpers.exceptions import ModuleException
 
 def get_cmake_flags():
     """Reads the configuration for default cmake flags"""

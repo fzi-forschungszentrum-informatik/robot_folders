@@ -19,7 +19,7 @@ import os
 import traceback
 
 from click.exceptions import UsageError
-from helpers.exceptions import ModuleException
+from robot_folders.helpers.exceptions import ModuleException
 
 plugin_folder = os.path.join(os.path.dirname(__file__), 'commands')
 
@@ -28,7 +28,7 @@ class RobotFolders(click.MultiCommand):
     def list_commands(self, ctx):
         rv = []
         for filename in os.listdir(plugin_folder):
-            if filename.endswith('.py'):
+            if filename.endswith('.py') and filename != '__init__.py':
                 rv.append(filename[:-3])
         rv.sort()
         return rv

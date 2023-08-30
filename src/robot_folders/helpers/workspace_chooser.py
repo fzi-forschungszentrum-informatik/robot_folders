@@ -5,7 +5,7 @@ workspaces inside an environment.
 
 import os
 import click
-from helpers.directory_helpers import (
+from robot_folders.helpers.directory_helpers import (
     get_base_dir,
     get_active_env_path,
     get_catkin_dir,

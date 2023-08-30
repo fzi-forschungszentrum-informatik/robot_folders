@@ -7,7 +7,7 @@ import subprocess
 
 import click
 
-import helpers.config_helpers as config_helpers
+import robot_folders.helpers.config_helpers as config_helpers
 
 
 def get_base_dir():
