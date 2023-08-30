@@ -1,0 +1,12 @@
+Source: python3-robot-folders
+Section: python
+Priority: extra
+Maintainer: Felix Exner <exner@fzi.de>
+Standards-Version: 4.0.0
+Build-Depends: debhelper (>= 11), dh-python, python3-all, python3-setuptools
+
+Package: python3-robot-folders
+Architecture: all
+Depends: python3, ${misc:Depends}, ${python:Depends}, python3-click, python3-vcstool, python3-git, python3-yaml
+Description: robot_folders
+    robot_folders is great
