@@ -79,11 +79,11 @@ def get_checkout_dir():
                                                     'checkout_dir',
                                                     debug=False)
     if checkout_config == '' or checkout_config is None:
-        return os.path.join(get_base_dir(), 'checkout')
-    else:
-        if not os.path.exists(checkout_config):
-            mkdir_p(checkout_config)
-        return checkout_config
+        checkout_config = '~/checkout'
+    expanded = os.path.expanduser(checkout_config)
+    if not os.path.exists(expanded):
+        mkdir_p(expanded)
+    return expanded
 
 
 def get_catkin_dir(env_dir=''):
