@@ -7,5 +7,5 @@ run_tests:
     - pip install .
     - source $(pwd)/bin/fzirob_source.sh
     - fzirob get_checkout_base_dir
-    - pytest-3 . -rA --cov robot_folders
+    - pytest-3 . -rA --cov
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'

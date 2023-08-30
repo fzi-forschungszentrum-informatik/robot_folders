@@ -1,4 +1,4 @@
 [report]
-include = ./*
+include = src/*
 omit = test/*
 show_missing = true
