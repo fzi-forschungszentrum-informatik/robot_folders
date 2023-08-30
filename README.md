@@ -4,7 +4,7 @@
 # Robot Folders
 Welcome to robot_folders! robot_folders helps you
 keeping track of different environment setups including multiple workspaces
-such as ic_workspace, catkin_workspace and mca_workspace.
+such as catkin_workspace and colcon_workspace
 
 You can source, create or build environments very easy.
 
@@ -69,9 +69,6 @@ The configuration is split into different sections which will be explained in th
   <dt>make_threads</dt>
   <dd>Number of threads that should be used with make. Only relevant when <b>generator</b> is set to <em>make</em>.</dd>
 
-  <dt>install_ic</dt>
-  <dd>If set to true, the build command will also install the ic_workspace (into the export folder by default).</dd>
-
   <dt>install_catkin</dt>
   <dd>If set to true, the build command will also install the catkin_workspace (into the catkin_ws/install folder by default).</dd>
 
@@ -127,7 +124,7 @@ fzirob add_environment <workspace> --config_file <config-file> --no_build
 
 is used to share or save a workspace with others.
 
-When sourcing an environment, the misc_ws export folder will be sourced ontop of the catkin_workspace and ic_workspace. This way, it will be available to other workspaces automatically.
+When sourcing an environment, the misc_ws export folder will be sourced ontop of the catkin_workspace / colcon workspace. This way, it will be available to other workspaces automatically.
 
 ### Misc workspace example
 

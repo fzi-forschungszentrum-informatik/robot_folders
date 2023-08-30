@@ -53,17 +53,6 @@ class Cleaner(click.Command):
             click.echo('Cleaning not confirmed. Aborting now')
         click.echo('')
 
-
-class IcCleaner(Cleaner):
-    """Cleaner class for an ic workspace"""
-    def invoke(self, ctx):
-        click.echo('========== Cleaning ic workspace ==========')
-        ic_dir = os.path.realpath(os.path.join(get_active_env_path(), 'ic_workspace'))
-        self.clean_list.append(os.path.realpath(os.path.join(ic_dir, 'build')))
-        self.clean_list.append(os.path.realpath(os.path.join(ic_dir, 'export')))
-        self.clean()
-
-
 class CatkinCleaner(Cleaner):
     """Cleaner class for catkin workspace"""
     def invoke(self, ctx):
@@ -87,14 +76,4 @@ class ColconCleaner(Cleaner):
         self.clean_list.append(os.path.join(colcon_dir, 'log'))
         self.clean_list.append(os.path.join(colcon_dir, 'install'))
         click.echo("Cleaning colcon_workspace in {}".format(colcon_dir))
-        self.clean()
-
-class McaCleaner(Cleaner):
-    """Cleaner class for an mca workspace"""
-    def invoke(self, ctx):
-        click.echo('========== Cleaning mca workspace ==========')
-        mca_dir = os.path.realpath(os.path.join(get_active_env_path(), 'mca_workspace'))
-        build_dir = os.path.realpath(os.path.join(mca_dir, 'build'))
-        self.clean_list.append(build_dir)
-        click.echo("Cleaning mca_workspace in {}".format(build_dir))
         self.clean()

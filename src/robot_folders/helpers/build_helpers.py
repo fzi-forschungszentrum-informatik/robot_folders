@@ -118,25 +118,6 @@ class Builder(click.Command):
         return False
 
 
-class IcBuilder(Builder):
-    """Builder class for an ic workspace"""
-    def invoke(self, ctx):
-        ic_dir = os.path.realpath(os.path.join(get_active_env_path(), 'ic_workspace'))
-        self.build_dir = os.path.realpath(os.path.join(ic_dir, 'build'))
-        self.check_previous_build(ic_dir)
-        click.echo("Building ic_workspace in {}".format(self.build_dir))
-        try:
-            process = subprocess.check_call(["bash", "-c", self.get_build_command()],
-                                   cwd=self.build_dir)
-        except subprocess.CalledProcessError as err:
-            raise(ModuleException(err.output, "build_ic", err.returncode))
-
-    def get_install_key(self):
-        return 'install_ic'
-
-    def get_install_default(self):
-        return True
-
 class ColconBuilder(Builder):
     """Builder class for colcon workspace"""
     def get_build_command(self, ros_distro):
@@ -277,22 +258,3 @@ class CatkinBuilder(Builder):
 
     def get_install_key(self):
         return 'install_catkin'
-
-
-# TODO: We could support building of single projects? Unfortunately, I don't know
-#       much about mca. (mauch: 20160417)
-class McaBuilder(Builder):
-    """Builder class for an mca workspace"""
-    def invoke(self, ctx):
-        mca_dir = os.path.realpath(os.path.join(get_active_env_path(), 'mca_workspace'))
-        self.build_dir = os.path.realpath(os.path.join(mca_dir, 'build'))
-        self.check_previous_build(mca_dir)
-        click.echo("Building mca_workspace in {}".format(self.build_dir))
-        try:
-            process = subprocess.check_call(["bash", "-c", self.get_build_command()],
-                                        cwd=self.build_dir)
-        except subprocess.CalledProcessError as err:
-            raise(ModuleException(err.output, "build_mca", err.returncode))
-
-    def get_install_default(self):
-        return '' # don't install by default

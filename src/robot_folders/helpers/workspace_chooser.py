@@ -28,10 +28,6 @@ class WorkspaceChooser(click.MultiCommand):
             return list()
         workspaces = [folder for folder in os.listdir(get_active_env_path())]
         cmds = list()
-        if 'ic_workspace' in workspaces:
-            cmds.append('ic')
-        if 'mca_workspace' in workspaces:
-            cmds.append('mca')
         if os.path.exists(get_colcon_dir()):
             cmds.append('colcon')
         if os.path.exists(get_catkin_dir()):

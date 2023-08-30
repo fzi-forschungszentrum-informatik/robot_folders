@@ -183,8 +183,7 @@ def is_fzirob_environment(checkout_folder, env_dir):
     """Checks whether a given directory actually contains an environment"""
     is_environment = False
 
-    environment_folders = ['ic_workspace', 'mca_workspace']
-    environment_folders = environment_folders + \
+    environment_folders = \
         config_helpers.get_value_safe_default(
             section='directories',
             value='catkin_names',

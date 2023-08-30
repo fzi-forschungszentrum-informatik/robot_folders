@@ -31,14 +31,10 @@ environment '{}'".format(dir_helpers.get_last_activated_env()))
 
         target_dir = dir_helpers.get_active_env_path()
         if name in self.list_commands(ctx):
-            if name == 'ic':
-                target_dir = os.path.join(target_dir, 'ic_workspace')
-            elif name == 'ros':
+            if name == 'ros':
                 target_dir = dir_helpers.get_catkin_dir()
             elif name == 'colcon':
                 target_dir = dir_helpers.get_colcon_dir()
-            elif name == 'mca':
-                target_dir = os.path.join(target_dir, 'mca_workspace')
         else:
             click.echo('Did not find a workspace with the key < {} > inside '
                        'current environment < {} >.'.format(name, env))

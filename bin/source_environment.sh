@@ -4,8 +4,7 @@
 # This script handles sourcing of an environment. Simply        #
 # source this file using                                        #
 #   source source_environment.sh                                #
-# This script will search for an ic_workspace,                  #
-# a catkin_workspace and an mca_workspace and call their        #
+# This script will search for a workspace and call their        #
 # respective source files.                                      #
 # Afterwards the setup_local.sh file will be sourced if present.#
 #                                                               #
@@ -69,7 +68,6 @@ if [ -d $environment_dir ]; then
   fi
 
   # It is important to source the catkin_ws first, as it will remove non-existing paths from the
-  # environment (e.g. the export-folder of an ic_ws when not built yet)
   # Run ROS initialization if available
   # We run the setup.sh in the catkin_ws folder. Afterwards we can run rosrun, roslaunch etc. with the files in it.
   catkin_dir_long=$environment_dir/catkin_workspace
@@ -163,29 +161,6 @@ if [ -d $environment_dir ]; then
     fi
   fi
 
-  # Run ic_workspace initialization if available
-  ic_dir=$environment_dir/ic_workspace
-  if [ -d $ic_dir ]
-  then
-    if [[ ! "$LD_LIBRARY_PATH" =~ "$ic_dir/export/lib" ]]; then
-      export LD_LIBRARY_PATH=$ic_dir/export/lib/:$LD_LIBRARY_PATH
-    fi
-    if [[ ! "$PYTHONPATH" =~ "$ic_dir/export/lib/python2.7/site-packages" ]]; then
-      export PYTHONPATH=$ic_dir/export/lib/python2.7/site-packages:$PYTHONPATH
-    fi
-    if [[ ! "$PATH" =~ "$ic_dir/export/bin" ]]; then
-      export PATH=$ic_dir/export/bin:${PATH}
-    fi
-    if [[ ! "$QML_IMPORT_PATH" =~ "$ic_dir/export/plugins/qml" ]]; then
-      export QML_IMPORT_PATH=$ic_dir/export/plugins/qml:$QML_IMPORT_PATH
-    fi
-    if [[ ! "$CMAKE_PREFIX_PATH" =~ "$ic_dir/export/" ]]; then
-      export CMAKE_PREFIX_PATH=$ic_dir/export:$CMAKE_PREFIX_PATH
-    fi
-    export IC_MAKER_DIR=$ic_dir/icmaker
-    echo "Sourced ic_workspace from $ic_dir"
-  fi
-
   # source misc_ws environment if existing.
   misc_ws_dir=$environment_dir/misc_ws
   if [ -d $misc_ws_dir ]
@@ -200,17 +175,6 @@ if [ -d $environment_dir ]; then
       export CMAKE_PREFIX_PATH=$misc_ws_dir/export:$CMAKE_PREFIX_PATH
     fi
     echo "Sourced misc_ws workspace from $misc_ws_dir"
-  fi
-
-  # source mca environment
-  mca_dir=$environment_dir/mca_workspace
-  if [ -d $mca_dir ]
-  then
-    pushd . &> /dev/null
-    cd $mca_dir/build
-    source script/mcasetenv
-    popd . &> /dev/null
-    echo "Sourced mca_workspace"
   fi
 
   # source local source file

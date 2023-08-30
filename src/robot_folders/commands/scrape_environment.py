@@ -18,25 +18,16 @@ class EnvironmentScraper(click.Command):
 
     def invoke(self, ctx):
         env_dir = os.path.join(get_checkout_dir(), self.name)
-        ic_pkg_dir = os.path.join(env_dir, 'ic_workspace', 'packages')
         misc_ws_pkg_dir = os.path.join(env_dir, 'misc_ws')
         catkin_dir = get_catkin_dir(env_dir)
         catkin_src_dir = os.path.join(catkin_dir, 'src')
         colcon_dir = get_colcon_dir(env_dir)
         colcon_src_dir = os.path.join(colcon_dir, 'src')
-        mca_library_dir = os.path.join(env_dir, 'mca_workspace', 'libraries')
-        mca_project_dir = os.path.join(env_dir, 'mca_workspace', 'projects')
-        mca_tool_dir = os.path.join(env_dir, 'mca_workspace', 'tools')
         demos_dir = os.path.join(env_dir, 'demos')
 
         self.use_commit_id = ctx.parent.params['use_commit_id']
 
         yaml_data = dict()
-
-        if os.path.isdir(ic_pkg_dir):
-            click.echo("Scraping IC workspace")
-            yaml_data['ic_workspace'] = dict()
-            yaml_data['ic_workspace']['rosinstall'] = self.parse_folder(ic_pkg_dir)
 
         if os.path.isdir(misc_ws_pkg_dir):
             click.echo("Scraping misc_ws_dir")
@@ -47,24 +38,11 @@ class EnvironmentScraper(click.Command):
             click.echo("Scraping catkin workspace")
             yaml_data['catkin_workspace'] = dict()
             yaml_data['catkin_workspace']['rosinstall'] = self.parse_folder(catkin_src_dir)
-        
+
         if os.path.isdir(colcon_src_dir):
             click.echo("Scraping colcon workspace")
             yaml_data['colcon_workspace'] = dict()
             yaml_data['colcon_workspace']['rosinstall'] = self.parse_folder(colcon_src_dir)
-
-        if os.path.isdir(mca_library_dir):
-            yaml_data['mca_workspace'] = dict()
-            click.echo("Scraping mca libraries")
-            yaml_data['mca_workspace']['libraries'] = self.parse_folder(mca_library_dir)
-
-            if os.path.isdir(mca_project_dir):
-                click.echo("Scraping mca projects")
-                yaml_data['mca_workspace']['projects'] = self.parse_folder(mca_project_dir)
-
-            if os.path.isdir(mca_tool_dir):
-                click.echo("Scraping mca tools")
-                yaml_data['mca_workspace']['tools'] = self.parse_folder(mca_tool_dir)
 
         if os.path.isdir(demos_dir):
             yaml_data['demos'] = dict()

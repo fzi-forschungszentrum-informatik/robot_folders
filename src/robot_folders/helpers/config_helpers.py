@@ -33,20 +33,6 @@ class Userconfig(object):
         filename_userconfig = os.path.join(Userconfig.get_base_dir(),
                                            'config',
                                            'userconfig.yaml')
-        # check for migration
-        location_old = os.path.join(Userconfig.get_base_dir(),
-                                    '.robot_folders',
-                                    'userconfig.py')
-        if os.path.isfile(location_old):
-            print('\n\n!!!!! MIGRATION WARNING !!!!!')
-            print('The config file format and location have changed.')
-            print('The old config file at {} is deprecated and will be renamed.'
-                  .format(location_old))
-            print('The new config file is located at {}.'
-                  .format(filename_userconfig))
-            Userconfig.migrate_userconfig(location_old, filename_userconfig)
-            print('!!!!! MIGRATION DONE !!!!!\n\n')
-
         try:
             with open(filename_userconfig, 'r') as file_content:
                 try:
@@ -65,42 +51,6 @@ class Userconfig(object):
         """Get the robot_folders base dir"""
         base_dir = os.environ['ROB_FOLDERS_BASE_DIR']
         return os.path.realpath(base_dir)
-
-
-    @classmethod
-    def migrate_entry(cls, section, value, section_module, yaml_dump):
-        """Migrate a config entry from old python config system to yaml """
-        if value in section_module:
-            yaml_dump[section][value] = section_module[value]
-            print('  {}.{}: {}'.format(section, value, section_module[value]))
-
-
-    @classmethod
-    def migrate_userconfig(cls, old_location, new_location):
-        """Migration of old python module config to yaml config stucture"""
-        legacy_config = imp.load_source('*', old_location)
-        build_config = legacy_config.config
-        dir_config = legacy_config.directories
-        yaml_dump = {'build': dict(), 'directories': dict()}
-        print('Migrating entries:')
-        Userconfig.migrate_entry('build', 'generator', build_config, yaml_dump)
-        Userconfig.migrate_entry('build', 'make_threads', build_config, yaml_dump)
-        Userconfig.migrate_entry('build', 'install_ic', build_config, yaml_dump)
-        Userconfig.migrate_entry('build', 'install_catkin', build_config, yaml_dump)
-        Userconfig.migrate_entry('directories', 'checkout_dir', dir_config, yaml_dump)
-        Userconfig.migrate_entry('directories', 'catkin_names', dir_config, yaml_dump)
-
-        with open(new_location, mode='w') as out_stream:
-            yaml.dump(yaml_dump, stream=out_stream, default_flow_style=False)
-        filename_deprectated = os.path.join(Userconfig.get_base_dir(),
-                                            '.robot_folders',
-                                            'userconfig_deprecated_safecopy.py')
-        os.rename(old_location, filename_deprectated)
-        print('Moved old config file {} to backup location {}.'
-              .format(old_location, filename_deprectated))
-        print('You may safely delete this file, as it is no longer used.')
-
-
 
 
 # This is the internal yaml query. It can be used for the modified

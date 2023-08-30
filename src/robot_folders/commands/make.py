@@ -18,12 +18,8 @@ class BuildChooser(WorkspaceChooser):
             return self
 
         if name in self.list_commands(ctx):
-            if name == 'ic':
-                return build.IcBuilder(name=name, add_help_option=False)
-            elif name == 'ros':
+            if name == 'ros':
                 return build.CatkinBuilder(name=name, add_help_option=False)
-            elif name == 'mca':
-                return build.McaBuilder(name=name, add_help_option=False)
             elif name == 'colcon':
                 return build.ColconBuilder(name=name, add_help_option=False)
         else:

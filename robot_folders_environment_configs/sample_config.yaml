@@ -2,30 +2,12 @@
 # Specify the workspaces you like to use in this environment.
 # If you don't want to use one of the workspace types, just delete
 # the according section completely.
-ic_workspace:
-  packages:
-    - icl_hardware
-  package_versions:
-    icl_hardware: master
-  flags: # add any IcWorkspace flags here
-    - verbose
 catkin_workspace:
   rosinstall:
     - git:
         local-name: fzi_manipulation_msgs
         uri: fzi:ros/fzi_manipulation_msgs.git
         version: master
-mca_workspace:
-  projects:
-    - git:
-        local-name: mcap_kairo
-        uri: git@ids-git.fzi.de:mca2-autonomous-robots/mcap_kairo.git
-
-  libraries:
-    - git:
-        local-name: driver_svh
-        uri: git@ids-git.fzi.de:hardware-drivers/driver_svh.git
-
 
 # put any shell script under demos.
 # Use the 'script.ending: |' syntax to use multiline scripts

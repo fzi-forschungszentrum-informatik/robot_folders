@@ -16,14 +16,10 @@ class CleanChooser(WorkspaceChooser):
             return self
 
         if name in self.list_commands(ctx):
-            if name == 'ic':
-                return clean.IcCleaner(name=name, add_help_option=False)
-            elif name == 'ros':
+            if name == 'ros':
                 return clean.CatkinCleaner(name=name, add_help_option=False)
             elif name == 'colcon':
                 return clean.ColconCleaner(name=name, add_help_option=False)
-            elif name == 'mca':
-                return clean.McaCleaner(name=name, add_help_option=False)
         else:
             click.echo('Did not find a workspace with the key < {} >.'.format(name))
             return None

@@ -49,8 +49,6 @@ class EnvironmentDeleter(click.Command):
     def invoke(self, ctx):
         env_dir = os.path.join(directory_helpers.get_checkout_dir(), self.name)
         catkin_dir = directory_helpers.get_catkin_dir(env_dir)
-        ic_dir = os.path.join(env_dir, 'ic_workspace')
-        mca_dir = os.path.join(env_dir, 'mca_workspace')
 
         delete_list = list()
 
@@ -67,25 +65,6 @@ class EnvironmentDeleter(click.Command):
             append_to_list_if_folder(catkin_dir, delete_list)
         else:
             click.echo('No catkin workspace found')
-
-        # Ic-Workspace
-        if os.path.exists(ic_dir):
-            ic_build = os.path.join(ic_dir, 'build')
-            ic_export = os.path.join(ic_dir, 'export')
-            append_to_list_if_symlink(ic_build, delete_list)
-            append_to_list_if_symlink(ic_export, delete_list)
-            append_to_list_if_folder(ic_dir, delete_list)
-        else:
-            click.echo('No Ic-Workspace found')
-
-        # mca-Workspace
-        if os.path.exists(mca_dir):
-            mca_build = os.path.join(mca_dir, 'build')
-
-            append_to_list_if_symlink(mca_build, delete_list)
-            append_to_list_if_folder(mca_dir, delete_list)
-        else:
-            click.echo('No mca-Workspace found')
 
         delete_list.append(env_dir)
 
