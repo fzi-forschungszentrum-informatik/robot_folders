@@ -28,8 +28,13 @@ In order to use ``robot_folders`` you'll have to call its source file. In case y
 
 .. code:: bash
 
-   echo "source ${HOME}/.local/pipx/venvs/robot-folders/bin/fzirob_source.sh" >> ~/.bashrc
+   echo "source ${HOME}/.local/pipx/venvs/robot-folders/bin/rob_folders_source.sh" >> ~/.bashrc
 
+In case you installed it using the debian package, call
+
+.. code:: bash
+
+   echo "source /usr/bin/rob_folders_source.sh >> ~/.bashrc
 
 Basic usage
 -----------
@@ -285,59 +290,13 @@ manually by calling:
    cd repo-B
    mkdir build && cd build
    cmake .. -DCMAKE_INSTALL_PREFIX=../../export -DBUILD_SHARED_LIBS=1
-   make 
+   make
    make install
    cd ../../repo-A
    mkdir build && cd build
    cmake .. -DCMAKE_INSTALL_PREFIX=../../export -DBUILD_SHARED_LIBS=1
-   make 
+   make
    make install
-
-placement of ``fzirob_source.sh``
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-
-If you alter your ``~.bashrc`` file after you’ve unstalled
-``robot_folders``, make sure that the line
-
-::
-
-   source ${HOME}/robot_folders/bin/fzirob_source.sh
-
-is always the **last** line when setting up your environment.
-``robot_folders`` caches a couple of environment variables to make
-transitioning between different environments easier. Therefore, most
-changes to the environment that are made after that line will get
-overwritten once an environment is sourced using ``robot_folders``. See
-the cache variables with the names ``$ROB_FOLDERS_EMPTY_*`` for details
-on which variables are cached.
-
-Transitioning from old robot_folders
-------------------------------------
-
-If you used the old bash-based robot folders before, you might be happy
-to know that many of the old aliases exist here, as well. To see a list
-of available aliases you can have a look at bin/fzirob_source.sh
-
-If you want to source additional files or want to run other various
-commands when sourcing an environment, you can add the necessary
-commands to the setup_local.sh in that enviroment’s folder.
-
-NOTE: Unlike the old bash-based robot folders, LC_ALL is not set to C
-per default anymore. If you want to keep this behaviour, use
-source_local.sh to set LC_ALL=C.
-
-By default make will be used to build your workspaces. You can change
-your default build system and other settings in
-.robot_folders/userconfig.py
-
-ATTENTION: The files setup.bash, setup.sh, setup.zsh from the old
-bash-based robot folders may shadow the new change_environment function
-of the python based robot folders. This can cause various problems,
-since the folder ~/.cmake/packages does not get removed on every
-change_environment command and the builds of two environments may be
-messed up and corrupted. When you switch to the new robot folders,
-please check for setup.\* files and delete them if want to rely on the
-standard python robot folders.
 
 .. |pipeline status| image:: https://ids-git.fzi.de/core/robot_folders/badges/master/pipeline.svg
    :target: https://ids-git.fzi.de/core/robot_folders/-/commits/master
