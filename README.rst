@@ -20,6 +20,10 @@ install pipx``).
    git clone https://ids-git.fzi.de/core/robot_folders
    pipx install ./robot_folders
 
+
+There is also a debian package available that is meant for centralized installations. Please contact
+the package maintainers for further questions.
+
 Shell setup
 -----------
 
@@ -51,15 +55,26 @@ to get an overview over all available commands.
 Customization
 -------------
 
-Configuration lies inside the **config** directory. The default
-configuration is stored inside the file **userconfig_distribute.yaml**,
-which will be copied to **userconfig.yaml** automatically. If you like
-to change any configuration parameter, please change the
-**userconfig.yaml** file.
+The default configuration is stored inside the file ``userconfig_distribute.yaml``,
+which will be copied to ``~/.config/robot_folders.yaml`` automatically on first invocation.
 
-It might happen, that your **userconfig.yaml** does not contain a
-configuration parameter, yet. In this case, simply copy it from the
-**userconfig_distribute.yaml** file.
+.. code:: yaml
+
+   build: {
+       generator: make,
+       cmake_flags: "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
+       make_threads: 4,
+       install_catkin: False,
+       catkin_make_cmd: catkin_make,
+       colcon_build_options: "--symlink-install"
+   }
+
+   directories: {
+       # if left blank, the default ~/checkout will be used
+       checkout_dir: ,
+       catkin_names: ["catkin_workspace", "catkin_ws"],
+       colcon_names: ["colcon_workspace", "colcon_ws", "dev_ws"]
+   }
 
 The configuration is split into different sections which will be
 explained in the following.
@@ -67,171 +82,45 @@ explained in the following.
 Build options
 ~~~~~~~~~~~~~
 
-.. raw:: html
+``generator``
+    Currently make and ninja can be used. If ninja is configured, but not
+    installed, building will throw an error.
 
-   <dl>
+``cmake_flags``
+    These flags will be passed to the cmake command.
 
-.. raw:: html
+``make_threads``
+    Number of threads that should be used with make. Only relevant when
+    generator is set to make.
 
-   <dt>
+``install_catkin``
+    If set to true, the build command will also install the catkin_workspace
+    (into the catkin_ws/install folder by default).
 
-generator
+``catkin_make_cmd``
+    Set to catkin_make by default but can be changed to catkin build.
 
-.. raw:: html
-
-   </dt>
-
-.. raw:: html
-
-   <dd>
-
-Currently make and ninja can be used. If ninja is configured, but not
-installed, building will throw an error.
-
-.. raw:: html
-
-   </dd>
-
-.. raw:: html
-
-   <dt>
-
-cmake_flags
-
-.. raw:: html
-
-   </dt>
-
-.. raw:: html
-
-   <dd>
-
-These flags will be passed to the cmake command.
-
-.. raw:: html
-
-   </dd>
-
-.. raw:: html
-
-   <dt>
-
-make_threads
-
-.. raw:: html
-
-   </dt>
-
-.. raw:: html
-
-   <dd>
-
-Number of threads that should be used with make. Only relevant when
-generator is set to make.
-
-.. raw:: html
-
-   </dd>
-
-.. raw:: html
-
-   <dt>
-
-install_catkin
-
-.. raw:: html
-
-   </dt>
-
-.. raw:: html
-
-   <dd>
-
-If set to true, the build command will also install the catkin_workspace
-(into the catkin_ws/install folder by default).
-
-.. raw:: html
-
-   </dd>
-
-.. raw:: html
-
-   <dt>
-
-catkin_make_cmd
-
-.. raw:: html
-
-   </dt>
-
-.. raw:: html
-
-   <dd>
-
-Set to catkin_make by default but can be changed to catkin build.
-
-.. raw:: html
-
-   </dd>
-
-.. raw:: html
-
-   </dl>
+``colcon_build_options``
+    Options passed to each ``colcon build`` invocation that is piped through ``fzirob make``.
 
 Directory options
 ~~~~~~~~~~~~~~~~~
 
-.. raw:: html
+``checkout_dir``
+    By default, environments are stored inside
+    ${ROBOT_FOLDERS_BASE_DIR}/checkout If environments should be stored
+    somewhere else, specify this path here. This **must** be an absolute path, but ``${HOME}/`` or
+    ``~/`` can be used, as well.
 
-   <dl>
+``catkin_names``
+    All first level subdirectories in an environment that match one of these
+    names will be treated as catkin workspaces. If you name yor catkin
+    workspaces differently, please specify this name here.
 
-.. raw:: html
-
-   <dt>
-
-checkout_dir
-
-.. raw:: html
-
-   </dt>
-
-.. raw:: html
-
-   <dd>
-
-By default, environments are stored inside
-${ROBOT_FOLDERS_BASE_DIR}/checkout If environments should be stored
-somewhere else, specify this path here.
-
-.. raw:: html
-
-   </dd>
-
-.. raw:: html
-
-   <dt>
-
-catkin_names
-
-.. raw:: html
-
-   </dt>
-
-.. raw:: html
-
-   <dd>
-
-All first level subdirectories in an environment that match one of these
-names will be treated as catkin workspaces. If you name yor catkin
-workspaces differently, please specify this name here.
-
-.. raw:: html
-
-   </dd>
-
-.. raw:: html
-
-   </dl>
+``colcon_names``
+    All first level subdirectories in an environment that match one of these
+    names will be treated as colcon workspaces. If you name yor colcon
+    workspaces differently, please specify this name here.
 
 Misc workspace
 ~~~~~~~~~~~~~~

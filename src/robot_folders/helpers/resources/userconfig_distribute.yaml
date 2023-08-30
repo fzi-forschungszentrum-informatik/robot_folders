@@ -8,7 +8,7 @@ build: {
 }
 
 directories: {
-    # if left blank, the default robot_folders/checkout will be used
+    # if left blank, the default ~/checkout will be used
     checkout_dir: ,
     catkin_names: ["catkin_workspace", "catkin_ws"],
     colcon_names: ["colcon_workspace", "colcon_ws", "dev_ws"]
