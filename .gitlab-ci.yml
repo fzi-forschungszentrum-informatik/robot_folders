@@ -33,3 +33,11 @@ build_deb_pkg:
   artifacts:
     paths:
       - artifacts/
+
+variables:
+  DOCS_SOURCE: docs # The folder containing the sphinx conf.py file
+
+include:
+  - project: 'continuous_integration/ci_scripts'
+    ref: master
+    file: '/gitlab-ci-yml/doc_sphinx.yml'
