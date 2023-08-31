@@ -9,6 +9,7 @@ run_tests:
     - fzirob get_checkout_base_dir
     - pytest-3 . -rA --cov
   coverage: '/(?i)total.*? (100(?:\.0+)?\%|[1-9]?\d(?:\.\d+)?\%)$/'
+  needs: []
 
 .build_matrix:
   parallel:
@@ -20,6 +21,7 @@ run_tests:
 
 build_deb_pkg:
   parallel: !reference [.build_matrix, parallel]
+  stage: build
   image: $CI_IMAGE
   script:
     - apt-get update && apt-get install -y dh-python python3-all fakeroot dpkg-dev debhelper
