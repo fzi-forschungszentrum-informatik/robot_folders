@@ -263,7 +263,7 @@ class ColconCreator(object):
         if local_build_dir_name != self.build_directory:
             os.symlink(self.build_directory, local_build_dir_name)
             os.makedirs(colcon_log_directory)
-            os.symlink(catkin_log_directory, local_log_dir_name)
+            os.symlink(colcon_log_directory, local_log_dir_name)
             os.makedirs(colcon_install_directory)
             os.symlink(colcon_install_directory, local_install_dir_name)
 
