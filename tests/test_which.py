@@ -1,7 +1,7 @@
 import sys
 import subprocess
 
-from helpers import which
+from robot_folders.helpers import which
 
 def test_is_exe():
     assert which.is_exe(sys.executable)

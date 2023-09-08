@@ -6,12 +6,12 @@ import sys
 
 import click
 
-import helpers.directory_helpers as dir_helpers
-import helpers.build_helpers as build
-import helpers.environment_helpers as environment_helpers
-from helpers.ConfigParser import ConfigFileParser
-from helpers.exceptions import ModuleException
-from helpers.ros_version_helpers import *
+import robot_folders.helpers.directory_helpers as dir_helpers
+import robot_folders.helpers.build_helpers as build
+import robot_folders.helpers.environment_helpers as environment_helpers
+from robot_folders.helpers.ConfigParser import ConfigFileParser
+from robot_folders.helpers.exceptions import ModuleException
+from robot_folders.helpers.ros_version_helpers import *
 
 
 class EnvCreator(object):

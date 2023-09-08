@@ -7,10 +7,10 @@ import stat
 import subprocess
 import click
 
-import helpers.directory_helpers as dir_helpers
-from helpers.repository_helpers import create_rosinstall_entry
-from helpers.ConfigParser import ConfigFileParser
-import helpers.environment_helpers as environment_helpers
+import robot_folders.helpers.directory_helpers as dir_helpers
+from robot_folders.helpers.repository_helpers import create_rosinstall_entry
+from robot_folders.helpers.ConfigParser import ConfigFileParser
+import robot_folders.helpers.environment_helpers as environment_helpers
 
 
 class EnvironmentAdapter(click.Command):

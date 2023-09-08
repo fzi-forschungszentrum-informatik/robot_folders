@@ -2,8 +2,8 @@
 import os
 import click
 
-from helpers.workspace_chooser import WorkspaceChooser
-import helpers.directory_helpers as dir_helpers
+from robot_folders.helpers.workspace_chooser import WorkspaceChooser
+import robot_folders.helpers.directory_helpers as dir_helpers
 
 
 class CdCommand(click.Command):

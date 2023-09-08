@@ -2,10 +2,10 @@
 import click
 import subprocess
 
-from helpers.workspace_chooser import WorkspaceChooser
-import helpers.build_helpers as build
-from helpers.directory_helpers import get_active_env
-from helpers.exceptions import ModuleException
+from robot_folders.helpers.workspace_chooser import WorkspaceChooser
+import robot_folders.helpers.build_helpers as build
+from robot_folders.helpers.directory_helpers import get_active_env
+from robot_folders.helpers.exceptions import ModuleException
 
 
 class BuildChooser(WorkspaceChooser):

@@ -5,8 +5,8 @@ import pytest
 
 import os
 
-import helpers.config_helpers as config_helpers
-import helpers.directory_helpers as directory_helpers
+import robot_folders.helpers.config_helpers as config_helpers
+import robot_folders.helpers.directory_helpers as directory_helpers
 
 
 class TestCLI(unittest.TestCase):

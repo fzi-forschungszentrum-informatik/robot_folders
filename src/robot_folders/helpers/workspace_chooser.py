@@ -5,8 +5,8 @@ workspaces inside an environment.
 
 import os
 import click
-from helpers.directory_helpers import (
-    get_base_dir,
+from robot_folders.helpers.directory_helpers import (
+    get_checkout_dir,
     get_active_env_path,
     get_catkin_dir,
     get_colcon_dir)
@@ -18,7 +18,7 @@ class WorkspaceChooser(click.MultiCommand):
 
     def get_workspaces(self):
         """Searches all environments inside the checkout folder"""
-        checkout_folder = os.path.join(get_base_dir(), 'checkout')
+        checkout_folder = get_checkout_dir()
         # TODO possibly check whether the directory contains actual workspace
         return [folder for folder in os.listdir(checkout_folder) if
                 os.path.isdir(os.path.join(checkout_folder, folder))]

@@ -5,10 +5,10 @@ import imp
 import shutil
 import yaml
 
-try:
-    FileNotFoundError
-except NameError:
-    FileNotFoundError = IOError
+from importlib import resources
+
+XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME", os.path.expandvars(os.path.join("$HOME", ".config")))
+FILENAME_USERCONFIG = os.path.join(XDG_CONFIG_HOME, "robot_folders.yaml")
 
 class Userconfig(object):
     """Class for managing a userconfig"""
@@ -18,39 +18,32 @@ class Userconfig(object):
     @classmethod
     def init_class(cls):
         """ Load the distribution config file """
-        filename_distribute = os.path.join(Userconfig.get_base_dir(),
-                                           'config',
-                                           'userconfig_distribute.yaml')
-        with open(filename_distribute, 'r') as file_content:
+        with resources.path(
+            ".".join([__package__, "resources"]), "userconfig_distribute.yaml"
+        ) as p:
+            filename_distribute = p.as_posix()
+            file_content = p.read_text()
             try:
-                Userconfig.config_fallback = yaml.load(file_content, Loader=yaml.SafeLoader)
+                Userconfig.config_fallback = yaml.safe_load(file_content)
             except yaml.YAMLError as exc:
                 print("Error in configuration file:", exc)
             except IOError as exc:
-                print('ERROR: There was a problem loading the distribution file:', exc)
+                print("ERROR: There was a problem loading the distribution file:", exc)
 
         # Load the user-modified config file
-        filename_userconfig = os.path.join(Userconfig.get_base_dir(),
-                                           'config',
-                                           'userconfig.yaml')
         try:
-            with open(filename_userconfig, 'r') as file_content:
+            with open(FILENAME_USERCONFIG, "r") as file_content:
                 try:
-                    Userconfig.config = yaml.load(file_content, Loader=yaml.SafeLoader)
+                    Userconfig.config = yaml.safe_load(file_content)
                 except yaml.YAMLError as exc:
                     print("Error in configuration file:", exc)
         except (IOError, FileNotFoundError) as exc:
-            print('Did not find userconfig file. Copying the distribution file.')
+            print("Did not find userconfig file. Copying the distribution file.")
             Userconfig.config = Userconfig.config_fallback
-            shutil.copy(filename_distribute, filename_userconfig)
+            if not os.path.exists(XDG_CONFIG_HOME):
+                os.makedirs(XDG_CONFIG_HOME)
+            shutil.copy(filename_distribute, FILENAME_USERCONFIG)
         Userconfig.initialized = True
-
-    # We need to define this here, as we need the base dir a lot.
-    @classmethod
-    def get_base_dir(cls):
-        """Get the robot_folders base dir"""
-        base_dir = os.environ['ROB_FOLDERS_BASE_DIR']
-        return os.path.realpath(base_dir)
 
 
 # This is the internal yaml query. It can be used for the modified

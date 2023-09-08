@@ -3,7 +3,7 @@ import os
 import subprocess
 import click
 
-from helpers.directory_helpers import get_active_env_path, get_active_env
+from robot_folders.helpers.directory_helpers import get_active_env_path, get_active_env
 
 
 def get_demo_binaries():

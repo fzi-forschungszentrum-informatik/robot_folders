@@ -6,7 +6,7 @@ import shutil
 import getpass
 import click
 
-import helpers.directory_helpers as directory_helpers
+import robot_folders.helpers.directory_helpers as directory_helpers
 
 
 def append_to_list_if_symlink(path, delete_list):
