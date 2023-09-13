@@ -13,12 +13,15 @@ Installation
 ------------
 
 It is recommended to install robot_folders using ``pipx`` (You can install ``pipx`` using ``sudo apt
-install pipx``).
+install pipx``). Please note: With pipx versions < 1.0 you'll have to provide the `--spec` flag
 
 .. code:: bash
 
    git clone https://ids-git.fzi.de/core/robot_folders
+   # pipx >= 1.0 (from ubuntu 22.04 on)
    pipx install ./robot_folders
+   # pipx < 1.0 (ubuntu 20.04)
+   pipx install --spec ./robot_folders robot-folders
 
 
 There is also a debian package available that is meant for centralized installations. Please contact
@@ -108,7 +111,7 @@ Directory options
 
 ``checkout_dir``
     By default, environments are stored inside
-    ${ROBOT_FOLDERS_BASE_DIR}/checkout If environments should be stored
+    ~/checkout. If environments should be stored
     somewhere else, specify this path here. This **must** be an absolute path, but ``${HOME}/`` or
     ``~/`` can be used, as well.
 
