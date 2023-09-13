@@ -9,7 +9,7 @@
 project = 'robot_folders'
 copyright = '2023, Felix Exner'
 author = 'Felix Exner'
-release = '0.3.0'
+release = '0.3.1'
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
