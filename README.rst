@@ -52,7 +52,7 @@ In case you installed it using the debian package, call
 
 .. code:: bash
 
-   echo "source /usr/bin/rob_folders_source.sh >> ~/.bashrc
+   echo "source /usr/bin/rob_folders_source.sh" >> ~/.bashrc
 
 Basic usage
 -----------
