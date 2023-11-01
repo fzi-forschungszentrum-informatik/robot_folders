@@ -291,7 +291,7 @@ class EnvironmentChooser(click.MultiCommand):
 @click.option('--ignore_catkin', default=False, is_flag=True,
               help='Prevent catkin workspace from getting adapted') 
 @click.option('--ignore_colcon', default=False, is_flag=True,
-              help='Prevent ccolcon workspace from getting adapted') 
+              help='Prevent colcon workspace from getting adapted')
 @click.option('--ignore_misc', default=False, is_flag=True,
               help='Prevent misc workspace from getting adapted')
 @click.option('--no_submodules', default=False, is_flag=True,
@@ -299,9 +299,10 @@ class EnvironmentChooser(click.MultiCommand):
 
 @click.pass_context
 def cli(ctx, local_delete_policy, ignore_catkin, ignore_colcon, ignore_misc, no_submodules, local_override_policy):
-    """Adapts an environment to ica config file.
+    """Adapts an environment to given config file.
        New repositories will be added, versions/branches will be changed and
        deleted repositories will/may be removed.
+       Provide path to config file as [ARGS] after the environment name.
     """  
 
     print("The policy for deleting repos only existing locally is: '{}'"
