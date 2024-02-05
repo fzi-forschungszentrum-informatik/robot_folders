@@ -1,14 +1,5 @@
-Robot Folders
-=============
-
-Welcome to ``robot_folders``! ``robot_folders`` helps you keeping track of
-different environment setups including multiple workspaces such as
-catkin_workspace and colcon_workspace
-
-You can source, create or build environments very easy.
-
-Quick start
-------------
+Installation
+============
 
 It is recommended to install robot_folders using ``pipx`` (You can install ``pipx`` using ``sudo apt
 install pipx``). Please note: With pipx versions < 1.0 you'll have to provide the `--spec` flag
@@ -51,15 +42,3 @@ In case you installed it using the debian package, call
 .. code:: bash
 
    echo "source /usr/bin/rob_folders_source.sh" >> ~/.bashrc
-
-Basic usage
------------
-
-After installation open up a new terminal to use robot_folders. The main
-command for using robot_folders is ``fzirob``. Type
-
-.. code:: bash
-
-   fzirob --help
-
-to get an overview over all available commands.

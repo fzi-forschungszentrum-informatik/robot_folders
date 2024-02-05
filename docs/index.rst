@@ -10,8 +10,15 @@ Welcome to robot_folders's documentation!
    :maxdepth: 2
    :caption: Contents:
 
+   installation
+   configuration
+   usage
+   misc_workspace
    aliases
+   faq
+   
 
 .. include:: ../README.rst
+
 
 
