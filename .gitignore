@@ -4,3 +4,5 @@ checkout
 *.pyc
 robot_folders.egg-info
 src/robot_folders/build/
+build/
+dist/
