@@ -18,6 +18,7 @@ setup(
     install_requires=[
         'Click>=7.0',
         'gitpython',
+        'inquirer',
         'PyYaml',
         'vcstool'
     ],
