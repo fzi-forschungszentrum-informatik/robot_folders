@@ -10,6 +10,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     wget \
     tmux \
     python3-argcomplete \
+    ros-humble-ros-base \
     && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
