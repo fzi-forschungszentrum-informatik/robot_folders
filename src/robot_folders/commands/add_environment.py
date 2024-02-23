@@ -13,6 +13,7 @@ import robot_folders.helpers.environment_helpers as environment_helpers
 from robot_folders.helpers.ConfigParser import ConfigFileParser
 from robot_folders.helpers.exceptions import ModuleException
 from robot_folders.helpers.ros_version_helpers import *
+from robot_folders.helpers.underlays import UnderlayManager
 
 
 class EnvCreator(object):
@@ -49,7 +50,7 @@ class EnvCreator(object):
         self.create_colcon = False
         self.create_misc_ws = False
 
-        self.underlays = []
+        self.underlays = UnderlayManager(self.env_name)
 
     def create_new_environment(self,
                                config_file,
@@ -127,15 +128,9 @@ class EnvCreator(object):
                                                   ros2_distro=ros2_distro,
                                                   no_submodules=self.no_submodules)
 
-        envs = dir_helpers.list_environments()
-        if envs:
-            questions = [
-                inquirer.Checkbox('underlays',
-                              message="Which environments would you like to use as underlays (Can be left empty)?",
-                              choices=envs,
-                          ),
-            ]
-            self.underlays = inquirer.prompt(questions)["underlays"]
+        # TODO add quiet method for that
+        self.underlays.query_underlays()
+
 
         # Let's get down to business
         self.create_directories()
@@ -192,13 +187,7 @@ class EnvCreator(object):
                                 '  setup_local_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"\nfi\n')
         env_source_file.close()
 
-        with open(os.path.join(dir_helpers.get_checkout_dir(),
-                                            self.env_name,
-                                            "underlays.txt"),
-                  encoding="utf-8",
-                  mode='w') as underlay_file:
-            for underlay in self.underlays:
-                underlay_file.write(os.path.join(dir_helpers.get_checkout_dir(), underlay) + "\n")
+        self.underlays.write_underlay_file()
 
         os.symlink(os.path.join(dir_helpers.get_base_dir(), "bin", "source_environment.sh"),
                    os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "setup.sh"))
