@@ -131,7 +131,7 @@ class EnvCreator(object):
         if envs:
             questions = [
                 inquirer.Checkbox('underlays',
-                              message="Which environments would you like to use as ROS 2 underlays?",
+                              message="Which environments would you like to use as underlays (Can be left empty)?",
                               choices=envs,
                           ),
             ]
