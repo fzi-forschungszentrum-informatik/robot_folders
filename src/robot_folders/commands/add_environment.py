@@ -136,7 +136,6 @@ class EnvCreator(object):
                           ),
             ]
             self.underlays = inquirer.prompt(questions)["underlays"]
-            click.echo(self.underlays)
 
         # Let's get down to business
         self.create_directories()
@@ -199,7 +198,6 @@ class EnvCreator(object):
                   encoding="utf-8",
                   mode='w') as underlay_file:
             for underlay in self.underlays:
-                print(underlay)
                 underlay_file.write(os.path.join(dir_helpers.get_checkout_dir(), underlay) + "\n")
 
         os.symlink(os.path.join(dir_helpers.get_base_dir(), "bin", "source_environment.sh"),
