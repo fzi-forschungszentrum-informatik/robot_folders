@@ -150,7 +150,7 @@ fzirob()
             fi
             # declare environment-specific aliases
             env_aliases
-            check_env
+            #check_env
           else
             echo "Could not change environment"
           fi

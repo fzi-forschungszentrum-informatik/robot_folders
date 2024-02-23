@@ -5,6 +5,7 @@ import subprocess
 import sys
 
 import click
+import inquirer
 
 import robot_folders.helpers.directory_helpers as dir_helpers
 import robot_folders.helpers.build_helpers as build
@@ -47,6 +48,8 @@ class EnvCreator(object):
         self.create_catkin = False
         self.create_colcon = False
         self.create_misc_ws = False
+
+        self.underlays = []
 
     def create_new_environment(self,
                                config_file,
@@ -124,6 +127,17 @@ class EnvCreator(object):
                                                   ros2_distro=ros2_distro,
                                                   no_submodules=self.no_submodules)
 
+        envs = dir_helpers.list_environments()
+        if envs:
+            questions = [
+                inquirer.Checkbox('underlays',
+                              message="Which environments would you like to use as ROS 2 underlays?",
+                              choices=envs,
+                          ),
+            ]
+            self.underlays = inquirer.prompt(questions)["underlays"]
+            click.echo(self.underlays)
+
         # Let's get down to business
         self.create_directories()
         self.create_demo_docs()
@@ -178,6 +192,15 @@ class EnvCreator(object):
                                 '  # Get the base directory where the install script is located\n' \
                                 '  setup_local_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"\nfi\n')
         env_source_file.close()
+
+        with open(os.path.join(dir_helpers.get_checkout_dir(),
+                                            self.env_name,
+                                            "underlays.txt"),
+                  encoding="utf-8",
+                  mode='w') as underlay_file:
+            for underlay in self.underlays:
+                print(underlay)
+                underlay_file.write(os.path.join(dir_helpers.get_checkout_dir(), underlay) + "\n")
 
         os.symlink(os.path.join(dir_helpers.get_base_dir(), "bin", "source_environment.sh"),
                    os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "setup.sh"))
