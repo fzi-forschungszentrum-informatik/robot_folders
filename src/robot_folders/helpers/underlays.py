@@ -31,7 +31,7 @@ class UnderlayManager():
             with open(self._get_underlay_filename(), encoding="utf-8", mode="r") as underlay_file:
                 lines = underlay_file.readlines()
                 for line in lines:
-                    underlays.append(os.path.basename(line))
+                    underlays.append(os.path.basename(line).strip())
         return underlays
 
     def write_underlay_file(self):
