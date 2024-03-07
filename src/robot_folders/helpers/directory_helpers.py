@@ -216,5 +216,5 @@ def is_fzirob_environment(checkout_folder, env_dir):
 def list_environments():
     """List all environments"""
     checkout_folder = get_checkout_dir()
-    return [env_dir for env_dir in os.listdir(checkout_folder)
+    return [env_dir for env_dir in sorted(os.listdir(checkout_folder))
             if is_fzirob_environment(checkout_folder, env_dir)]
