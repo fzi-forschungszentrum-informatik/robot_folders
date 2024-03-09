@@ -7,7 +7,7 @@ from setuptools import setup
 
 setup(
     name='robot_folders',
-    version='0.3.1',
+    version='0.3.2',
     python_requires='>=3',
     packages = [
         "robot_folders",
