@@ -26,7 +26,7 @@ setup(
         rob_folders=robot_folders.main:cli
     ''',
     scripts=[
-        "bin/get_zsh_source_command.py",
+        "bin/rob_folders_get_source_command.py",
         "bin/rob_folders-complete.sh",
         "bin/rob_folders_source.sh",
         "bin/source_environment.sh",

@@ -2,13 +2,12 @@
 if [ -d "$HOME/.local/bin" ] ; then
     PATH="$HOME/.local/bin:$PATH"
 fi
-
+my_source="source"
 if [ -n "${ZSH_VERSION+1}" ];
 then
   # Get the base directory where the install script is located
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${(%):-%N}" )/.." && pwd )"
-  my_source_zsh=$(get_zsh_source_command.py)
-  eval "$(_ROB_FOLDERS_COMPLETE=${my_source_zsh} rob_folders)"
+  my_source=$(rob_folders_get_source_command.py -s zsh)
 fi
 
 # bash
@@ -16,8 +15,9 @@ if [ -n "${BASH_VERSION+1}" ];
 then
   # Get the base directory where the install script is located
   export ROB_FOLDERS_BASE_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )/.." && pwd )"
-  eval "$(_ROB_FOLDERS_COMPLETE=source rob_folders)"
+  my_source=$(rob_folders_get_source_command.py -s bash)
 fi
+eval "$(_ROB_FOLDERS_COMPLETE=${my_source} rob_folders)"
 
 # if there is alreay an active environment, refrain from scraping the empty paths
 # (they must already there)

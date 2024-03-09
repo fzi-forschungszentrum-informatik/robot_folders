@@ -5,14 +5,12 @@ then
 fi
 if [ -n "${BASH_VERSION+1}" ];
 then
-  _rob_folders_completion() {
-    COMPREPLY=( $( env COMP_WORDS="${COMP_WORDS[*]}" \
-      COMP_CWORD=$COMP_CWORD \
-      _ROB_FOLDERS_COMPLETE=complete rob_folders ) )
+  _fzirob_completion() {
+    # replace 'fzirob' with 'rob_folders' for completion
+    _rob_folders_completion rob_folders ${@:2}
     return 0
   }
-  complete -F _rob_folders_completion -o default fzirob;
-  complete -F _rob_folders_completion -o default rob_folders;
+  complete -F _fzirob_completion -o default fzirob
 fi
 #complete -F _rob_folders_completion -o default rob_folders;
 
