@@ -4,23 +4,8 @@ Configuration
 The default configuration is stored inside the file ``userconfig_distribute.yaml``,
 which will be copied to ``~/.config/robot_folders.yaml`` automatically on first invocation.
 
-.. code:: yaml
-
-   build: {
-       generator: make,
-       cmake_flags: "-DCMAKE_EXPORT_COMPILE_COMMANDS=1",
-       make_threads: 4,
-       install_catkin: False,
-       catkin_make_cmd: catkin_make,
-       colcon_build_options: "--symlink-install"
-   }
-
-   directories: {
-       # if left blank, the default ~/checkout will be used
-       checkout_dir: ,
-       catkin_names: ["catkin_workspace", "catkin_ws"],
-       colcon_names: ["colcon_workspace", "colcon_ws", "dev_ws"]
-   }
+.. literalinclude:: ../src/robot_folders/helpers/resources/userconfig_distribute.yaml
+   :language: yaml
 
 The configuration is split into different sections which will be
 explained in the following.
@@ -69,4 +54,9 @@ Directory options
     All first level subdirectories in an environment that match one of these
     names will be treated as colcon workspaces. If you name yor colcon
     workspaces differently, please specify this name here.
+
+``no_backup_dir``
+    Location where build and install steps should be performed if they should be outside of the
+    checkout tree. If that folder exists, users will be prompted whether to build inside the
+    ``no_backup_dir`` when creating a new environment.
 

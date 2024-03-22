@@ -234,8 +234,7 @@ class EnvCreator(object):
                     'copied to the src folder of the catkin ws without asking for it again.'))
 @click.option('--local_build', type=click.Choice(['yes', 'no', 'ask']), default='ask',
               help=('If set to \'yes\', the environment folder will be used for building directly. '
-                    ' If set to \'no\', builds will be done on `no_backup`. This only affects '
-                    'building on our workstations.'))
+                    ' If set to \'no\', builds will be done inside the `no_backup` directory'))
 @click.option('--ros_distro', default='ask',
               help=('If set, use this ROS1 distro instead of asking when multiple ROS1 distros are present on the system.'))
 @click.option('--ros2_distro', default='ask',

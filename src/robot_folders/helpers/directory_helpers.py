@@ -75,11 +75,11 @@ def recursive_rmdir(path):
 
 def get_checkout_dir():
     """Get the robot folders checkout directory from the userconfig"""
-    checkout_config = config_helpers.get_value_safe('directories',
-                                                    'checkout_dir',
-                                                    debug=False)
-    if checkout_config == '' or checkout_config is None:
-        checkout_config = '~/checkout'
+    checkout_config = config_helpers.get_value_safe(
+        "directories", "checkout_dir", debug=False
+    )
+    if checkout_config == "" or checkout_config is None:
+        checkout_config = "~/checkout"
     expanded = os.path.expanduser(checkout_config)
     if not os.path.exists(expanded):
         mkdir_p(expanded)
@@ -135,49 +135,44 @@ def check_nobackup(local_build='ask'):
 
     local_build == 'yes' - ignore nobackup even if it exists -> will return false
     """
-    # If we are on a workstation or when no_backup is mounted like on
-    # a workstation offer to build in no_backup
+    # If the no_backup location exists, offer to build in no_backup
     has_nobackup = False
+    no_backup_location = os.path.expanduser(config_helpers.get_value_safe("directories", "no_backup_dir"))
     try:
-        if os.path.isdir('/disk/no_backup'):
+        if os.path.isdir(no_backup_location):
             has_nobackup = True
     except subprocess.CalledProcessError:
         pass
 
     if has_nobackup:
-        if local_build == 'ask':
+        if local_build == "ask":
             build_dir_choice = click.prompt(
                 "Which folder should I use as a base for creating the build tree?\n"
-                "Type 'local' for building inside the local robot_folders tree.\n"
+                "Type 'local' for building inside the local checkout tree.\n"
                 "Type 'no_backup' (or simply press enter) for building in the no_backup "
-                "space (should be used on workstations).\n",
-                type=click.Choice(['no_backup', 'local']),
-                default='no_backup')
-            build_dir_choice = build_dir_choice == 'local'
+                "space.\n",
+                type=click.Choice(["no_backup", "local"]),
+                default="no_backup",
+            )
+            build_dir_choice = build_dir_choice == "local"
         else:
             build_dir_choice = yes_no_to_bool(local_build)
 
         return not build_dir_choice
 
-        # if not build_dir_choice:
-            # username = getpass.getuser()
-            # build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
-        # else:
-            # build_base_dir = default_build_base
-
-        # return build_base_dir
 
 def get_build_base_dir(use_no_backup):
     """
     Gets the base directory for building depending on whether no_backup should be used or not
     """
     if use_no_backup:
-        username = getpass.getuser()
-        build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
+        no_backup_dir = config_helpers.get_value_safe("directories", "no_backup_dir")
+        build_base_dir = os.path.expanduser(f"{no_backup_dir}/robot_folders_build_base")
     else:
         build_base_dir = get_checkout_dir()
 
     return build_base_dir
+
 
 def is_fzirob_environment(checkout_folder, env_dir):
     """Checks whether a given directory actually contains an environment"""

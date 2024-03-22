@@ -69,8 +69,7 @@ class EnvironmentDeleter(click.Command):
         delete_list.append(env_dir)
 
         # no_backup build base
-        username = getpass.getuser()
-        build_base_dir = '/disk/no_backup/{}/robot_folders_build_base'.format(username)
+        build_base_dir = directory_helpers.get_build_base_dir(use_no_backup=True)
         append_to_list_if_folder(os.path.join(build_base_dir, self.name), delete_list)
 
         click.echo('Going to delete the following paths:\n{}'.format('\n'.join(delete_list)))
@@ -123,9 +122,9 @@ class EnvironmentChooser(click.MultiCommand):
               help='Skip confirmation and delete directly. This is meant for automated runs only.')
 @click.pass_context
 def cli(ctx, force):
-    """Removes an existing environment. This means that all files from this environments
+    """Removes an existing environment. This means that all files from this environment
     will be deleted from the checkout folder. If build or install directories are symlinked
-    to another location (e.g. because it was build on no_backup), those will be deleted as well."""
+    to another location (e.g. because it was built on no_backup), those will be deleted as well."""
     if ctx.invoked_subcommand is None:
         click.echo('No environment specified. Please choose one '
                    'of the available environments!')

@@ -61,11 +61,13 @@ environment. Depending on your specific setup further questions may be asked:
 - When creating a catkin or colcon workspace with multiple installed ROS
   versions, you will be prompted for the ROS version being used for that
   workspace.
-- When running on IDS/TKS workstations you will be asked whether the build and
-  install folders should be placed outside of your ``checkout`` directory
-  inside the ``$HOME/no_backup`` folder. This should be used on the
-  workstations.
-
+- If you use an automatic backup strategy for your machine you probably do not want to backup the
+  build and install artifacts from your workspaces, but only the sources. For that purpose
+  ``robot_folders`` allows building and installing outside of your checkout tree and creating
+  symlinks at the respecitve places instead. Whenever the configured backup location exists on the
+  system (By default that's ``$HOME/no_backup``, that can be changed in the
+  :ref:`configuration:Configuration`.) you will be prompted whether
+  you want to build inside the checkout tree or in the no-backup folder.
 
 Upon completion, you will receive the confirmation: *"Environment setup for
 'ENV_NAME` is complete."*

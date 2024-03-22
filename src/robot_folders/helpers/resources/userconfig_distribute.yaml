@@ -11,5 +11,6 @@ directories: {
     # if left blank, the default ~/checkout will be used
     checkout_dir: ,
     catkin_names: ["catkin_workspace", "catkin_ws"],
-    colcon_names: ["colcon_workspace", "colcon_ws", "dev_ws"]
+    colcon_names: ["colcon_workspace", "colcon_ws", "dev_ws"],
+    no_backup_dir: "~/no_backup"
 }
