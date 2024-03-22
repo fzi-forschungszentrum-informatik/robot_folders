@@ -1,11 +1,14 @@
 Robot Folders
 =============
 
-Welcome to ``robot_folders``! ``robot_folders`` helps you keeping track of
-different environment setups including multiple workspaces such as
-catkin_workspace and colcon_workspace
+Welcome to ``robot_folders``! ``robot_folders`` is a collection of utility scripts designed to
+streamline and facilitate the management of workspaces used for (ROS) development. It is designed
+to enhance efficiency in handling different environments, consisting of multiple workspaces like a
+``catkin_workspace`` and ``colcon_workspace`` or a plain CMake workspace.
 
-You can source, create or build environments very easy.
+It focuses on optimizing the management of various subworkspaces, contributing
+to a seamless development experience.
+
 
 Quick start
 ------------

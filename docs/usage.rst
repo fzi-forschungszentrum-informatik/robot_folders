@@ -1,14 +1,9 @@
 Usage
 =====
 
-The term "robot_folders" refers to a collection of utility scripts designed to
-streamline and facilitate the management of workspaces within the IDS/TKS
-framework. ``robot_folders`` is designed to enhance efficiency in handling
-different environment setups, including multiple workspaces like a
-``catkin_workspace`` and ``colcon_workspace``.
-
-It focuses on optimizing the management of various subworkspaces, contributing
-to a seamless development experience.
+This page should give you an overview of different tasks that can be performed using
+``robot_folders``. It is kind of an inverse documentation to the command documentation that comes
+with the command line interface.
 
 What is an environment?
 -----------------------
