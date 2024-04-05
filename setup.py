@@ -33,5 +33,6 @@ setup(
         "bin/source_environment.sh",
         ],
     include_package_data=True,
-    package_data={"": ["*.yaml"]}
+    package_data={"": ["*.yaml"]},
+    license_files = ("LICENSE.txt")
 )
