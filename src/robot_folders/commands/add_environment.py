@@ -5,6 +5,7 @@ import subprocess
 import sys
 
 import click
+import inquirer
 
 import robot_folders.helpers.directory_helpers as dir_helpers
 import robot_folders.helpers.build_helpers as build
@@ -12,6 +13,7 @@ import robot_folders.helpers.environment_helpers as environment_helpers
 from robot_folders.helpers.ConfigParser import ConfigFileParser
 from robot_folders.helpers.exceptions import ModuleException
 from robot_folders.helpers.ros_version_helpers import *
+from robot_folders.helpers.underlays import UnderlayManager
 
 
 class EnvCreator(object):
@@ -48,6 +50,8 @@ class EnvCreator(object):
         self.create_colcon = False
         self.create_misc_ws = False
 
+        self.underlays = UnderlayManager(self.env_name)
+
     def create_new_environment(self,
                                config_file,
                                no_build,
@@ -57,7 +61,8 @@ class EnvCreator(object):
                                copy_cmake_lists,
                                local_build,
                                ros_distro,
-                               ros2_distro):
+                               ros2_distro,
+                               underlays):
         """Worker method that does the actual job"""
         if os.path.exists(os.path.join(dir_helpers.get_checkout_dir(), self.env_name)):
             # click.echo("An environment with the name \"{}\" already exists. Exiting now."
@@ -124,6 +129,25 @@ class EnvCreator(object):
                                                   ros2_distro=ros2_distro,
                                                   no_submodules=self.no_submodules)
 
+        if underlays == 'ask':
+            self.underlays.query_underlays()
+        elif underlays == 'skip':
+            pass
+        else:
+            raise NotImplementedError("Manually passing underlays isn't implemented yet.")
+
+
+        if self.underlays.underlays:
+            if not no_build and (self.catkin_rosinstall or self.colcon_rosinstall):
+                click.secho(
+                    "Underlays selected without the 'no-build' option with a specified workspace. "
+                    "Initial build will be deactivated. "
+                    "Please manually build your environment by calling `fzirob make`.",
+                    fg="yellow",
+                )
+            no_build = True
+
+
         # Let's get down to business
         self.create_directories()
         self.create_demo_docs()
@@ -178,6 +202,8 @@ class EnvCreator(object):
                                 '  # Get the base directory where the install script is located\n' \
                                 '  setup_local_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"\nfi\n')
         env_source_file.close()
+
+        self.underlays.write_underlay_file()
 
         os.symlink(os.path.join(dir_helpers.get_base_dir(), "bin", "source_environment.sh"),
                    os.path.join(dir_helpers.get_checkout_dir(), self.env_name, "setup.sh"))
@@ -241,6 +267,9 @@ class EnvCreator(object):
               help=('If set, use this ROS2 distro instead of asking when multiple ROS2 distros are present on the system.'))
 @click.option('--no_submodules', default=False, is_flag=True,
               help='Prevent git submodules from being cloned')
+@click.option('--underlays', type=click.Choice(['ask', 'skip']), default='ask',
+              help=('When set to "ask" the user will be prompted for a list of underlays '
+              'to be used. When set to "skip", no underlays will be configured.'))
 @click.argument('env_name', nargs=1)
 def cli(env_name,
         config_file,
@@ -252,7 +281,8 @@ def cli(env_name,
         local_build,
         ros_distro,
         ros2_distro,
-        no_submodules):
+        no_submodules,
+        underlays):
     """Adds a new environment and creates the basic needed folders,
     e.g. a colcon_workspace and a catkin_ws."""
     environment_creator = EnvCreator(env_name, no_submodules=no_submodules)
@@ -272,7 +302,8 @@ def cli(env_name,
                                                    copy_cmake_lists,
                                                    local_build,
                                                    ros_distro,
-                                                   ros2_distro)
+                                                   ros2_distro,
+                                                   underlays)
     except subprocess.CalledProcessError as err:
         raise(ModuleException(str(err), 'add'))
     except Exception as err:

@@ -35,7 +35,7 @@ then
     environment_dir="$( cd "$( dirname "${(%):-%N}" )" && pwd )"
   fi
 
-  shell_type="zsh"
+  export shell_type="zsh"
 fi
 
 # bash
@@ -46,9 +46,12 @@ then
     # Get the base directory where the install script is located
     environment_dir="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
   fi
-  shell_type="bash"
+  export shell_type="bash"
 fi
 
+if [ ! -z "$rob_folders_overlay" ]; then
+  echo "Overlaying $rob_folders_overlay"
+fi
 
 # This is the environment's name, which we will print out later
 env_name=$(basename $environment_dir)
@@ -59,12 +62,44 @@ rm -rf $HOME/.cmake/packages/
 # This is basically only relevant when calling the script with an externally defined environment_dir
 if [ -d $environment_dir ]; then
   if [ -n ${ROB_FOLDERS_EMPTY_PATH} ]; then
-    # Set the prefix path to the one stored away when starting a new session
-    export CMAKE_PREFIX_PATH=${ROB_FOLDERS_EMPTY_CMAKE_PATH}
-    export PATH=${ROB_FOLDERS_EMPTY_PATH}
-    export LD_LIBRARY_PATH=${ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH}
-    export QML_IMPORT_PATH=${ROB_FOLDERS_EMPTY_QML_IMPORT_PATH}
-    export PYTHONPATH=${ROB_FOLDERS_EMPTY_PYTHONPATH}
+    if [ -z "$rob_folders_overlay" ]; then
+      # Set the prefix path to the one stored away when starting a new session
+      export CMAKE_PREFIX_PATH=${ROB_FOLDERS_EMPTY_CMAKE_PATH}
+      export PATH=${ROB_FOLDERS_EMPTY_PATH}
+      export LD_LIBRARY_PATH=${ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH}
+      export QML_IMPORT_PATH=${ROB_FOLDERS_EMPTY_QML_IMPORT_PATH}
+      export PYTHONPATH=${ROB_FOLDERS_EMPTY_PYTHONPATH}
+    fi
+  fi
+
+  underlay_file="$environment_dir/underlays.txt"
+  #echo "Found underlay file: $underlay_file"
+
+  if [ -e $underlay_file ]; then
+    while read underlay; do
+      if [ ! -z "$underlay" ]; then
+        # cache current recursion step
+        this_env_dir="$environment_dir"
+        this_env_name="$env_name"
+
+        echo "Sourcing underlay $underlay"
+        export environment_dir="$underlay"
+        export rob_folders_overlay="$this_env_dir"
+        if [ -f ${environment_dir}/setup.sh ]; then
+          source ${environment_dir}/setup.sh
+        elif [ -f ${environment_dir}/setup.zsh ]; then
+          source ${environment_dir}/setup.zsh
+        elif [ -f ${environment_dir}/setup.bash ]; then
+          source ${environment_dir}/setup.bash
+        else
+          source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
+        fi
+        # reset things
+        export environment_dir=$this_env_dir
+        export env_name=$this_env_name
+        rob_folders_overlay=""
+      fi
+    done < "$underlay_file"
   fi
 
   # It is important to source the catkin_ws first, as it will remove non-existing paths from the
@@ -138,12 +173,13 @@ if [ -d $environment_dir ]; then
   then
     if [ -f $colcon_dir/install/local_setup.$shell_type ]
     then
-      # Find underlay workspace
-      ros2_version=$(grep "COLCON_CURRENT_PREFIX=\"/opt/ros" $colcon_dir/install/setup.sh | cut -d '"' -f2)
-      echo "Sourcing ${ros2_version}/setup.${shell_type}"
-      source "${ros2_version}/setup.${shell_type}"
+      if [ -z "$rob_folders_overlay" ]; then
+        ros2_version=$(grep "COLCON_CURRENT_PREFIX=\"/opt/ros" $colcon_dir/install/setup.sh | cut -d '"' -f2)
+        echo "Sourcing ${ros2_version}/setup.${shell_type}"
+        source "${ros2_version}/setup.${shell_type}"
+      fi
       source $colcon_dir/install/local_setup.$shell_type
-      echo "Sourced colcon workspace"
+      echo "Sourced colcon workspace $colcon_dir"
     else
       echo "no setup.$shell_type for the colcon workspace found. Sourcing global ROS2"
       num_ros_distros=$(find /opt/ros -maxdepth 1 -mindepth 1 -type d | wc -l)
@@ -186,7 +222,11 @@ if [ -d $environment_dir ]; then
     source $environment_dir/source_local.sh
   fi
 
-  echo "Environment setup for '${env_name}' done. You now have a sourced environment."
+  if [ -z "$rob_folders_overlay" ]; then
+    echo "Environment setup for '${env_name}' done. You now have a sourced environment."
+  else
+    echo "Sourced underlay '${env_name}'"
+  fi
 else
   echo "No environment with the given name found!"
 fi

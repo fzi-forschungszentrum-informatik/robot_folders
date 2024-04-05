@@ -51,7 +51,13 @@ To create a new environment called ``ENV_NAME``, simply run
    fzirob add_environment ENV_NAME
 
 This will ask which types of workspaces should be generated for the new
-environment. Depending on your specific setup further questions may be asked:
+environment.
+
+One of the questions will be which underlay you'd like to use. If you don't know what underlays are
+and what to use them for, you can just leave the selection empty and press enter. If you want to
+know more, see :ref:`usage:Using underlay environments`.
+
+Depending on your specific setup further questions may be asked:
 
 - When creating a catkin or colcon workspace with multiple installed ROS
   versions, you will be prompted for the ROS version being used for that
@@ -82,6 +88,52 @@ present.
 Executing ``fzirob change_environment`` without any environment specified will
 source the most recently sourced environment.
 
+Using underlay environments
+---------------------------
+
+``robot_folders`` supports using underlay environments that will be sourced during sourcing the
+current environment. With this it is possible to keep parts of your setup in another workspace.
+Imaging for example, you have two packages: "Application" and "Library". "Application" is depending
+on "Library", but there are also other packages in other environments depending on "Library". You
+can reuse your local "Library" installation by putting it into its own environment and use that as
+an underlay for your environment containing "Application" (and for all the other environments with
+packages depending on "Library").
+
+This way, you'll only have to keep "Library" up to date in one place.
+
+Another use case is if you want to test your "Application" against different versions of "Library".
+You could keep compiled versions of "Library" in separate environments and select the correct one
+as an underlay for your application's environment. You'll only have to recompile your application
+while with keeping "Library" inside your application environment you would have to go the to
+library package, switch branches and rebuild the library and application package.
+
+When creating new environment you will be prompted for the underlays to be used.
+
+Underlays will be stored in a ``underlays.txt`` file inside your environment's folder. You can
+either edit that file manually or use the ``fzirob manage_underlays`` command to change the
+environment's underlays.
+
+.. note::
+   The underlay file will not get deleted by ``fzirob clean``. Although you will be asked for the
+   ROS distribution to use (if more than one is installed), underlay configuration persists.
+
+.. note::
+   You can stack underlays. That means you can create dependency chains e.g. env1 -> env2 -> env3
+
+.. note::
+   Currently, initial build isn't supported when using underlay workspaces. When specifying an
+   environment config when creating a new environment the user will have to manually trigger the
+   build process after initially creating the environment. Usually, a simple `fzirob make` should
+   do the trick.
+
+.. warning::
+   Currently there is no check for cyclic environment dependency. Please make sure you do not run
+   into this problem.
+
+.. warning::
+   The order in which environments are sourced is depending on the order in which they are written
+   into the ``underlays.txt`` file. That order might be alterd by the ``fzirob manage_underlays``
+   command. If you depend on an order, you may instead consider stack underlay dependencies.
 
 Compiling an environment
 ------------------------
