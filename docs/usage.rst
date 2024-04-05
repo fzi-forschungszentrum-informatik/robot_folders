@@ -123,6 +123,12 @@ environment's underlays.
 .. note::
    You can stack underlays. That means you can create dependency chains e.g. env1 -> env2 -> env3
 
+.. note::
+   Currently, initial build isn't supported when using underlay workspaces. When specifying an
+   environment config when creating a new environment the user will have to manually trigger the
+   build process after initially creating the environment. Usually, a simple `fzirob make` should
+   do the trick.
+
 .. warning::
    Currently there is no check for cyclic environment dependency. Please make sure you do not run
    into this problem.

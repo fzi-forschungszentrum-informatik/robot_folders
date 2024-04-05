@@ -137,6 +137,17 @@ class EnvCreator(object):
             raise NotImplementedError("Manually passing underlays isn't implemented yet.")
 
 
+        if self.underlays.underlays:
+            if not no_build and (self.catkin_rosinstall or self.colcon_rosinstall):
+                click.secho(
+                    "Underlays selected without the 'no-build' option with a specified workspace. "
+                    "Initial build will be deactivated. "
+                    "Please manually build your environment by calling `fzirob make`.",
+                    fg="yellow",
+                )
+            no_build = True
+
+
         # Let's get down to business
         self.create_directories()
         self.create_demo_docs()
