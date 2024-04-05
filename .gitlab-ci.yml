@@ -16,7 +16,6 @@ run_tests:
     matrix:
       # we use the ROS image since we want to try installing it later and need packages from the ROS
       # sources
-      - CI_IMAGE: ros:foxy
       - CI_IMAGE: ros:humble
 
 build_deb_pkg:
