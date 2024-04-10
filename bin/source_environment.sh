@@ -71,8 +71,9 @@ then
   export shell_type="bash"
 fi
 
-if [ ! -z "$rob_folders_overlay" ]; then
-  echo "Overlaying $rob_folders_overlay"
+if [ -z ${rob_folders_overlay+x} ]; then
+  echo "Sourcing environment '$environment_dir'"
+  ROB_FOLDERS_ROOT_ENV=$environment_dir
 fi
 
 # This is the environment's name, which we will print out later
@@ -80,6 +81,44 @@ env_name=$(basename $environment_dir)
 
 # Remove the packages cache from cmake as this creates problems with multiple envs
 rm -rf $HOME/.cmake/packages/
+
+function source_underlay() {
+        # cache current recursion step
+        local this_env_dir="$environment_dir"
+        local this_env_name="$env_name"
+        export ROB_FOLDERS_IS_UNDERLAY=true
+
+        export rob_folders_overlay="$this_env_dir"
+        echo "Sourcing underlay $1 overlaying $rob_folders_overlay"
+        export environment_dir="$1"
+        if [ -f ${environment_dir}/setup.sh ]; then
+          source ${environment_dir}/setup.sh
+        elif [ -f ${environment_dir}/setup.zsh ]; then
+          source ${environment_dir}/setup.zsh
+        elif [ -f ${environment_dir}/setup.bash ]; then
+          source ${environment_dir}/setup.bash
+        else
+          source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
+        fi
+        # reset things
+        export environment_dir=$this_env_dir
+        export env_name=$this_env_name
+
+}
+
+function source_underlays() {
+  local overlay=$1
+  local underlay_file="$overlay/underlays.txt"
+
+  if [ -e $underlay_file ]; then
+    while read underlay; do
+      if [ ! -z "$underlay" ]; then
+        source_underlay $underlay
+      fi
+    done < "$underlay_file"
+  fi
+
+}
 
 # This is basically only relevant when calling the script with an externally defined environment_dir
 if [ -d $environment_dir ]; then
@@ -94,35 +133,8 @@ if [ -d $environment_dir ]; then
     fi
   fi
 
-  underlay_file="$environment_dir/underlays.txt"
-  #echo "Found underlay file: $underlay_file"
+  source_underlays $environment_dir
 
-  if [ -e $underlay_file ]; then
-    while read underlay; do
-      if [ ! -z "$underlay" ]; then
-        # cache current recursion step
-        this_env_dir="$environment_dir"
-        this_env_name="$env_name"
-
-        echo "Sourcing underlay $underlay"
-        export environment_dir="$underlay"
-        export rob_folders_overlay="$this_env_dir"
-        if [ -f ${environment_dir}/setup.sh ]; then
-          source ${environment_dir}/setup.sh
-        elif [ -f ${environment_dir}/setup.zsh ]; then
-          source ${environment_dir}/setup.zsh
-        elif [ -f ${environment_dir}/setup.bash ]; then
-          source ${environment_dir}/setup.bash
-        else
-          source ${ROB_FOLDERS_BASE_DIR}/bin/source_environment.sh
-        fi
-        # reset things
-        export environment_dir=$this_env_dir
-        export env_name=$this_env_name
-        rob_folders_overlay=""
-      fi
-    done < "$underlay_file"
-  fi
 
   # It is important to source the catkin_ws first, as it will remove non-existing paths from the
   # Run ROS initialization if available
@@ -195,7 +207,7 @@ if [ -d $environment_dir ]; then
   then
     if [ -f $colcon_dir/install/local_setup.$shell_type ]
     then
-      if [ -z "$rob_folders_overlay" ]; then
+      if [ "$environment_dir" = "$ROB_FOLDERS_ROOT_ENV" ]; then
         ros2_version=$(grep "COLCON_CURRENT_PREFIX=\"/opt/ros" $colcon_dir/install/setup.sh | cut -d '"' -f2)
         echo "Sourcing ${ros2_version}/setup.${shell_type}"
         source "${ros2_version}/setup.${shell_type}"
@@ -244,10 +256,10 @@ if [ -d $environment_dir ]; then
     source $environment_dir/source_local.sh
   fi
 
-  if [ -z "$rob_folders_overlay" ]; then
+  if [ "$environment_dir" = "$ROB_FOLDERS_ROOT_ENV" ]; then
     echo "Environment setup for '${env_name}' done. You now have a sourced environment."
-  else
-    echo "Sourced underlay '${env_name}'"
+  #else
+    #echo "Sourced underlay '${env_name}'"
   fi
 else
   echo "No environment with the given name found!"
