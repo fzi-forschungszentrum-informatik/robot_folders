@@ -25,7 +25,7 @@ setup(
         "robot_folders.helpers.resources",
     ],
     package_dir={"": "src"},
-    install_requires=["Click>=7.0", "gitpython", "inquirer", "PyYaml", "vcstool"],
+    install_requires=["Click>=8.0", "gitpython", "inquirer", "PyYaml", "vcstool"],
     entry_points="""
         [console_scripts]
         rob_folders=robot_folders.main:cli
