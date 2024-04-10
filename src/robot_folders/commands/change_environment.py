@@ -79,11 +79,20 @@ def cli(ctx):
     if ctx.invoked_subcommand is None:
         env_name = dir_helpers.get_last_activated_env()
         if env_name is not None:
-            click.echo(
-                "No environment specified. Sourcing the most recent active environment: {}".format(
-                    env_name
+            last_env_name = os.environ.get("ROB_FOLDERS_ACTIVE_ENV")
+            if last_env_name:
+                click.echo(
+                    "No environment specified but there is already an active environment: {}\n".format(
+                        last_env_name
+                    )
+                    + "Not sourcing anything new."
                 )
-            )
+            else:
+                click.echo(
+                    "No environment specified. Sourcing the most recent active environment: {}".format(
+                        env_name
+                    )
+                )
     else:
         pass
     # print(env_name)
