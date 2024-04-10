@@ -6,33 +6,28 @@ This file is kept for legacy pip compatibility only.
 from setuptools import setup
 
 setup(
-    name='robot_folders',
-    version='0.3.3',
-    python_requires='>=3',
-    packages = [
+    name="robot_folders",
+    version="0.3.3",
+    python_requires=">=3",
+    packages=[
         "robot_folders",
         "robot_folders.commands",
         "robot_folders.helpers",
-        "robot_folders.helpers.resources"],
-    package_dir = {"": "src"},
-    install_requires=[
-        'Click>=7.0',
-        'gitpython',
-        'inquirer',
-        'PyYaml',
-        'vcstool'
+        "robot_folders.helpers.resources",
     ],
-    entry_points='''
+    package_dir={"": "src"},
+    install_requires=["Click>=7.0", "gitpython", "inquirer", "PyYaml", "vcstool"],
+    entry_points="""
         [console_scripts]
         rob_folders=robot_folders.main:cli
-    ''',
+    """,
     scripts=[
         "bin/rob_folders_get_source_command.py",
         "bin/rob_folders-complete.sh",
         "bin/rob_folders_source.sh",
         "bin/source_environment.sh",
-        ],
+    ],
     include_package_data=True,
     package_data={"": ["*.yaml"]},
-    license_files = ("LICENSE.txt")
+    license_files=("LICENSE.txt"),
 )

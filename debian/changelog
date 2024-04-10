@@ -6,6 +6,6 @@ python3-robot-folders (0.3.2-1) UNRELEASED; urgency=medium
 
 python3-robot-folders (0.3.0-1) UNRELEASED; urgency=medium
 
-  * Initial release. 
+  * Initial release.
 
  -- Felix Exner <exner@fzi.de>  Wed, 30 Aug 2023 16:36:04 +0200

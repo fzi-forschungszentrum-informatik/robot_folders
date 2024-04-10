@@ -37,20 +37,19 @@ from robot_folders.helpers.ros_version_helpers import *
 
 from yaml import dump as yaml_dump
 
+
 class MiscCreator(object):
     """
     Class to create a misc workspace
     """
 
-    def __init__(self,
-                 misc_ws_directory,
-                 build_root,
-                 rosinstall=None,
-                 no_submodules=False):
+    def __init__(
+        self, misc_ws_directory, build_root, rosinstall=None, no_submodules=False
+    ):
 
         self.misc_ws_directory = misc_ws_directory
         self.build_root = build_root
-        self.no_submodules=no_submodules
+        self.no_submodules = no_submodules
 
         self.create_build_folders()
         self.add_rosinstall(rosinstall)
@@ -58,19 +57,28 @@ class MiscCreator(object):
     def add_rosinstall(self, rosinstall):
         if rosinstall:
             # Dump the rosinstall to a file and use vcstool for getting the packages
-            rosinstall_filename = '/tmp/rob_folders_rosinstall'
-            with open(rosinstall_filename, 'w') as rosinstall_content:
+            rosinstall_filename = "/tmp/rob_folders_rosinstall"
+            with open(rosinstall_filename, "w") as rosinstall_content:
                 yaml_dump(rosinstall, rosinstall_content)
 
             os.makedirs(self.misc_ws_directory, exist_ok=True)
             if self.no_submodules:
                 process = subprocess.check_call(
                     ["vcs", "import", "--input", rosinstall_filename, "."],
-                    cwd=self.misc_ws_directory)
+                    cwd=self.misc_ws_directory,
+                )
             else:
                 process = subprocess.check_call(
-                    ["vcs", "import", "--recursive", "--input", rosinstall_filename, "."],
-                    cwd=self.misc_ws_directory)
+                    [
+                        "vcs",
+                        "import",
+                        "--recursive",
+                        "--input",
+                        rosinstall_filename,
+                        ".",
+                    ],
+                    cwd=self.misc_ws_directory,
+                )
 
             os.remove(rosinstall_filename)
 
@@ -93,13 +101,15 @@ class CatkinCreator(object):
     Creates a catkin workspace
     """
 
-    def __init__(self,
-                 catkin_directory,
-                 build_directory,
-                 rosinstall,
-                 copy_cmake_lists='ask',
-                 ros_distro='ask',
-                 no_submodules=False):
+    def __init__(
+        self,
+        catkin_directory,
+        build_directory,
+        rosinstall,
+        copy_cmake_lists="ask",
+        ros_distro="ask",
+        no_submodules=False,
+    ):
         self.catkin_directory = catkin_directory
         self.build_directory = build_directory
         self.copy_cmake_lists = copy_cmake_lists
@@ -116,39 +126,49 @@ class CatkinCreator(object):
         self.clone_packages(self.rosinstall)
 
         if self.copy_cmake_lists:
-            if os.path.exists(os.path.join(self.catkin_directory, "src", "CMakeLists.txt")):
-                subprocess.check_call(["rm", "{}/src/CMakeLists.txt".format(self.catkin_directory)])
+            if os.path.exists(
+                os.path.join(self.catkin_directory, "src", "CMakeLists.txt")
+            ):
+                subprocess.check_call(
+                    ["rm", "{}/src/CMakeLists.txt".format(self.catkin_directory)]
+                )
                 subprocess.check_call(
                     [
                         "cp",
-                        "{}/share/catkin/cmake/toplevel.cmake".format(self.ros_global_dir),
-                        "{}/src/CMakeLists.txt".format(self.catkin_directory)
-                    ])
+                        "{}/share/catkin/cmake/toplevel.cmake".format(
+                            self.ros_global_dir
+                        ),
+                        "{}/src/CMakeLists.txt".format(self.catkin_directory),
+                    ]
+                )
 
     def ask_questions(self):
         """
         When creating a catkin workspace some questions need to be answered such as which ros
         version to use and whether to copy the CMakeLists.txt
         """
-        if self.ros_distro == 'ask':
+        if self.ros_distro == "ask":
             installed_ros_distros = sorted(installed_ros_1_versions())
             self.ros_distro = installed_ros_distros[-1]
             if len(installed_ros_distros) > 1:
                 questions = [
-                    inquirer.List('ros_distro',
-                                  message="Which ROS distribution would you like to use for catkin?",
-                                  choices=installed_ros_distros,
-                              ),
+                    inquirer.List(
+                        "ros_distro",
+                        message="Which ROS distribution would you like to use for catkin?",
+                        choices=installed_ros_distros,
+                    ),
                 ]
                 self.ros_distro = inquirer.prompt(questions)["ros_distro"]
-        click.echo("Using ROS distribution \'{}\'".format(self.ros_distro))
-        if self.copy_cmake_lists == 'ask':
-            self.copy_cmake_lists = click.confirm("Would you like to copy the top-level "
-                                                  "CMakeLists.txt to the catkin"
-                                                  " src directory instead of using a symlink?\n"
-                                                  "(This is incredibly useful when using the "
-                                                  "QtCreator.)",
-                                                  default=True)
+        click.echo("Using ROS distribution '{}'".format(self.ros_distro))
+        if self.copy_cmake_lists == "ask":
+            self.copy_cmake_lists = click.confirm(
+                "Would you like to copy the top-level "
+                "CMakeLists.txt to the catkin"
+                " src directory instead of using a symlink?\n"
+                "(This is incredibly useful when using the "
+                "QtCreator.)",
+                default=True,
+            )
         else:
             self.copy_cmake_lists = dir_helpers.yes_no_to_bool(self.copy_cmake_lists)
 
@@ -158,8 +178,9 @@ class CatkinCreator(object):
         """
         # We abuse the name parameter to code the ros distribution
         # if we're building for the first time.
-        ros_builder = build_helpers.CatkinBuilder(name=self.ros_distro,
-                                                  add_help_option=False)
+        ros_builder = build_helpers.CatkinBuilder(
+            name=self.ros_distro, add_help_option=False
+        )
         ros_builder.invoke(None)
 
     def create_catkin_skeleton(self):
@@ -197,33 +218,45 @@ class CatkinCreator(object):
         # copy packages
         if rosinstall != "":
             # Dump the rosinstall to a file and use vcstools for getting the packages
-            rosinstall_filename = '/tmp/rob_folders_rosinstall'
-            with open(rosinstall_filename, 'w') as rosinstall_content:
+            rosinstall_filename = "/tmp/rob_folders_rosinstall"
+            with open(rosinstall_filename, "w") as rosinstall_content:
                 yaml_dump(rosinstall, rosinstall_content)
 
             os.makedirs(os.path.join(self.catkin_directory, "src"), exist_ok=True)
             if self.no_submodules:
                 process = subprocess.check_call(
                     ["vcs", "import", "--input", rosinstall_filename, "src"],
-                    cwd=self.catkin_directory)
+                    cwd=self.catkin_directory,
+                )
             else:
                 process = subprocess.check_call(
-                    ["vcs", "import", "--recursive", "--input", rosinstall_filename, "src"],
-                    cwd=self.catkin_directory)
+                    [
+                        "vcs",
+                        "import",
+                        "--recursive",
+                        "--input",
+                        rosinstall_filename,
+                        "src",
+                    ],
+                    cwd=self.catkin_directory,
+                )
 
             os.remove(rosinstall_filename)
+
 
 class ColconCreator(object):
     """
     Creates a colcon workspace
     """
 
-    def __init__(self,
-                 colcon_directory,
-                 build_directory,
-                 rosinstall,
-                 ros2_distro='ask',
-                 no_submodules=False):
+    def __init__(
+        self,
+        colcon_directory,
+        build_directory,
+        rosinstall,
+        ros2_distro="ask",
+        no_submodules=False,
+    ):
         self.colcon_directory = colcon_directory
         self.build_directory = build_directory
         self.ros2_distro = ros2_distro
@@ -243,18 +276,19 @@ class ColconCreator(object):
         When creating a colcon workspace some questions need to be answered such as which ros
         version to use
         """
-        if self.ros2_distro == 'ask':
+        if self.ros2_distro == "ask":
             installed_ros_distros = sorted(installed_ros_2_versions())
             self.ros_distro = installed_ros_distros[-1]
             if len(installed_ros_distros) > 1:
                 questions = [
-                    inquirer.List('ros_distro',
-                                  message="Which ROS2 distribution would you like to use for colcon?",
-                                  choices=installed_ros_distros,
-                              ),
+                    inquirer.List(
+                        "ros_distro",
+                        message="Which ROS2 distribution would you like to use for colcon?",
+                        choices=installed_ros_distros,
+                    ),
                 ]
                 self.ros2_distro = inquirer.prompt(questions)["ros_distro"]
-        click.echo("Using ROS2 distribution \'{}\'".format(self.ros2_distro))
+        click.echo("Using ROS2 distribution '{}'".format(self.ros2_distro))
 
     def build(self):
         """
@@ -262,8 +296,9 @@ class ColconCreator(object):
         """
         # We abuse the name parameter to code the ros distribution
         # if we're building for the first time.
-        ros2_builder = build_helpers.ColconBuilder(name=self.ros2_distro,
-                                                  add_help_option=False)
+        ros2_builder = build_helpers.ColconBuilder(
+            name=self.ros2_distro, add_help_option=False
+        )
         ros2_builder.invoke(None)
 
     def create_colcon_skeleton(self):
@@ -301,20 +336,27 @@ class ColconCreator(object):
         # copy packages
         if rosinstall != "":
             # Dump the rosinstall to a file and use vcstool for getting the packages
-            rosinstall_filename = '/tmp/rob_folders_rosinstall'
-            with open(rosinstall_filename, 'w') as rosinstall_content:
+            rosinstall_filename = "/tmp/rob_folders_rosinstall"
+            with open(rosinstall_filename, "w") as rosinstall_content:
                 yaml_dump(rosinstall, rosinstall_content)
 
             os.makedirs(os.path.join(self.colcon_directory, "src"), exist_ok=True)
             if self.no_submodules:
                 process = subprocess.check_call(
                     ["vcs", "import", "--input", rosinstall_filename, "src"],
-                    cwd=self.colcon_directory
+                    cwd=self.colcon_directory,
                 )
             else:
                 process = subprocess.check_call(
-                    ["vcs", "import", "--recursive", "--input", rosinstall_filename, "src"],
-                    cwd=self.colcon_directory
+                    [
+                        "vcs",
+                        "import",
+                        "--recursive",
+                        "--input",
+                        rosinstall_filename,
+                        "src",
+                    ],
+                    cwd=self.colcon_directory,
                 )
 
             os.remove(rosinstall_filename)

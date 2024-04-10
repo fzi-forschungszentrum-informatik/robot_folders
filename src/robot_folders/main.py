@@ -42,26 +42,27 @@ import traceback
 from click.exceptions import UsageError
 from robot_folders.helpers.exceptions import ModuleException
 
-plugin_folder = os.path.join(os.path.dirname(__file__), 'commands')
+plugin_folder = os.path.join(os.path.dirname(__file__), "commands")
+
 
 class RobotFolders(click.MultiCommand):
 
     def list_commands(self, ctx):
         rv = []
         for filename in os.listdir(plugin_folder):
-            if filename.endswith('.py') and filename != '__init__.py':
+            if filename.endswith(".py") and filename != "__init__.py":
                 rv.append(filename[:-3])
         rv.sort()
         return rv
 
     def get_command(self, ctx, name):
         ns = {}
-        fn = os.path.join(plugin_folder, name + '.py')
+        fn = os.path.join(plugin_folder, name + ".py")
         if os.path.isfile(fn):
             with open(fn) as f:
-                code = compile(f.read(), fn, 'exec')
+                code = compile(f.read(), fn, "exec")
                 eval(code, ns, ns)
-                return ns['cli']
+                return ns["cli"]
         else:
             return None
 
@@ -69,8 +70,11 @@ class RobotFolders(click.MultiCommand):
         try:
             super(RobotFolders, self).invoke(ctx)
         except ModuleException as err:
-            click.echo("Execution of module '{}' failed. Error message:\n{}".format(
-                err.module_name, err))
+            click.echo(
+                "Execution of module '{}' failed. Error message:\n{}".format(
+                    err.module_name, err
+                )
+            )
             os._exit(err.return_code)
         except UsageError as err:
             click.echo(err.show())
@@ -88,7 +92,9 @@ class RobotFolders(click.MultiCommand):
             click.echo(traceback.format_exc())
             os._exit(1)
 
-cli = RobotFolders(help='This tool helps you managing different robot environments. '
-                        'Use tab-completion for combining commands or type --help on each level '
-                        'to get a help message.')
 
+cli = RobotFolders(
+    help="This tool helps you managing different robot environments. "
+    "Use tab-completion for combining commands or type --help on each level "
+    "to get a help message."
+)

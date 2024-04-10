@@ -42,7 +42,9 @@ def print_source_command(shell: str):
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--shell", type=str, choices=["bash", "zsh"], default="bash")
+    parser.add_argument(
+        "-s", "--shell", type=str, choices=["bash", "zsh"], default="bash"
+    )
     args = parser.parse_args()
     print_source_command(args.shell)
 

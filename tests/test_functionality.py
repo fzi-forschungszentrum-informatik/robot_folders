@@ -40,12 +40,15 @@ class TestCLI(unittest.TestCase):
 
     def test_get_checkout_base_dir(self):
         try:
-            process_result = subprocess.run(["rob_folders", "get_checkout_base_dir"],
-                                            stdout=subprocess.PIPE, check=True)
+            process_result = subprocess.run(
+                ["rob_folders", "get_checkout_base_dir"],
+                stdout=subprocess.PIPE,
+                check=True,
+            )
         except:
             (etype, evalue, etrace) = sys.exc_info()
             self.fail("Failed with %s" % evalue)
 
         expected = directory_helpers.get_checkout_dir()
 
-        self.assertEqual(process_result.stdout.strip(), bytes(expected, 'utf-8'))
+        self.assertEqual(process_result.stdout.strip(), bytes(expected, "utf-8"))

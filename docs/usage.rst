@@ -44,10 +44,10 @@ To utilize any command, adhere to the general syntax:
 
 Creating an Environment
 -----------------------
-To create a new environment called ``ENV_NAME``, simply run 
+To create a new environment called ``ENV_NAME``, simply run
 
 .. code:: bash
-  
+
    fzirob add_environment ENV_NAME
 
 This will ask which types of workspaces should be generated for the new
@@ -79,7 +79,7 @@ Sourcing an environment
 
 To activate or source an environment, use the ``fzirob change_environment
 ENV_NAME`` command. This command sources the appropriate setup scripts of the
-environment depending on its contents. 
+environment depending on its contents.
 
 You can use tab completion on the environments so typing ``fzirob
 change_environment`` and then pressing :kbd:`Tab` should list all environments
@@ -222,7 +222,7 @@ If you've got provided an environment configuration from somebody you can
 create a new environment with that using
 
 .. code:: bash
-   
+
    fzirob add_environment --config-file /tmp/env_name.yaml other_env
 
 which will create an environment called ``other_env`` with the configuration
@@ -240,7 +240,7 @@ If there are repositories in your local environment that are not in the config
 file you will be prompted whether you want to keep those repositories. If
 branches or remotes in the config file differ from those present locally, you
 will also be asked. You can override that to a default behavior using the
-``--local_delete_policy`` and ``--local_override_policy`` options. 
+``--local_delete_policy`` and ``--local_override_policy`` options.
 
 Deleting an environment
 -----------------------

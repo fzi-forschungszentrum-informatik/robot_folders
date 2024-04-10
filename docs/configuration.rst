@@ -59,4 +59,3 @@ Directory options
     Location where build and install steps should be performed if they should be outside of the
     checkout tree. If that folder exists, users will be prompted whether to build inside the
     ``no_backup_dir`` when creating a new environment.
-

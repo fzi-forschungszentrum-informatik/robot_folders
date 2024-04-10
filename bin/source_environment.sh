@@ -168,7 +168,7 @@ if [ -d $environment_dir ]; then
       echo "Sourced catkin_workspace"
 
     elif [ -f $catkin_dir/install/setup.$shell_type ]
-    then 
+    then
       echo "Only found installed workspace. Sourcing $catkin_dir/install/setup.$shell_type"
       source $catkin_dir/install/setup.$shell_type
     else

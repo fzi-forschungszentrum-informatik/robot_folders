@@ -39,6 +39,7 @@ def append_to_list_if_symlink(path, delete_list):
             return True
     return False
 
+
 def append_to_list_if_folder(path, delete_list):
     """Appends the given path to the given list, if it exists, is a folder
     and is not in the list yet.
@@ -48,6 +49,7 @@ def append_to_list_if_folder(path, delete_list):
             delete_list.append(os.path.realpath(path))
             return True
     return False
+
 
 def delete_folder(path):
     """Deletes the given path, if it exists and is a folder.
@@ -73,19 +75,19 @@ class EnvironmentDeleter(click.Command):
 
         delete_list = list()
 
-        self.force = ctx.parent.params['force']
+        self.force = ctx.parent.params["force"]
 
         # Catkin workspace
         if catkin_dir is not None:
-            catkin_build = os.path.join(catkin_dir, 'build')
-            catkin_devel = os.path.join(catkin_dir, 'devel')
-            catkin_install = os.path.join(catkin_dir, 'install')
+            catkin_build = os.path.join(catkin_dir, "build")
+            catkin_devel = os.path.join(catkin_dir, "devel")
+            catkin_install = os.path.join(catkin_dir, "install")
             append_to_list_if_symlink(catkin_build, delete_list)
             append_to_list_if_symlink(catkin_devel, delete_list)
             append_to_list_if_symlink(catkin_install, delete_list)
             append_to_list_if_folder(catkin_dir, delete_list)
         else:
-            click.echo('No catkin workspace found')
+            click.echo("No catkin workspace found")
 
         delete_list.append(env_dir)
 
@@ -93,7 +95,9 @@ class EnvironmentDeleter(click.Command):
         build_base_dir = directory_helpers.get_build_base_dir(use_no_backup=True)
         append_to_list_if_folder(os.path.join(build_base_dir, self.name), delete_list)
 
-        click.echo('Going to delete the following paths:\n{}'.format('\n'.join(delete_list)))
+        click.echo(
+            "Going to delete the following paths:\n{}".format("\n".join(delete_list))
+        )
         confirmed = False
         if self.force:
             confirmed = True
@@ -102,22 +106,22 @@ class EnvironmentDeleter(click.Command):
                 "Please confirm by typing in the environment name '{}' once again.\nWARNING: "
                 "After this all environment files will be deleted and cannot be recovered! "
                 "If you wish to abort your delete request, type 'abort'".format(
-                    self.name),
-                type=click.Choice([self.name, 'abort']),
-                default='abort')
+                    self.name
+                ),
+                type=click.Choice([self.name, "abort"]),
+                default="abort",
+            )
             if confirm == self.name:
                 confirmed = True
 
         if confirmed:
-            click.echo('performing deletion!')
+            click.echo("performing deletion!")
             for folder in delete_list:
-                click.echo('Deleting {}'.format(folder))
+                click.echo("Deleting {}".format(folder))
                 delete_folder(folder)
-            click.echo('Successfully deleted environment \'{}\''.format(self.name))
+            click.echo("Successfully deleted environment '{}'".format(self.name))
         else:
-            click.echo('Delete request aborted. Nothing happened.')
-
-
+            click.echo("Delete request aborted. Nothing happened.")
 
 
 class EnvironmentChooser(click.MultiCommand):
@@ -132,20 +136,30 @@ class EnvironmentChooser(click.MultiCommand):
             cmd = EnvironmentDeleter(name=name)
             return cmd
         else:
-            click.echo('No environment with name < %s > found.' % name)
+            click.echo("No environment with name < %s > found." % name)
             return None
 
 
-@click.command('delete_environment', cls=EnvironmentChooser,
-               short_help='Deletes an environment from the checkout folder.',
-               invoke_without_command=True)
-@click.option('--force', default=False, is_flag=True,
-              help='Skip confirmation and delete directly. This is meant for automated runs only.')
+@click.command(
+    "delete_environment",
+    cls=EnvironmentChooser,
+    short_help="Deletes an environment from the checkout folder.",
+    invoke_without_command=True,
+)
+@click.option(
+    "--force",
+    default=False,
+    is_flag=True,
+    help="Skip confirmation and delete directly. This is meant for automated runs only.",
+)
 @click.pass_context
 def cli(ctx, force):
     """Removes an existing environment. This means that all files from this environment
     will be deleted from the checkout folder. If build or install directories are symlinked
-    to another location (e.g. because it was built on no_backup), those will be deleted as well."""
+    to another location (e.g. because it was built on no_backup), those will be deleted as well.
+    """
     if ctx.invoked_subcommand is None:
-        click.echo('No environment specified. Please choose one '
-                   'of the available environments!')
+        click.echo(
+            "No environment specified. Please choose one "
+            "of the available environments!"
+        )

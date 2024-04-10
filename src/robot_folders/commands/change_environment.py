@@ -27,6 +27,7 @@ import subprocess
 import robot_folders.helpers.directory_helpers as dir_helpers
 from robot_folders.helpers.exceptions import ModuleException
 
+
 class EnvironmentChoice(click.Command):
     """
     Writes the chosen environment into the cur_env temp file.
@@ -34,7 +35,9 @@ class EnvironmentChoice(click.Command):
     """
 
     def invoke(self, ctx):
-        with open(os.path.join(dir_helpers.get_checkout_dir(), '.cur_env'), 'w') as cur_env_file:
+        with open(
+            os.path.join(dir_helpers.get_checkout_dir(), ".cur_env"), "w"
+        ) as cur_env_file:
             cur_env_file.write("{}".format(self.name))
 
 
@@ -50,18 +53,22 @@ class EnvironmentChooser(click.MultiCommand):
             cmd = EnvironmentChoice(name=name, add_help_option=False)
             return cmd
         else:
-            click.echo('No environment with name < %s > found.' % name)
+            click.echo("No environment with name < %s > found." % name)
             raise ModuleException("unknown environment", "EnvironmentChoice", 1)
 
     def invoke(self, ctx):
         try:
             super(EnvironmentChooser, self).invoke(ctx)
         except subprocess.CalledProcessError as err:
-            raise(ModuleException(str(err), 'change'))
+            raise (ModuleException(str(err), "change"))
 
 
-@click.command('change_environment', cls=EnvironmentChooser, short_help='Source an existing environment',
-               invoke_without_command=True)
+@click.command(
+    "change_environment",
+    cls=EnvironmentChooser,
+    short_help="Source an existing environment",
+    invoke_without_command=True,
+)
 @click.pass_context
 def cli(ctx):
     """
@@ -73,8 +80,10 @@ def cli(ctx):
         env_name = dir_helpers.get_last_activated_env()
         if env_name is not None:
             click.echo(
-                "No environment specified. Sourcing the most recent active environment: {}"
-                .format(env_name))
+                "No environment specified. Sourcing the most recent active environment: {}".format(
+                    env_name
+                )
+            )
     else:
         pass
     # print(env_name)

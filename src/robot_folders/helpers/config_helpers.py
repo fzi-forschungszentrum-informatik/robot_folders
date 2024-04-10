@@ -28,17 +28,22 @@ import yaml
 
 from importlib import resources
 
-XDG_CONFIG_HOME = os.getenv("XDG_CONFIG_HOME", os.path.expandvars(os.path.join("$HOME", ".config")))
+XDG_CONFIG_HOME = os.getenv(
+    "XDG_CONFIG_HOME", os.path.expandvars(os.path.join("$HOME", ".config"))
+)
 FILENAME_USERCONFIG = os.path.join(XDG_CONFIG_HOME, "robot_folders.yaml")
+
 
 class Userconfig(object):
     """Class for managing a userconfig"""
+
     config = None
     config_fallback = None
     initialized = False
+
     @classmethod
     def init_class(cls):
-        """ Load the distribution config file """
+        """Load the distribution config file"""
         with resources.path(
             ".".join([__package__, "resources"]), "userconfig_distribute.yaml"
         ) as p:
@@ -75,17 +80,19 @@ def _get_value_safe(dictionary, section, value, debug=True):
         result = dictionary[section][value]
     except KeyError:
         if debug:
-            print('Did not find key {}.{}!!!'.format(section, value))
+            print("Did not find key {}.{}!!!".format(section, value))
     except TypeError:
-        print('There is an illegal config. '
-              'Probably something went wrong during initialization. '
-              'Check your config file.')
+        print(
+            "There is an illegal config. "
+            "Probably something went wrong during initialization. "
+            "Check your config file."
+        )
     return result
 
 
 # Interface funtion to the outside. You might want to consider the
 def get_value_safe(section, value, debug=True):
-    '''Retrieve an entry from the config backend.
+    """Retrieve an entry from the config backend.
 
     Will try to find the given entry in the config. If it is not
     found in the user-modified config, the default value from the
@@ -101,7 +108,7 @@ def get_value_safe(section, value, debug=True):
         :type debug: bool
         :returns: config entry
         :rtype: mixed
-    '''
+    """
     if not Userconfig.initialized:
         Userconfig.init_class()
 
@@ -112,7 +119,7 @@ def get_value_safe(section, value, debug=True):
 
 
 def get_value_safe_default(section, value, default, debug=True):
-    '''Retrieve an entry from the config backend or use default value.
+    """Retrieve an entry from the config backend or use default value.
 
     Will try to find the given entry in the config. If it is not
     found in the user-modified config, the default value from the
@@ -130,7 +137,7 @@ def get_value_safe_default(section, value, default, debug=True):
         :type debug: bool
         :returns: config entry
         :rtype: mixed
-    '''
+    """
     result = get_value_safe(section, value, debug)
     if result is None:
         result = default

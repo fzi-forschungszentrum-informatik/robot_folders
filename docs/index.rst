@@ -16,9 +16,6 @@ Welcome to robot_folders's documentation!
    misc_workspace
    aliases
    faq
-   
+
 
 .. include:: ../README.rst
-
-
-

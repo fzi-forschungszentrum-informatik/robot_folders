@@ -33,27 +33,29 @@ import robot_folders.helpers.config_helpers as config_helpers
 
 def get_base_dir():
     """Returns the robot_folders base dir."""
-    base_dir = os.environ['ROB_FOLDERS_BASE_DIR']
+    base_dir = os.environ["ROB_FOLDERS_BASE_DIR"]
     return os.path.realpath(base_dir)
 
 
 def get_last_activated_env():
     """Looks for the most recently sourced environment"""
-    env_file = os.path.join(get_checkout_dir(), '.cur_env')
+    env_file = os.path.join(get_checkout_dir(), ".cur_env")
 
     if os.path.isfile(env_file):
-        with open(env_file, 'r') as file_content:
+        with open(env_file, "r") as file_content:
             return file_content.read().rstrip()
     else:
-        print("No recently activated environment found. Is this your first run?"
-              "Try to add an environment and then do a change_environment to this.")
+        print(
+            "No recently activated environment found. Is this your first run?"
+            "Try to add an environment and then do a change_environment to this."
+        )
         return None
 
 
 def get_active_env():
     """Returns the currently sourced environment. If none is sourced, this will return None"""
     try:
-        active_env = os.environ['ROB_FOLDERS_ACTIVE_ENV']
+        active_env = os.environ["ROB_FOLDERS_ACTIVE_ENV"]
         return active_env
     except KeyError:
         # print "Currently, there is no active environment!\n\
@@ -71,6 +73,7 @@ def get_active_env_path():
             return None
         active_env = active_env_fallback
     return os.path.join(get_checkout_dir(), active_env)
+
 
 def mkdir_p(path):
     """Checks whether a directory exists, otherwise it will be created."""
@@ -107,48 +110,55 @@ def get_checkout_dir():
     return expanded
 
 
-def get_catkin_dir(env_dir=''):
+def get_catkin_dir(env_dir=""):
     """Tries to find the right catkin workspace in the Currently \
     sourced environment."""
 
-    path = ''
+    path = ""
     cur_env_path = env_dir
-    if env_dir == '':
+    if env_dir == "":
         cur_env_path = get_active_env_path()
 
     valid_names = config_helpers.get_value_safe_default(
-        'directories', 'catkin_names', ["catkin_workspace", "catkin_ws"], debug=False)
+        "directories", "catkin_names", ["catkin_workspace", "catkin_ws"], debug=False
+    )
     for path_name in valid_names:
         path = os.path.join(cur_env_path, path_name)
         if os.path.exists(path):
             return path
     return os.path.join(cur_env_path, "catkin_ws")
 
-def get_colcon_dir(env_dir=''):
+
+def get_colcon_dir(env_dir=""):
     """Tries to find the right colcon workspace in the Currently \
     sourced environment."""
 
-    path = ''
+    path = ""
     cur_env_path = env_dir
-    if env_dir == '':
+    if env_dir == "":
         cur_env_path = get_active_env_path()
 
     valid_names = config_helpers.get_value_safe_default(
-        'directories', 'colcon_names', ["colcon_workspace", "colcon_ws", "dev_ws"], debug=False)
+        "directories",
+        "colcon_names",
+        ["colcon_workspace", "colcon_ws", "dev_ws"],
+        debug=False,
+    )
     for path_name in valid_names:
         path = os.path.join(cur_env_path, path_name)
         if os.path.exists(path):
             return path
     return os.path.join(cur_env_path, "colcon_ws")
 
+
 def yes_no_to_bool(bool_str):
     """
     Converts a yes/no string to a bool
     """
-    return bool_str == 'yes' or bool_str == 'Yes'
+    return bool_str == "yes" or bool_str == "Yes"
 
 
-def check_nobackup(local_build='ask'):
+def check_nobackup(local_build="ask"):
     """
     Checks whether there is a nobackup on this system. If there is, the local_build
     parameter is used to determine whether a the no_backup folder should be used or
@@ -158,7 +168,9 @@ def check_nobackup(local_build='ask'):
     """
     # If the no_backup location exists, offer to build in no_backup
     has_nobackup = False
-    no_backup_location = os.path.expanduser(config_helpers.get_value_safe("directories", "no_backup_dir"))
+    no_backup_location = os.path.expanduser(
+        config_helpers.get_value_safe("directories", "no_backup_dir")
+    )
     try:
         if os.path.isdir(no_backup_location):
             has_nobackup = True
@@ -199,17 +211,13 @@ def is_fzirob_environment(checkout_folder, env_dir):
     """Checks whether a given directory actually contains an environment"""
     is_environment = False
 
-    environment_folders = \
-        config_helpers.get_value_safe_default(
-            section='directories',
-            value='catkin_names',
-            default=["catkin_workspace"])
-    environment_folders = environment_folders + \
-        config_helpers.get_value_safe_default(
-            section='directories',
-            value='colcon_names',
-            default=["colcon_workspace"])
-    environment_files = ['setup.bash', 'setup.zsh', 'setup.sh']
+    environment_folders = config_helpers.get_value_safe_default(
+        section="directories", value="catkin_names", default=["catkin_workspace"]
+    )
+    environment_folders = environment_folders + config_helpers.get_value_safe_default(
+        section="directories", value="colcon_names", default=["colcon_workspace"]
+    )
+    environment_files = ["setup.bash", "setup.zsh", "setup.sh"]
 
     possible_env = os.path.join(checkout_folder, env_dir)
     if os.path.isdir(possible_env):
@@ -232,5 +240,8 @@ def is_fzirob_environment(checkout_folder, env_dir):
 def list_environments():
     """List all environments"""
     checkout_folder = get_checkout_dir()
-    return [env_dir for env_dir in sorted(os.listdir(checkout_folder))
-            if is_fzirob_environment(checkout_folder, env_dir)]
+    return [
+        env_dir
+        for env_dir in sorted(os.listdir(checkout_folder))
+        if is_fzirob_environment(checkout_folder, env_dir)
+    ]
