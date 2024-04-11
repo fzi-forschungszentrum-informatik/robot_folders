@@ -18,23 +18,6 @@ run_tests:
       # sources
       - CI_IMAGE: ros:humble
 
-build_deb_pkg:
-  parallel: !reference [.build_matrix, parallel]
-  stage: build
-  image: $CI_IMAGE
-  script:
-    - apt-get update && apt-get install -y dh-python python3-all fakeroot dpkg-dev debhelper
-    - fakeroot dpkg-buildpackage -b
-    - mkdir artifacts
-    - cp ../python3-robot-folders*.deb artifacts/
-    - apt-get install -y python3-vcstool python3-git python3-yaml python3-click
-    - dpkg -i ../python3-robot-folders*.deb
-    - source /usr/bin/rob_folders_source.sh
-    - fzirob get_checkout_base_dir
-  artifacts:
-    paths:
-      - artifacts/
-
 variables:
   DOCS_SOURCE: docs # The folder containing the sphinx conf.py file
 
