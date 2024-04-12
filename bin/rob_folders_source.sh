@@ -153,16 +153,12 @@ fzirob()
         reset_environment
       fi
 
+      echo "rob_folders $@"
+
       rob_folders $@
 
       if [ $? -eq 0 ]; then
-        # Read env or source from ROB_FOLDERS_CHECKOUT_DIR/.cur_env if
-        #  - command is not --help and
-        #  - env is specified
-        #  - the ROB_FOLDERS_ACTIVE_ENV is not set
-        #  This means that a simple 'fzirob change_environment' in a shell where there has been an
-        #  env sourced in the past, won't be altered.
-        if [ $1 = "change_environment" ] && [ "$2" != "--help"  ] && [ ! -z "$2" ] && [ -z "$ROB_FOLDERS_ACTIVE_ENV" ]; then
+        if [ $1 = "change_environment" ] && [ "$2" != "--help"  ]; then
           checkout_dir=$(rob_folders get_checkout_base_dir)
           if [ -f ${checkout_dir}/.cur_env ]; then
             export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)

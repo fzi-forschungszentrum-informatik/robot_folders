@@ -28,6 +28,13 @@ import robot_folders.helpers.directory_helpers as dir_helpers
 from robot_folders.helpers.exceptions import ModuleException
 
 
+def set_active_env(env_name):
+    with open(
+        os.path.join(dir_helpers.get_checkout_dir(), ".cur_env"), "w"
+    ) as cur_env_file:
+        cur_env_file.write("{}".format(env_name))
+
+
 class EnvironmentChoice(click.Command):
     """
     Writes the chosen environment into the cur_env temp file.
@@ -35,10 +42,7 @@ class EnvironmentChoice(click.Command):
     """
 
     def invoke(self, ctx):
-        with open(
-            os.path.join(dir_helpers.get_checkout_dir(), ".cur_env"), "w"
-        ) as cur_env_file:
-            cur_env_file.write("{}".format(self.name))
+        set_active_env(self.name)
 
 
 class EnvironmentChooser(click.MultiCommand):
@@ -79,14 +83,10 @@ def cli(ctx):
     if ctx.invoked_subcommand is None:
         env_name = dir_helpers.get_last_activated_env()
         if env_name is not None:
-            last_env_name = os.environ.get("ROB_FOLDERS_ACTIVE_ENV")
-            if last_env_name:
-                click.echo(
-                    "No environment specified but there is already an active environment: {}\n".format(
-                        last_env_name
-                    )
-                    + "Not sourcing anything new."
-                )
+            active_env_name = os.environ.get("ROB_FOLDERS_ACTIVE_ENV")
+            if active_env_name:
+                click.echo(f"Re-sourcing {active_env_name}")
+                set_active_env(active_env_name)
             else:
                 click.echo(
                     "No environment specified. Sourcing the most recent active environment: {}".format(
