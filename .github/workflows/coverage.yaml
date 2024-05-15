@@ -1,0 +1,41 @@
+name: Coverage
+on:
+  workflow_dispatch:
+  pull_request:
+  push:
+    branches:
+      - main
+
+jobs:
+  test:
+    name: run tests
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        include:
+          - os: ubuntu-22.04
+            ros_distribution: humble
+
+    steps:
+      - uses: actions/checkout@v3
+      - name: Setup ROS
+        uses: ros-tooling/setup-ros@v0.7
+        with:
+          required-ros-distributions: ${{ matrix.ros_distribution }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pytest-cov codecov
+          python setup.py develop
+      - name: Test with pytest
+        run: |
+          source bin/rob_folders_source.sh
+          python3 -m pytest . -rA --cov=robot_folders --cov-report term --cov-report xml:coverage.xml
+      #- name: Upload coverage to Codecov
+        #uses: codecov/codecov-action@v4
+        #with:
+          #file: ./coverage.xml
+          #flags: unittests
+          #name: codecov-umbrella
+          #fail_ci_if_error: true
+          #token: ${{ secrets.CODECOV_TOKEN }}
