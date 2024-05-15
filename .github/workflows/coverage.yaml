@@ -42,7 +42,6 @@ jobs:
           source bin/rob_folders_source.sh
           coverage run --source=src -m pytest && coverage report
           coverage xml -o coverage.xml
-          python3 -m pytest . -rA --cov=robot_folders --cov-report term --cov-report xml:coverage.xml
         shell: bash
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
