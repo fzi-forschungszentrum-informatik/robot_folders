@@ -54,7 +54,7 @@ In case you manually installed ``robot_folders`` using a python virtualenv the p
 
 .. code:: bash
 
-   echo "source <your-vurtualenv-path>/bin/rob_folders_source.sh" >> ~/.bashrc
+   echo "source <your-virtualenv-path>/bin/rob_folders_source.sh" >> ~/.bashrc
 
 
 Basic usage
