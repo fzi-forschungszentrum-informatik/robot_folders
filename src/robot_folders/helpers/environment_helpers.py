@@ -278,7 +278,7 @@ class ColconCreator(object):
         """
         if self.ros2_distro == "ask":
             installed_ros_distros = sorted(installed_ros_2_versions())
-            self.ros_distro = installed_ros_distros[-1]
+            self.ros2_distro = installed_ros_distros[-1]
             if len(installed_ros_distros) > 1:
                 questions = [
                     inquirer.List(
