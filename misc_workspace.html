@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Misc Workspace &#8212; robot_folders 0.3.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=a5c4661c" />
+    <script src="_static/documentation_options.js?v=ba50482b"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Robot folders aliases" href="aliases.html" />
+    <link rel="prev" title="Usage" href="usage.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="misc-workspace">
+<h1>Misc Workspace<a class="headerlink" href="#misc-workspace" title="Link to this heading">¶</a></h1>
+<p><strong>Note:</strong> the misc workspace should be used with caution as it is an
+unconvenient way to build your software.</p>
+<p>The misc workspace can be used to build plain cmake, fla or other types
+of git repositories, but the build procedure has to be managed manually
+by the user. The misc workspace has the following structure:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="p">|</span>--<span class="w"> </span>misc_ws
+<span class="w">  </span><span class="p">|</span>--<span class="w"> </span><span class="nb">export</span>
+<span class="w">  </span><span class="p">|</span>--<span class="w"> </span>repo-A
+<span class="w">  </span><span class="p">|</span>--<span class="w"> </span>repo-B
+<span class="w">  </span><span class="p">|</span>--<span class="w"> </span>...
+</pre></div>
+</div>
+<p>The misc workspace is included when the command</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fzirob<span class="w"> </span>scrape_environment<span class="w"> </span>&lt;workspace&gt;<span class="w"> </span>&lt;config-file&gt;
+</pre></div>
+</div>
+<p>is used and also applied when</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fzirob<span class="w"> </span>adapt_environment<span class="w"> </span>&lt;workspace&gt;<span class="w"> </span>&lt;config-file&gt;
+</pre></div>
+</div>
+<p>or</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="c1"># If your environment contains a misc_ws you probably want to built its contents first</span>
+<span class="c1"># (see next section) before building any workspace depending on that. That&#39;s why the</span>
+<span class="c1"># &#39;--no_build&#39; flag is activated in this example</span>
+fzirob<span class="w"> </span>add_environment<span class="w"> </span>&lt;workspace&gt;<span class="w"> </span>--config_file<span class="w"> </span>&lt;config-file&gt;<span class="w"> </span>--no_build
+</pre></div>
+</div>
+<p>is used to share or save a workspace with others.</p>
+<p>When sourcing an environment, the misc_ws export folder will be sourced
+ontop of the catkin_workspace / colcon workspace. This way, it will be
+available to other workspaces automatically.</p>
+<section id="exported-and-sourced-paths">
+<h2>Exported (and sourced) paths<a class="headerlink" href="#exported-and-sourced-paths" title="Link to this heading">¶</a></h2>
+<p>Currently, the following paths are added to the respective environment variables when sourcing an environment:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">misc_ws/export/lib</span></code> gets added to <code class="docutils literal notranslate"><span class="pre">$LD_LIBRARY_PATH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">misc_ws/export/bin</span></code> gets added to <code class="docutils literal notranslate"><span class="pre">$PATH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">misc_ws/export</span></code> gets added to <code class="docutils literal notranslate"><span class="pre">$CMAKE_PREFIX_PATH</span></code></p></li>
+</ul>
+</section>
+<section id="misc-workspace-example">
+<h2>Misc workspace example<a class="headerlink" href="#misc-workspace-example" title="Link to this heading">¶</a></h2>
+<p>Assume that repository “repo-A” has build dependencies on repository
+“repo-B”: repo-B depends on repo-A. Then you can build the workspace
+manually by calling:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span><span class="nb">cd</span><span class="w"> </span>repo-B
+mkdir<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+cmake<span class="w"> </span>..<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>../../export<span class="w"> </span>-DBUILD_SHARED_LIBS<span class="o">=</span><span class="m">1</span>
+make
+make<span class="w"> </span>install
+<span class="nb">cd</span><span class="w"> </span>../../repo-A
+mkdir<span class="w"> </span>build<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="nb">cd</span><span class="w"> </span>build
+cmake<span class="w"> </span>..<span class="w"> </span>-DCMAKE_INSTALL_PREFIX<span class="o">=</span>../../export<span class="w"> </span>-DBUILD_SHARED_LIBS<span class="o">=</span><span class="m">1</span>
+make
+make<span class="w"> </span>install
+</pre></div>
+</div>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/robot_folders.svg" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="index.html">robot_folders</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Misc Workspace</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#exported-and-sourced-paths">Exported (and sourced) paths</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#misc-workspace-example">Misc workspace example</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="aliases.html">Robot folders aliases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequendly Asked Questions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="usage.html" title="previous chapter">Usage</a></li>
+      <li>Next: <a href="aliases.html" title="next chapter">Robot folders aliases</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, FZI Forschungszentrum Informatik.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/misc_workspace.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

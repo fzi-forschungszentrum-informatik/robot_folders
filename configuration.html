@@ -1,0 +1,185 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Configuration &#8212; robot_folders 0.3.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=a5c4661c" />
+    <script src="_static/documentation_options.js?v=ba50482b"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Usage" href="usage.html" />
+    <link rel="prev" title="Installation" href="installation.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="configuration">
+<h1>Configuration<a class="headerlink" href="#configuration" title="Link to this heading">¶</a></h1>
+<p>The default configuration is stored inside the file <code class="docutils literal notranslate"><span class="pre">userconfig_distribute.yaml</span></code>,
+which will be copied to <code class="docutils literal notranslate"><span class="pre">~/.config/robot_folders.yaml</span></code> automatically on first invocation.</p>
+<div class="highlight-yaml notranslate"><div class="highlight"><pre><span></span><span class="nt">build</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span>
+<span class="nt">    generator</span><span class="p">:</span><span class="w"> </span><span class="nv">make</span><span class="p p-Indicator">,</span>
+<span class="nt">    cmake_flags</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;-DCMAKE_EXPORT_COMPILE_COMMANDS=1&quot;</span><span class="p p-Indicator">,</span>
+<span class="nt">    make_threads</span><span class="p">:</span><span class="w"> </span><span class="nv">4</span><span class="p p-Indicator">,</span>
+<span class="nt">    install_catkin</span><span class="p">:</span><span class="w"> </span><span class="nv">False</span><span class="p p-Indicator">,</span>
+<span class="nt">    catkin_make_cmd</span><span class="p">:</span><span class="w"> </span><span class="nv">catkin_make</span><span class="p p-Indicator">,</span>
+<span class="nt">    colcon_build_options</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;--symlink-install&quot;</span>
+<span class="p p-Indicator">}</span>
+
+<span class="nt">directories</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">{</span>
+<span class="w">    </span><span class="c1"># if left blank, the default ~/checkout will be used</span>
+<span class="nt">    checkout_dir</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">,</span>
+<span class="nt">    catkin_names</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;catkin_workspace&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;catkin_ws&quot;</span><span class="p p-Indicator">],</span>
+<span class="nt">    colcon_names</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="s">&quot;colcon_workspace&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;colcon_ws&quot;</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="s">&quot;dev_ws&quot;</span><span class="p p-Indicator">],</span>
+<span class="nt">    no_backup_dir</span><span class="p">:</span><span class="w"> </span><span class="s">&quot;~/no_backup&quot;</span>
+<span class="p p-Indicator">}</span>
+</pre></div>
+</div>
+<p>The configuration is split into different sections which will be
+explained in the following.</p>
+<section id="build-options">
+<h2>Build options<a class="headerlink" href="#build-options" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">generator</span></code></dt><dd><p>Currently make and ninja can be used. If ninja is configured, but not
+installed, building will throw an error.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">cmake_flags</span></code></dt><dd><p>These flags will be passed to the cmake command.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">make_threads</span></code></dt><dd><p>Number of threads that should be used with make. Only relevant when
+generator is set to make.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">install_catkin</span></code></dt><dd><p>If set to true, the build command will also install the catkin_workspace
+(into the catkin_ws/install folder by default).</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">catkin_make_cmd</span></code></dt><dd><p>Set to catkin_make by default but can be changed to catkin build.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">colcon_build_options</span></code></dt><dd><p>Options passed to each <code class="docutils literal notranslate"><span class="pre">colcon</span> <span class="pre">build</span></code> invocation that is piped through <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">make</span></code>.</p>
+</dd>
+</dl>
+</section>
+<section id="directory-options">
+<h2>Directory options<a class="headerlink" href="#directory-options" title="Link to this heading">¶</a></h2>
+<dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">checkout_dir</span></code></dt><dd><p>By default, environments are stored inside
+~/checkout. If environments should be stored
+somewhere else, specify this path here. This <strong>must</strong> be an absolute path, but <code class="docutils literal notranslate"><span class="pre">${HOME}/</span></code> or
+<code class="docutils literal notranslate"><span class="pre">~/</span></code> can be used, as well.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">catkin_names</span></code></dt><dd><p>All first level subdirectories in an environment that match one of these
+names will be treated as catkin workspaces. If you name yor catkin
+workspaces differently, please specify this name here.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">colcon_names</span></code></dt><dd><p>All first level subdirectories in an environment that match one of these
+names will be treated as colcon workspaces. If you name yor colcon
+workspaces differently, please specify this name here.</p>
+</dd>
+<dt><code class="docutils literal notranslate"><span class="pre">no_backup_dir</span></code></dt><dd><p>Location where build and install steps should be performed if they should be outside of the
+checkout tree. If that folder exists, users will be prompted whether to build inside the
+<code class="docutils literal notranslate"><span class="pre">no_backup_dir</span></code> when creating a new environment.</p>
+</dd>
+</dl>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/robot_folders.svg" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="index.html">robot_folders</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuration</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#build-options">Build options</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#directory-options">Directory options</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="usage.html">Usage</a></li>
+<li class="toctree-l1"><a class="reference internal" href="misc_workspace.html">Misc Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aliases.html">Robot folders aliases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequendly Asked Questions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="installation.html" title="previous chapter">Installation</a></li>
+      <li>Next: <a href="usage.html" title="next chapter">Usage</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, FZI Forschungszentrum Informatik.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/configuration.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>

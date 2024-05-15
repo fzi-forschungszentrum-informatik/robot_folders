@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+
+<html lang="en" data-content_root="./">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+    <title>Usage &#8212; robot_folders 0.3.5 documentation</title>
+    <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=d1102ebc" />
+    <link rel="stylesheet" type="text/css" href="_static/alabaster.css?v=12dfc556" />
+    <link rel="stylesheet" type="text/css" href="_static/tabs.css?v=a5c4661c" />
+    <script src="_static/documentation_options.js?v=ba50482b"></script>
+    <script src="_static/doctools.js?v=9a2dae69"></script>
+    <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Misc Workspace" href="misc_workspace.html" />
+    <link rel="prev" title="Configuration" href="configuration.html" />
+   
+  <link rel="stylesheet" href="_static/custom.css" type="text/css" />
+  
+
+  
+  
+
+  </head><body>
+  
+
+    <div class="document">
+      <div class="documentwrapper">
+        <div class="bodywrapper">
+          
+
+          <div class="body" role="main">
+            
+  <section id="usage">
+<h1>Usage<a class="headerlink" href="#usage" title="Link to this heading">¶</a></h1>
+<p>This page should give you an overview of different tasks that can be performed using
+<code class="docutils literal notranslate"><span class="pre">robot_folders</span></code>. It is kind of an inverse documentation to the command documentation that comes
+with the command line interface.</p>
+<section id="what-is-an-environment">
+<h2>What is an environment?<a class="headerlink" href="#what-is-an-environment" title="Link to this heading">¶</a></h2>
+<p>An “environment” inside <code class="docutils literal notranslate"><span class="pre">robot_folders</span></code> consists of a set of workspaces. At
+the moment the following types of workspaces ares supported:</p>
+<ol class="arabic simple">
+<li><p><strong>catkin_ws (ROS Workspace):</strong>
+Modeled after the standard ROS (Robot Operating System) workspace,
+<code class="docutils literal notranslate"><span class="pre">catkin_ws</span></code> adheres to ROS tutorials and conventions, serving as a
+standardized environment for ROS-related development.</p></li>
+</ol>
+<ol class="arabic simple">
+<li><p><strong>colcon_ws (ROS 2 Workspace):</strong>
+Modeled after the standard ROS 2 (Robot Operating System) workspace,
+<code class="docutils literal notranslate"><span class="pre">colcon_ws</span></code> adheres to ROS tutorials and conventions, serving as a
+standardized environment for ROS 2 related development.</p></li>
+</ol>
+<ol class="arabic simple">
+<li><p><strong>misc_ws:</strong>
+The <code class="docutils literal notranslate"><span class="pre">misc_ws</span></code> adds the ability to add custom packages to your workspace.
+It simply adds its export paths to your environment. You’ll have to take
+care to make sure the targets are built and exported there, yourself. See
+<a class="reference internal" href="misc_workspace.html#misc-workspace"><span class="std std-ref">Misc Workspace</span></a> for details.</p></li>
+</ol>
+<p>After installation, open up a new terminal to use <code class="docutils literal notranslate"><span class="pre">robot_folders</span></code>. The main
+command for using <code class="docutils literal notranslate"><span class="pre">robot_folders</span></code> is <code class="docutils literal notranslate"><span class="pre">fzirob</span></code>. To get an overview of all available commands type</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fzirob<span class="w"> </span>--help
+</pre></div>
+</div>
+<p>To utilize any command, adhere to the general syntax:</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fzirob<span class="w"> </span><span class="nb">command</span><span class="w"> </span><span class="s1">&#39;argument&#39;</span>
+</pre></div>
+</div>
+</section>
+<section id="creating-an-environment">
+<h2>Creating an Environment<a class="headerlink" href="#creating-an-environment" title="Link to this heading">¶</a></h2>
+<p>To create a new environment called <code class="docutils literal notranslate"><span class="pre">ENV_NAME</span></code>, simply run</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fzirob<span class="w"> </span>add_environment<span class="w"> </span>ENV_NAME
+</pre></div>
+</div>
+<p>This will ask which types of workspaces should be generated for the new
+environment.</p>
+<p>One of the questions will be which underlay you’d like to use. If you don’t know what underlays are
+and what to use them for, you can just leave the selection empty and press enter. If you want to
+know more, see <a class="reference internal" href="#using-underlay-environments"><span class="std std-ref">Using underlay environments</span></a>.</p>
+<p>Depending on your specific setup further questions may be asked:</p>
+<ul class="simple">
+<li><p>When creating a catkin or colcon workspace with multiple installed ROS
+versions, you will be prompted for the ROS version being used for that
+workspace.</p></li>
+<li><p>If you use an automatic backup strategy for your machine you probably do not want to backup the
+build and install artifacts from your workspaces, but only the sources. For that purpose
+<code class="docutils literal notranslate"><span class="pre">robot_folders</span></code> allows building and installing outside of your checkout tree and creating
+symlinks at the respecitve places instead. Whenever the configured backup location exists on the
+system (By default that’s <code class="docutils literal notranslate"><span class="pre">$HOME/no_backup</span></code>, that can be changed in the
+<a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">Configuration</span></a>.) you will be prompted whether
+you want to build inside the checkout tree or in the no-backup folder.</p></li>
+</ul>
+<p>Upon completion, you will receive the confirmation: <em>“Environment setup for
+‘ENV_NAME` is complete.”</em></p>
+</section>
+<section id="sourcing-an-environment">
+<h2>Sourcing an environment<a class="headerlink" href="#sourcing-an-environment" title="Link to this heading">¶</a></h2>
+<p>To activate or source an environment, use the <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">change_environment</span>
+<span class="pre">ENV_NAME</span></code> command. This command sources the appropriate setup scripts of the
+environment depending on its contents.</p>
+<p>You can use tab completion on the environments so typing <code class="docutils literal notranslate"><span class="pre">fzirob</span>
+<span class="pre">change_environment</span></code> and then pressing <kbd class="kbd docutils literal notranslate">Tab</kbd> should list all environments
+present.</p>
+<p>Executing <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">change_environment</span></code> without any environment specified will
+source the most recently sourced environment.</p>
+</section>
+<section id="using-underlay-environments">
+<h2>Using underlay environments<a class="headerlink" href="#using-underlay-environments" title="Link to this heading">¶</a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">robot_folders</span></code> supports using underlay environments that will be sourced during sourcing the
+current environment. With this it is possible to keep parts of your setup in another workspace.
+Imaging for example, you have two packages: “Application” and “Library”. “Application” is depending
+on “Library”, but there are also other packages in other environments depending on “Library”. You
+can reuse your local “Library” installation by putting it into its own environment and use that as
+an underlay for your environment containing “Application” (and for all the other environments with
+packages depending on “Library”).</p>
+<p>This way, you’ll only have to keep “Library” up to date in one place.</p>
+<p>Another use case is if you want to test your “Application” against different versions of “Library”.
+You could keep compiled versions of “Library” in separate environments and select the correct one
+as an underlay for your application’s environment. You’ll only have to recompile your application
+while with keeping “Library” inside your application environment you would have to go the to
+library package, switch branches and rebuild the library and application package.</p>
+<p>When creating new environment you will be prompted for the underlays to be used.</p>
+<p>Underlays will be stored in a <code class="docutils literal notranslate"><span class="pre">underlays.txt</span></code> file inside your environment’s folder. You can
+either edit that file manually or use the <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">manage_underlays</span></code> command to change the
+environment’s underlays.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>The underlay file will not get deleted by <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">clean</span></code>. Although you will be asked for the
+ROS distribution to use (if more than one is installed), underlay configuration persists.</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>You can stack underlays. That means you can create dependency chains e.g. env1 -&gt; env2 -&gt; env3</p>
+</div>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Currently, initial build isn’t supported when using underlay workspaces. When specifying an
+environment config when creating a new environment the user will have to manually trigger the
+build process after initially creating the environment. Usually, a simple <cite>fzirob make</cite> should
+do the trick.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>Currently there is no check for cyclic environment dependency. Please make sure you do not run
+into this problem.</p>
+</div>
+<div class="admonition warning">
+<p class="admonition-title">Warning</p>
+<p>The order in which environments are sourced is depending on the order in which they are written
+into the <code class="docutils literal notranslate"><span class="pre">underlays.txt</span></code> file. That order might be alterd by the <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">manage_underlays</span></code>
+command. If you depend on an order, you may instead consider stacking underlays depending on
+each other.</p>
+</div>
+</section>
+<section id="compiling-an-environment">
+<h2>Compiling an environment<a class="headerlink" href="#compiling-an-environment" title="Link to this heading">¶</a></h2>
+<p>To build an environment please use the <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">make</span></code> command. It has to be
+invoked on an already sourced environment but can be called from anywhwere.</p>
+<p>Without any further options this will build all the workspace present which it
+knows how to build. So, if there is a catkin workspace present, it will build
+that, if there’s a colcon workspace this will be built.</p>
+<p>You can also manually specify which workspace to build by using <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">make</span>
+<span class="pre">ros</span></code> or <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">make</span> <span class="pre">colcon</span></code>. When using <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">make</span></code> you don’t have to
+worry about the particular build command at all.</p>
+<p>Default options for building environments such as the builder for catkin
+workspaces or cmake arguments for a colcon workspace can be set in the
+<a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">Configuration</span></a>.</p>
+</section>
+<section id="cleaning-an-environment">
+<h2>Cleaning an environment<a class="headerlink" href="#cleaning-an-environment" title="Link to this heading">¶</a></h2>
+<p>Sometimes you want to completely rebuild your environment. <code class="docutils literal notranslate"><span class="pre">fziron</span> <span class="pre">clean</span></code>
+provides a command that will delete all build and installation artifacts from
+your environment’s workspaces. Before actual deletion it will show a list of
+all the folders to be deleted with a safety prompt so you don’t accidentally
+delete things.</p>
+</section>
+<section id="navigating-inside-an-environment">
+<h2>Navigating inside an environment<a class="headerlink" href="#navigating-inside-an-environment" title="Link to this heading">¶</a></h2>
+<p>You can use the <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">cd</span></code> command to navigate around in an environment. The
+following examples show a couple of possible locations you can navigate to. For
+the examples we have sourced the environment <code class="docutils literal notranslate"><span class="pre">env_name</span></code> and environments are
+stored inside <code class="docutils literal notranslate"><span class="pre">~/checkout</span></code>:</p>
+<blockquote>
+<div><div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fzirob<span class="w"> </span><span class="nb">cd</span><span class="w">        </span><span class="c1"># Env root folder e.g. ~/checkout/env_name</span>
+fzirob<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>ros<span class="w">    </span><span class="c1"># Env catkin folder e.g. ~/checkout/env_name/catkin_ws</span>
+fzirob<span class="w"> </span><span class="nb">cd</span><span class="w"> </span>colcon<span class="w"> </span><span class="c1"># Env colcon folder e.g. ~/checkout/env_name/colcon_ws</span>
+</pre></div>
+</div>
+</div></blockquote>
+<p>Again, tab completion will present the possible options for the currently sourced environment.</p>
+</section>
+<section id="start-demo-scripts">
+<h2>Start / Demo scripts<a class="headerlink" href="#start-demo-scripts" title="Link to this heading">¶</a></h2>
+<p>For easy interaction with unknown environments <code class="docutils literal notranslate"><span class="pre">robot_folders</span></code> provides the
+<code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">run</span></code> command. With that any executable file inside the environment’s
+<code class="docutils literal notranslate"><span class="pre">demos</span></code> folder can be executed. So, if you’ve got an unknown environment and
+just want to startup a predefined demo, simply source the environment, type
+<code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">run</span> <span class="pre">&lt;tab&gt;</span></code> which should list all the possible demo scripts.</p>
+</section>
+<section id="sharing-environments">
+<h2>Sharing environments<a class="headerlink" href="#sharing-environments" title="Link to this heading">¶</a></h2>
+<p>Often you’d like to share an environment with colleagues working on the same
+project. While for colcon workspaces there exist external tools such as
+<a class="reference external" href="https://pypi.org/project/vcstool2/">vcstool2</a>, <code class="docutils literal notranslate"><span class="pre">robot_folders</span></code> provides extended functionality to that:</p>
+<ul class="simple">
+<li><p>Contents of multiple workspaces can be exported and imported at once (e.g.
+colcon workspace and misc workspace).</p></li>
+<li><p>Startup scripts are stored inside the exchange format for easy interaction.</p></li>
+</ul>
+<section id="exporting-an-environment">
+<h3>Exporting an environment<a class="headerlink" href="#exporting-an-environment" title="Link to this heading">¶</a></h3>
+<p>To export an environment, use the <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">scrape_environment</span></code> command. It scrapes an environment configuration into a config file, facilitating sharing with others. You’ll have to provide the environment name and the target file as arguments e.g.</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fzirob<span class="w"> </span>scrape_environment<span class="w"> </span>env_name<span class="w"> </span>/tmp/env_name.yaml
+</pre></div>
+</div>
+<p>In case you’ve got multiple remotes configured for repos inside your
+environments, you will be queried which remote should be used for each
+repository.</p>
+<p>When providing <code class="docutils literal notranslate"><span class="pre">--use_commit_id</span> <span class="pre">true</span></code>, the exact commit IDs get scraped
+instead of branch names. which is rather useful if you want to save a “working
+state” of your whole environment.</p>
+</section>
+<section id="creating-a-new-environment-with-a-configuration">
+<h3>Creating a new environment with a configuration<a class="headerlink" href="#creating-a-new-environment-with-a-configuration" title="Link to this heading">¶</a></h3>
+<p>If you’ve got provided an environment configuration from somebody you can
+create a new environment with that using</p>
+<div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fzirob<span class="w"> </span>add_environment<span class="w"> </span>--config-file<span class="w"> </span>/tmp/env_name.yaml<span class="w"> </span>other_env
+</pre></div>
+</div>
+<p>which will create an environment called <code class="docutils literal notranslate"><span class="pre">other_env</span></code> with the configuration
+from the previously exported <code class="docutils literal notranslate"><span class="pre">env_name</span></code> environment.</p>
+</section>
+<section id="adapting-an-environment-with-a-configuration-file">
+<h3>Adapting an environment with a configuration file<a class="headerlink" href="#adapting-an-environment-with-a-configuration-file" title="Link to this heading">¶</a></h3>
+<p>If you already have an environment but you want to update it to match a config
+file e.g. because some repositories have been added to the environment or some
+branch names have been changed you can do this using the <code class="docutils literal notranslate"><span class="pre">fzirob</span>
+<span class="pre">adapt_environment</span></code> command.</p>
+<p>If there are repositories in your local environment that are not in the config
+file you will be prompted whether you want to keep those repositories. If
+branches or remotes in the config file differ from those present locally, you
+will also be asked. You can override that to a default behavior using the
+<code class="docutils literal notranslate"><span class="pre">--local_delete_policy</span></code> and <code class="docutils literal notranslate"><span class="pre">--local_override_policy</span></code> options.</p>
+</section>
+</section>
+<section id="deleting-an-environment">
+<h2>Deleting an environment<a class="headerlink" href="#deleting-an-environment" title="Link to this heading">¶</a></h2>
+<p>If you want to delete an environment alltogether, you can use <code class="docutils literal notranslate"><span class="pre">fzirob</span>
+<span class="pre">delete_environment</span> <span class="pre">&lt;env_name</span></code>. This will delete the conmplete environment
+folder from your checkout directory.</p>
+</section>
+</section>
+
+
+          </div>
+          
+        </div>
+      </div>
+      <div class="sphinxsidebar" role="navigation" aria-label="main navigation">
+        <div class="sphinxsidebarwrapper">
+            <p class="logo"><a href="index.html">
+              <img class="logo" src="_static/robot_folders.svg" alt="Logo"/>
+            </a></p>
+<h1 class="logo"><a href="index.html">robot_folders</a></h1>
+
+
+
+
+
+
+
+
+<h3>Navigation</h3>
+<p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="installation.html">Installation</a></li>
+<li class="toctree-l1"><a class="reference internal" href="configuration.html">Configuration</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Usage</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#what-is-an-environment">What is an environment?</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#creating-an-environment">Creating an Environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sourcing-an-environment">Sourcing an environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#using-underlay-environments">Using underlay environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#compiling-an-environment">Compiling an environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#cleaning-an-environment">Cleaning an environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#navigating-inside-an-environment">Navigating inside an environment</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#start-demo-scripts">Start / Demo scripts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#sharing-environments">Sharing environments</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#deleting-an-environment">Deleting an environment</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="misc_workspace.html">Misc Workspace</a></li>
+<li class="toctree-l1"><a class="reference internal" href="aliases.html">Robot folders aliases</a></li>
+<li class="toctree-l1"><a class="reference internal" href="faq.html">Frequendly Asked Questions</a></li>
+</ul>
+
+<div class="relations">
+<h3>Related Topics</h3>
+<ul>
+  <li><a href="index.html">Documentation overview</a><ul>
+      <li>Previous: <a href="configuration.html" title="previous chapter">Configuration</a></li>
+      <li>Next: <a href="misc_workspace.html" title="next chapter">Misc Workspace</a></li>
+  </ul></li>
+</ul>
+</div>
+<search id="searchbox" style="display: none" role="search">
+  <h3 id="searchlabel">Quick search</h3>
+    <div class="searchformwrapper">
+    <form class="search" action="search.html" method="get">
+      <input type="text" name="q" aria-labelledby="searchlabel" autocomplete="off" autocorrect="off" autocapitalize="off" spellcheck="false"/>
+      <input type="submit" value="Go" />
+    </form>
+    </div>
+</search>
+<script>document.getElementById('searchbox').style.display = "block"</script>
+
+
+
+
+
+
+
+
+        </div>
+      </div>
+      <div class="clearer"></div>
+    </div>
+    <div class="footer">
+      &#169;2024, FZI Forschungszentrum Informatik.
+      
+      |
+      Powered by <a href="https://www.sphinx-doc.org/">Sphinx 7.3.7</a>
+      &amp; <a href="https://alabaster.readthedocs.io">Alabaster 0.7.16</a>
+      
+      |
+      <a href="_sources/usage.rst.txt"
+          rel="nofollow">Page source</a>
+    </div>
+
+    
+
+    
+  </body>
+</html>
