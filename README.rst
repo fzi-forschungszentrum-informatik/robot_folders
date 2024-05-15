@@ -12,7 +12,7 @@ to a seamless development experience.
 
 Documentation
 -------------
-Documentation can be found on `our GH pages <https://fzi-forschungszentrum-informatik.github.io/robot_folders/>_`.
+Documentation can be found on `our GH pages <https://fzi-forschungszentrum-informatik.github.io/robot_folders/>`_.
 
 
 Quick start
