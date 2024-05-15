@@ -9,33 +9,46 @@ on:
 jobs:
   test:
     name: run tests
-    runs-on: ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    container: ${{ matrix.container }}
     strategy:
       matrix:
-        include:
-          - os: ubuntu-22.04
-            ros_distribution: humble
+        container: ["ros:humble"]
 
     steps:
+      - name: "Determine prerequisites"
+        id: prereq
+        run: |
+          command -v sudo >/dev/null 2>&1 || (apt update && apt install -y sudo)
+          sudo apt update
+          echo "need_node=$(command -v node >/dev/null 2>&1 && echo 0 || echo 1)" >> $GITHUB_OUTPUT
+          echo "need_ros2=$(if [ -d "/opt/ros/${{ inputs.ros_distro }}" ]; then echo 0; else echo 1; fi)" >> $GITHUB_OUTPUT
+      - name: Install node
+        if: ${{ steps.prereq.outputs.need_node == '1' && env.ACT }}
+        run: |
+          sudo apt install -y curl
+          curl -sS https://webi.sh/node | sh
+          echo ~/.local/opt/node/bin >> $GITHUB_PATH
+
       - uses: actions/checkout@v3
-      - name: Setup ROS
-        uses: ros-tooling/setup-ros@v0.7
-        with:
-          required-ros-distributions: ${{ matrix.ros_distribution }}
       - name: Install dependencies
         run: |
-          python -m pip install --upgrade pip
-          pip install pytest-cov codecov
-          python setup.py develop
+          apt update && apt install -y python3-pip
+          python3 -m pip install --upgrade pip
+          pip install pytest-cov codecov coverage
+          pip install .
       - name: Test with pytest
         run: |
           source bin/rob_folders_source.sh
+          coverage run --source=src -m pytest && coverage report
+          coverage xml -o coverage.xml
           python3 -m pytest . -rA --cov=robot_folders --cov-report term --cov-report xml:coverage.xml
-      #- name: Upload coverage to Codecov
-        #uses: codecov/codecov-action@v4
-        #with:
-          #file: ./coverage.xml
-          #flags: unittests
-          #name: codecov-umbrella
-          #fail_ci_if_error: true
-          #token: ${{ secrets.CODECOV_TOKEN }}
+        shell: bash
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          file: ./coverage.xml
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          token: ${{ secrets.CODECOV_TOKEN }}
