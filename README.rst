@@ -10,6 +10,11 @@ It focuses on optimizing the management of various subworkspaces, contributing
 to a seamless development experience.
 
 
+Documentation
+-------------
+Documentation can be found on `our GH pages <https://fzi-forschungszentrum-informatik.github.io/robot_folders/>`_.
+
+
 Quick start
 ------------
 
@@ -21,7 +26,7 @@ install pipx``). Please note: With pipx versions < 1.0 you'll have to provide th
    pipx install robot_folders
 
 Upgrade
--------
+^^^^^^^
 
 To upgrade robot_folders using ``pipx`` do
 
@@ -30,7 +35,7 @@ To upgrade robot_folders using ``pipx`` do
    pipx upgrade robot_folders
 
 Shell setup
------------
+^^^^^^^^^^^
 
 In order to use ``robot_folders`` you'll have to call its source file. How to do this depends on
 the way you installed ``robot_folders`` and on the version of the installation tool.
@@ -53,7 +58,7 @@ In case you manually installed ``robot_folders`` using a python virtualenv the p
 
 
 Basic usage
------------
+^^^^^^^^^^^
 
 After installation open up a new terminal to use robot_folders. The main
 command for using robot_folders is ``fzirob``. Type
