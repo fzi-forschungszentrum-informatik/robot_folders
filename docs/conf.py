@@ -6,10 +6,14 @@
 # -- Project information -----------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#project-information
 
+from importlib.metadata import version
+
+release = version("robot_folders")
+version = release
+
 project = "robot_folders"
 copyright = "2024, FZI Forschungszentrum Informatik"
 author = "Felix Exner"
-release = "0.3.5"
 
 # -- General configuration ---------------------------------------------------
 # https://www.sphinx-doc.org/en/master/usage/configuration.html#general-configuration
