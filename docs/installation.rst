@@ -2,7 +2,7 @@ Installation
 ============
 
 It is recommended to install robot_folders using ``pipx`` (You can install ``pipx`` on Ubuntu using ``sudo apt
-install pipx``). Please note: With pipx versions < 1.0 you'll have to provide the `--spec` flag.
+install pipx``).
 
 .. code:: bash
 
