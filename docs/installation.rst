@@ -4,36 +4,18 @@ Installation
 It is recommended to install robot_folders using ``pipx`` (You can install ``pipx`` on Ubuntu using ``sudo apt
 install pipx``). Please note: With pipx versions < 1.0 you'll have to provide the `--spec` flag.
 
-.. tabs::
+.. code:: bash
 
-   .. group-tab:: pipx >= 1.0
-
-      .. code:: bash
-
-         pipx install git+https://github.com/fzi-forschungszentrum-informatik/robot_folders.git
-   .. group-tab:: pipx < 1.0
-
-      .. code:: bash
-
-         pipx install --spec git+https://github.com/fzi-forschungszentrum-informatik/robot_folders.git robot-folders
+   pipx install robot_folders
 
 Upgrade
 -------
 
 To upgrade robot_folders using ``pipx`` do
 
-.. tabs::
+.. code:: bash
 
-   .. group-tab:: pipx >= 1.0
-
-      .. code:: bash
-
-         pipx upgrade robot-folders
-   .. group-tab:: pipx < 1.0
-
-      .. code:: bash
-
-         pipx upgrade --spec git+https://github.com/fzi-forschungszentrum-informatik/robot_folders.git robot-folders
+   pipx upgrade robot_folders
 
 Shell setup
 -----------

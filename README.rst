@@ -18,10 +18,7 @@ install pipx``). Please note: With pipx versions < 1.0 you'll have to provide th
 
 .. code:: bash
 
-   # pipx >= 1.0 (from ubuntu 22.04 on)
-   pipx install git+https://github.com/fzi-forschungszentrum-informatik/robot_folders.git
-   # pipx < 1.0 (ubuntu 20.04)
-   pipx install --spec git+https://github.com/fzi-forschungszentrum-informatik/robot_folders.git robot-folders
+   pipx install robot_folders
 
 Upgrade
 -------
@@ -30,10 +27,7 @@ To upgrade robot_folders using ``pipx`` do
 
 .. code:: bash
 
-   # pipx >= 1.0 (from ubuntu 22.04 on)
-   pipx upgrade robot-folders
-   # pipx < 1.0 (ubuntu 20.04)
-   pipx upgrade --spec git+https://github.com/fzi-forschungszentrum-informatik/robot_folders.git robot-folders
+   pipx upgrade robot_folders
 
 Shell setup
 -----------
