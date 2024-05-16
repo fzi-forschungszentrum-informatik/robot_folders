@@ -23,7 +23,7 @@ install pipx``).
 
 .. code:: bash
 
-   pipx install robot_folders
+   pipx install robot-folders
 
 Upgrade
 ^^^^^^^
@@ -32,7 +32,7 @@ To upgrade robot_folders using ``pipx`` do
 
 .. code:: bash
 
-   pipx upgrade robot_folders
+   pipx upgrade robot-folders
 
 Shell setup
 ^^^^^^^^^^^
