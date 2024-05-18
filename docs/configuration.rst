@@ -60,3 +60,12 @@ Directory options
     Location where build and install steps should be performed if they should be outside of the
     checkout tree. If that folder exists, users will be prompted whether to build inside the
     ``no_backup_dir`` when creating a new environment.
+
+Environment variables
+---------------------
+
+There are also environment variables for some features of ``robot_folders``:
+
+``ROB_FOLDERS_DISABLE_PROMPT_MODIFICATION``
+    If this variable is set to a non-empty value, the currently active environment will **not** be
+    added to the prompt.
