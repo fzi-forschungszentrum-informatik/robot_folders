@@ -160,6 +160,7 @@ fzirob()
       if [ $? -eq 0 ]; then
         if [ $1 = "change_environment" ] && [ "$2" != "--help"  ]; then
           checkout_dir=$(rob_folders get_checkout_base_dir)
+
           if [ -f ${checkout_dir}/.cur_env ]; then
             export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
             environment_dir="${checkout_dir}/${ROB_FOLDERS_ACTIVE_ENV}"
@@ -175,6 +176,11 @@ fzirob()
             # declare environment-specific aliases
             env_aliases
             #check_env
+            # Write current env to prompt
+            if [ -z "${ROB_FOLDERS_DISABLE_PROMPT_MODIFICATION:-}" ] ; then
+                PS1="[${ROB_FOLDERS_ACTIVE_ENV}] ${PS1:-}"
+                export PS1
+            fi
           else
             echo "Could not change environment"
           fi
