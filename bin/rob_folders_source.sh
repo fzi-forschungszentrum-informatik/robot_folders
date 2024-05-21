@@ -178,8 +178,11 @@ fzirob()
             #check_env
             # Write current env to prompt
             if [ -z "${ROB_FOLDERS_DISABLE_PROMPT_MODIFICATION:-}" ] ; then
-                PS1="[${ROB_FOLDERS_ACTIVE_ENV}] ${PS1:-}"
-                export PS1
+                env_prompt="[${ROB_FOLDERS_ACTIVE_ENV}]"
+                if [ -n "${PS1##*"$env_prompt"*}" ]; then
+                  PS1="${env_prompt} ${PS1:-}"
+                  export PS1
+                fi
             fi
           else
             echo "Could not change environment"
