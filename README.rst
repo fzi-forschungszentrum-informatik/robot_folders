@@ -1,3 +1,6 @@
+|license_badge| |codecov_badge| |doc_badge|
+
+
 Robot Folders
 =============
 
@@ -68,3 +71,13 @@ command for using robot_folders is ``fzirob``. Type
    fzirob --help
 
 to get an overview over all available commands.
+
+
+
+.. |license_badge| image:: https://img.shields.io/github/license/fzi-forschungszentrum-informatik/robot_folders?color=yellow
+   :alt: GitHub License
+
+.. |codecov_badge| image:: https://codecov.io/gh/fzi-forschungszentrum-informatik/robot_folders/graph/badge.svg?token=85HNG0NCEI
+ :target: https://codecov.io/gh/fzi-forschungszentrum-informatik/robot_folders
+.. |doc_badge| image:: https://img.shields.io/badge/Documentation-Github_Pages-blue
+ :target: https://fzi-forschungszentrum-informatik.github.io/robot_folders/index.html
