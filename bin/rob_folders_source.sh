@@ -162,7 +162,13 @@ fzirob()
           checkout_dir=$(rob_folders get_checkout_base_dir)
 
           if [ -f ${checkout_dir}/.cur_env ]; then
-            export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
+            # Since the python command writes the .cur_env file there is a race condition when
+            # running change_environment commands in parallel. Thus it can happen that reading the
+            # file returns an empty value. This race condition only occurs on a very high io load
+            # and usually this while look should only be entered once.
+            while [ -z "$ROB_FOLDERS_ACTIVE_ENV" ]; do
+              export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
+            done
             environment_dir="${checkout_dir}/${ROB_FOLDERS_ACTIVE_ENV}"
             if [ -f ${environment_dir}/setup.sh ]; then
               source ${environment_dir}/setup.sh
