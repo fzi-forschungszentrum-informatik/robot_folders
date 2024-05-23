@@ -166,9 +166,11 @@ fzirob()
             # running change_environment commands in parallel. Thus it can happen that reading the
             # file returns an empty value. This race condition only occurs on a very high io load
             # and usually this while look should only be entered once.
+            ROB_FOLDERS_ACTIVE_ENV=$(cat "${checkout_dir}"/.cur_env) || true
             while [ -z "$ROB_FOLDERS_ACTIVE_ENV" ]; do
-              export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
+              ROB_FOLDERS_ACTIVE_ENV=$(cat "${checkout_dir}"/.cur_env) || true
             done
+            export ROB_FOLDERS_ACTIVE_ENV
             environment_dir="${checkout_dir}/${ROB_FOLDERS_ACTIVE_ENV}"
             if [ -f ${environment_dir}/setup.sh ]; then
               source ${environment_dir}/setup.sh
