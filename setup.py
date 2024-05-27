@@ -11,6 +11,14 @@ from pathlib import Path
 this_directory = Path(__file__).parent
 long_description = (this_directory / "README.rst").read_text()
 
+test_deps = [
+    "pytest",
+    "pyfakefs",
+]
+extras = {
+    "test": test_deps,
+}
+
 setup(
     name="robot_folders",
     version="0.5.0",
@@ -39,4 +47,6 @@ setup(
     include_package_data=True,
     package_data={"": ["*.yaml"]},
     license_files=("LICENSE.txt"),
+    tests_require=test_deps,
+    extras_require=extras,
 )

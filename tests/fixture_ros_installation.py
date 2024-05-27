@@ -21,16 +21,14 @@
 #
 import pytest
 
-import os
 
-from click.testing import CliRunner
-
-import robot_folders.main
-from importlib import resources
-
-
-def test_rob_folders_runs():
-    runner = CliRunner()
-
-    result = runner.invoke(robot_folders.main.cli)
-    assert result.exit_code == 0
+@pytest.fixture
+def fake_ros_installation(fs):
+    fs.create_file("/opt/ros/melodic/setup.sh", contents="catkin")
+    fs.create_file("/opt/ros/noetic/setup.sh", contents="catkin")
+    fs.create_file("/opt/ros/humble/setup.sh", contents="AMENT_CURRENT_PREFIX")
+    fs.create_file("/opt/ros/jazzy/setup.sh", contents="COLCON_CURRENT_PREFIX")
+    fs.create_file("/opt/ros/rolling/setup.sh", contents="AMENT_CURRENT_PREFIX")
+    fs.create_file("/opt/ros/spy/setup.sh", contents="imnotros")
+    fs.create_file("/opt/foo/setup.sh", contents="imnotros")
+    yield fs

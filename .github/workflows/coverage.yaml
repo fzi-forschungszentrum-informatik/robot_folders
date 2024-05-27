@@ -36,7 +36,7 @@ jobs:
           apt update && apt install -y python3-pip
           python3 -m pip install --upgrade pip
           pip install pytest-cov codecov coverage
-          pip install -e .
+          pip install -e .[test]
       - name: Test with pytest
         run: |
           source bin/rob_folders_source.sh

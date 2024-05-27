@@ -28,7 +28,7 @@ import robot_folders.commands.get_checkout_base_dir as get_checkout_base_dir
 import robot_folders.helpers.directory_helpers as directory_helpers
 
 
-def test_get_checkout_basedir():
+def test_get_checkout_basedir(fs):
     runner = CliRunner()
     result = runner.invoke(get_checkout_base_dir.cli)
     assert result.exit_code == 0
