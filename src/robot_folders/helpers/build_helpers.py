@@ -155,9 +155,7 @@ class ColconBuilder(Builder):
     """Builder class for colcon workspace"""
 
     def __init__(self, *args, **kwargs):
-        params = [
-            click.Argument(["colcon-args"], nargs=-1, type=click.UNPROCESSED)
-        ]
+        params = [click.Argument(["colcon-args"], nargs=-1, type=click.UNPROCESSED)]
         if "params" in kwargs and kwargs["params"]:
             kwargs["params"].extend(params)
         else:
