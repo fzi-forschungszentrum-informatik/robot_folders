@@ -97,7 +97,7 @@ class EnvCreator(object):
                 'Environment "{}" already exists'.format(self.env_name), "add"
             )
 
-        has_nobackup = dir_helpers.check_nobackup(local_build)
+        has_nobackup = dir_helpers.check_build_on_nobackup(local_build)
         self.build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
 
         self.misc_ws_build_directory = os.path.join(
