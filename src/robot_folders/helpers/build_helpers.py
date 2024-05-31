@@ -35,6 +35,7 @@ from robot_folders.helpers.which import which
 from robot_folders.helpers import compilation_db_helpers
 from robot_folders.helpers import config_helpers
 from robot_folders.helpers.exceptions import ModuleException
+from robot_folders.helpers.option_helpers import OptionEatAll
 
 
 def get_cmake_flags():
@@ -155,7 +156,14 @@ class ColconBuilder(Builder):
     """Builder class for colcon workspace"""
 
     def __init__(self, *args, **kwargs):
-        params = [click.Argument(["colcon-args"], nargs=-1, type=click.UNPROCESSED)]
+        params = [
+            OptionEatAll(
+                ["--colcon-args"],
+                nargs=-1,
+                save_other_options=False,
+                type=click.UNPROCESSED,
+            )
+        ]
         if "params" in kwargs and kwargs["params"]:
             kwargs["params"].extend(params)
         else:
@@ -202,7 +210,11 @@ class ColconBuilder(Builder):
         colcon_dir = get_colcon_dir()
         click.echo("Building colcon_ws in {}".format(colcon_dir))
 
-        if ctx is not None and "colcon_args" in ctx.params:
+        if (
+            ctx is not None
+            and "colcon_args" in ctx.params
+            and ctx.params["colcon_args"] is not None
+        ):
             colcon_args = ctx.params["colcon_args"]
             colcon_args = " ".join(colcon_args)
         else:
