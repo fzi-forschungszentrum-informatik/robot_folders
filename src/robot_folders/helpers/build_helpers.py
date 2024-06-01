@@ -35,7 +35,7 @@ from robot_folders.helpers.which import which
 from robot_folders.helpers import compilation_db_helpers
 from robot_folders.helpers import config_helpers
 from robot_folders.helpers.exceptions import ModuleException
-from robot_folders.helpers.option_helpers import OptionEatAll
+from robot_folders.helpers.option_helpers import SwallowAllOption
 
 
 def get_cmake_flags():
@@ -157,10 +157,9 @@ class ColconBuilder(Builder):
 
     def __init__(self, *args, **kwargs):
         params = [
-            OptionEatAll(
+            SwallowAllOption(
                 ["--colcon-args"],
                 nargs=-1,
-                save_other_options=False,
                 type=click.UNPROCESSED,
             )
         ]
