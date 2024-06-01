@@ -160,9 +160,12 @@ class ColconBuilder(Builder):
             SwallowAllOption(
                 ["--colcon-args"],
                 nargs=-1,
+                help="Arguments passed to colcon. Everything after this flag will be interpreted as"
+                " colcon arguments",
                 type=click.UNPROCESSED,
             )
         ]
+
         if "params" in kwargs and kwargs["params"]:
             kwargs["params"].extend(params)
         else:
