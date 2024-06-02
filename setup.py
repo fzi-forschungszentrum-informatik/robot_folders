@@ -13,6 +13,7 @@ long_description = (this_directory / "README.rst").read_text()
 
 test_deps = [
     "pytest",
+    "pytest-mock",
     "pyfakefs",
 ]
 extras = {
