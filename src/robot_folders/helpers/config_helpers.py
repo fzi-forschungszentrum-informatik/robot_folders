@@ -27,6 +27,8 @@ import yaml
 
 from importlib import resources
 
+import robot_folders.helpers.resources
+
 XDG_CONFIG_HOME = os.getenv(
     "XDG_CONFIG_HOME", os.path.expandvars(os.path.join("$HOME", ".config"))
 )
@@ -43,8 +45,8 @@ class Userconfig(object):
     @classmethod
     def init_class(cls):
         """Load the distribution config file"""
-        with resources.path(
-            ".".join([__package__, "resources"]), "userconfig_distribute.yaml"
+        with resources.files(robot_folders.helpers.resources).joinpath(
+            "userconfig_distribute.yaml"
         ) as p:
             filename_distribute = p.as_posix()
             file_content = p.read_text()
