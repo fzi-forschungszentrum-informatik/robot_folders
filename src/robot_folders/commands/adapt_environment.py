@@ -84,7 +84,7 @@ class EnvironmentAdapter(click.Command):
                     self.adapt_rosinstall(misc_ws_rosinstall, misc_ws_dir)
             else:
                 click.echo("Creating misc workspace")
-                has_nobackup = dir_helpers.check_nobackup()
+                has_nobackup = dir_helpers.check_build_on_nobackup()
                 build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
                 misc_ws_build_root = os.path.join(build_base_dir, self.name, "misc_ws")
 
@@ -104,7 +104,7 @@ class EnvironmentAdapter(click.Command):
                     self.adapt_rosinstall(ros_rosinstall, catkin_src_dir)
             else:
                 click.echo("Creating catkin workspace")
-                has_nobackup = dir_helpers.check_nobackup()
+                has_nobackup = dir_helpers.check_build_on_nobackup()
                 catkin_dir = os.path.join(env_dir, "catkin_ws")
                 build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
                 catkin_build_dir = os.path.join(
@@ -128,7 +128,7 @@ class EnvironmentAdapter(click.Command):
                     self.adapt_rosinstall(ros2_rosinstall, colcon_src_dir)
             else:
                 click.echo("Creating colcon workspace")
-                has_nobackup = dir_helpers.check_nobackup()
+                has_nobackup = dir_helpers.check_build_on_nobackup()
                 colcon_dir = os.path.join(env_dir, "colcon_ws")
                 build_base_dir = dir_helpers.get_build_base_dir(has_nobackup)
                 colcon_build_dir = os.path.join(

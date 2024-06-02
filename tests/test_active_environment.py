@@ -22,20 +22,29 @@
 import pytest
 
 import os
+import sys
 
 from click.testing import CliRunner
 
+from importlib import resources
+
 import robot_folders.commands.active_environment
+import robot_folders.helpers.resources
 from robot_folders.helpers.directory_helpers import get_checkout_dir
 
 
-def test_active_environment():
+def test_active_environment(fs):
+    if sys.version_info.major == 3 and sys.version_info.minor < 9:
+        fs.add_real_directory(
+            os.path.dirname(os.path.join(robot_folders.helpers.resources.__file__))
+        )
+    else:
+        fs.add_real_directory(resources.files(robot_folders.helpers.resources))
     runner = CliRunner()
 
     # First: Try to get the latest active env
     env_file = os.path.join(get_checkout_dir(), ".cur_env")
-    with open(env_file, "w") as file_content:
-        file_content.write("testing_ws")
+    fs.create_file(env_file, contents="testing_ws")
     result = runner.invoke(robot_folders.commands.active_environment.cli)
     assert (
         result.output

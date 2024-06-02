@@ -158,10 +158,10 @@ def yes_no_to_bool(bool_str):
     return bool_str == "yes" or bool_str == "Yes"
 
 
-def check_nobackup(local_build="ask"):
+def check_build_on_nobackup(local_build="ask"):
     """
     Checks whether there is a nobackup on this system. If there is, the local_build
-    parameter is used to determine whether a the no_backup folder should be used or
+    parameter is used to determine whether the no_backup folder should be used or
     the local structure should be used.
 
     local_build == 'yes' - ignore nobackup even if it exists -> will return false

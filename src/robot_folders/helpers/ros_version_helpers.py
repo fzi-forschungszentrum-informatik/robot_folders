@@ -23,11 +23,12 @@
 
 import subprocess
 import os
+import re
 
 
 def installed_ros_distros():
     """Returns all installed ROS versions (ROS1 and ROS2)"""
-    return os.listdir("/opt/ros")
+    return installed_ros_1_versions() + installed_ros_2_versions()
 
 
 def installed_ros_1_versions():
@@ -48,19 +49,9 @@ def installed_ros_2_versions():
     installed_ros_distros = []
     for distro in temp_installed_ros_distros:
         source_script_path = os.path.join("/opt/ros", distro, "setup.sh")
-        if "AMENT_PREFIX_PATH" in shell_source_env(source_script_path):
-            installed_ros_distros.append(distro)
+        if os.path.isfile(source_script_path):
+            with open(source_script_path) as f:
+                content = f.read()
+                if re.findall("(AMENT_CURRENT_PREFIX|COLCON_CURRENT_PREFIX)", content):
+                    installed_ros_distros.append(distro)
     return installed_ros_distros
-
-
-def shell_source_env(source_script_path):
-    """Emulates sourcing a shell file and returns the sourced environment as dictionary."""
-    pipe = subprocess.Popen(
-        ". %s; env" % source_script_path, stdout=subprocess.PIPE, shell=True
-    )
-    output = pipe.communicate()[0].decode("utf-8")
-
-    key_values = (x.split("=", 1) for x in output.splitlines())
-    filtered_pairs = filter(lambda x: len(x) == 2, key_values)
-
-    return dict(filtered_pairs)

@@ -22,6 +22,7 @@
 import os
 
 import pytest
+import subprocess
 
 from click.testing import CliRunner
 
@@ -30,14 +31,16 @@ import robot_folders.helpers.ros_version_helpers as ros_versions
 import robot_folders.commands.add_environment as add_environment
 import robot_folders.commands.delete_environment as delete_environment
 
+from .fixture_ros_installation import fake_ros_installation
 
-def test_add_catkin():
+
+@pytest.mark.usefixtures("fake_ros_installation")
+def test_add_catkin(mocker):
+    mocker.patch("subprocess.check_call")
 
     runner = CliRunner()
 
     installed_ros_distros = sorted(ros_versions.installed_ros_1_versions())
-    if len(installed_ros_distros) == 0:
-        pytest.skip("Skipping this test since no ROS 1 distro is installed.")
     ros_distro = installed_ros_distros[-1]
 
     result = runner.invoke(
@@ -49,14 +52,23 @@ def test_add_catkin():
                 "--create_colcon=no",
                 "--copy_cmake_lists=no",
                 "--underlays=skip",
-                f"--ros2_distro={ros_distro}",
+                f"--ros_distro={ros_distro}",
                 "testing_ws",
             ]
         ),
     )
+    print(result.output)
     assert result.exit_code == 0
     catkin_dir = directory_helpers.get_catkin_dir(
         os.path.join(directory_helpers.get_checkout_dir(), "testing_ws")
+    )
+    subprocess.check_call.assert_called_once_with(
+        [
+            "bash",
+            "-c",
+            "source /opt/ros/noetic/setup.bash && catkin_make   -DCMAKE_EXPORT_COMPILE_COMMANDS=1",
+        ],
+        cwd=catkin_dir,
     )
     assert os.path.isdir(catkin_dir)
 
@@ -65,13 +77,13 @@ def test_add_catkin():
     assert os.path.isdir(catkin_dir) is False
 
 
-def test_add_colcon():
+@pytest.mark.usefixtures("fake_ros_installation")
+def test_add_colcon(mocker):
+    mocker.patch("subprocess.check_call")
 
     runner = CliRunner()
 
     installed_ros_distros = sorted(ros_versions.installed_ros_2_versions())
-    if len(installed_ros_distros) == 0:
-        pytest.skip("Skipping this test since no ROS 2 distro is installed.")
     ros_distro = installed_ros_distros[-1]
 
     result = runner.invoke(
@@ -93,6 +105,15 @@ def test_add_colcon():
 
     colcon_dir = directory_helpers.get_colcon_dir(
         os.path.join(directory_helpers.get_checkout_dir(), "testing_ws")
+    )
+    subprocess.check_call.assert_called_once_with(
+        [
+            "bash",
+            "-c",
+            "source /opt/ros/rolling/setup.bash && colcon build --symlink-install --cmake-args   -DCMAKE_EXPORT_COMPILE_COMMANDS=1",
+        ],
+        cwd=colcon_dir,
+        env=os.environ.copy(),
     )
     assert os.path.isdir(colcon_dir)
 

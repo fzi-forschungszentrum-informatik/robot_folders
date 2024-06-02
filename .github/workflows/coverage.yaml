@@ -10,37 +10,32 @@ jobs:
   test:
     name: run tests
     runs-on: ubuntu-latest
-    container: ${{ matrix.container }}
     strategy:
       matrix:
-        container: ["ros:humble"]
+        python-version:
+          - '3.8'
+          - '3.10'
+          - '3.11'
+          - '3.12'
 
     steps:
-      - name: "Determine prerequisites"
-        id: prereq
-        run: |
-          command -v sudo >/dev/null 2>&1 || (apt update && apt install -y sudo)
-          sudo apt update
-          echo "need_node=$(command -v node >/dev/null 2>&1 && echo 0 || echo 1)" >> $GITHUB_OUTPUT
-          echo "need_ros2=$(if [ -d "/opt/ros/${{ inputs.ros_distro }}" ]; then echo 0; else echo 1; fi)" >> $GITHUB_OUTPUT
-      - name: Install node
-        if: ${{ steps.prereq.outputs.need_node == '1' && env.ACT }}
-        run: |
-          sudo apt install -y curl
-          curl -sS https://webi.sh/node | sh
-          echo ~/.local/opt/node/bin >> $GITHUB_PATH
+      - uses: actions/checkout@v4
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
 
-      - uses: actions/checkout@v3
       - name: Install dependencies
         run: |
-          apt update && apt install -y python3-pip
           python3 -m pip install --upgrade pip
           pip install pytest-cov codecov coverage
-          pip install -e .
+          pip install -e .[test]
       - name: Test with pytest
         run: |
           source bin/rob_folders_source.sh
-          coverage run --source=src -m pytest && coverage report
+          coverage run --source=src -m pytest
+          coverage report
           coverage xml -o coverage.xml
         shell: bash
       - name: Upload coverage to Codecov
