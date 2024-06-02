@@ -23,6 +23,7 @@
 from __future__ import print_function
 import os
 import shutil
+import sys
 import yaml
 
 from importlib import resources
@@ -35,6 +36,12 @@ XDG_CONFIG_HOME = os.getenv(
 FILENAME_USERCONFIG = os.path.join(XDG_CONFIG_HOME, "robot_folders.yaml")
 
 
+def get_resource_path(filename):
+    if sys.version_info.major == 3 and sys.version_info.minor < 9:
+        return resources.path(".".join([__package__, "resources"]), filename)
+    return resources.files(robot_folders.helpers.resources).joinpath(filename)
+
+
 class Userconfig(object):
     """Class for managing a userconfig"""
 
@@ -45,9 +52,7 @@ class Userconfig(object):
     @classmethod
     def init_class(cls):
         """Load the distribution config file"""
-        with resources.files(robot_folders.helpers.resources).joinpath(
-            "userconfig_distribute.yaml"
-        ) as p:
+        with get_resource_path("userconfig_distribute.yaml") as p:
             filename_distribute = p.as_posix()
             file_content = p.read_text()
             try:
