@@ -36,10 +36,11 @@ XDG_CONFIG_HOME = os.getenv(
 FILENAME_USERCONFIG = os.path.join(XDG_CONFIG_HOME, "robot_folders.yaml")
 
 
-def get_resource_path(filename):
+def get_resource_path(filename: str):
     if sys.version_info.major == 3 and sys.version_info.minor < 9:
-        return resources.path(".".join([__package__, "resources"]), filename)
-    return resources.files(robot_folders.helpers.resources).joinpath(filename)
+        with resources.path(".".join([str(__package__), "resources"]), filename) as p:
+            return str(p.as_posix())
+    return str(resources.files(robot_folders.helpers.resources).joinpath(filename))
 
 
 class Userconfig(object):
@@ -52,9 +53,9 @@ class Userconfig(object):
     @classmethod
     def init_class(cls):
         """Load the distribution config file"""
-        with get_resource_path("userconfig_distribute.yaml") as p:
-            filename_distribute = p.as_posix()
-            file_content = p.read_text()
+        filename_distribute = get_resource_path("userconfig_distribute.yaml")
+        with open(filename_distribute) as p:
+            file_content = p.read()
             try:
                 Userconfig.config_fallback = yaml.safe_load(file_content)
             except yaml.YAMLError as exc:
