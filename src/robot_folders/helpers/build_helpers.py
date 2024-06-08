@@ -161,7 +161,8 @@ class ColconBuilder(Builder):
                 ["--colcon-args"],
                 nargs=-1,
                 help="Arguments passed to colcon. Everything after this flag will be interpreted as"
-                " colcon arguments",
+                " colcon arguments. If this option is set, colcon arguments in the config are "
+                "discarded",
                 type=click.UNPROCESSED,
             )
         ]
