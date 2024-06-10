@@ -42,7 +42,7 @@ class BuildChooser(WorkspaceChooser):
             if name == "ros":
                 return build.CatkinBuilder(name=name, add_help_option=False)
             elif name == "colcon":
-                return build.ColconBuilder(name=name, add_help_option=False)
+                return build.ColconBuilder(name=name, add_help_option=True)
         else:
             click.echo("Did not find a workspace with the key < {} >.".format(name))
             return None

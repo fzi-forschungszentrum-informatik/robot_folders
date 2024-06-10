@@ -35,6 +35,7 @@ from robot_folders.helpers.which import which
 from robot_folders.helpers import compilation_db_helpers
 from robot_folders.helpers import config_helpers
 from robot_folders.helpers.exceptions import ModuleException
+from robot_folders.helpers.option_helpers import SwallowAllOption
 
 
 def get_cmake_flags():
@@ -154,12 +155,31 @@ class Builder(click.Command):
 class ColconBuilder(Builder):
     """Builder class for colcon workspace"""
 
-    def get_build_command(self, ros_distro):
-        build_cmd = "colcon build"
+    def __init__(self, *args, **kwargs):
+        params = [
+            SwallowAllOption(
+                ["--colcon-args"],
+                nargs=-1,
+                help="Arguments passed to colcon. Everything after this flag will be interpreted as"
+                " colcon arguments. If this option is set, colcon arguments in the config are "
+                "discarded",
+                type=click.UNPROCESSED,
+            )
+        ]
 
-        colcon_options = config_helpers.get_value_safe_default(
-            section="build", value="colcon_build_options", default=""
-        )
+        if "params" in kwargs and kwargs["params"]:
+            kwargs["params"].extend(params)
+        else:
+            kwargs["params"] = params
+        super().__init__(*args, **kwargs)
+
+    def get_build_command(self, ros_distro, colcon_options):
+        if colcon_options is None:
+            colcon_options = config_helpers.get_value_safe_default(
+                section="build", value="colcon_build_options", default=""
+            )
+
+        build_cmd = "colcon build"
 
         generator_flag = ""
         generator = config_helpers.get_value_safe_default(
@@ -193,6 +213,16 @@ class ColconBuilder(Builder):
         colcon_dir = get_colcon_dir()
         click.echo("Building colcon_ws in {}".format(colcon_dir))
 
+        if (
+            ctx is not None
+            and "colcon_args" in ctx.params
+            and ctx.params["colcon_args"] is not None
+        ):
+            colcon_args = ctx.params["colcon_args"]
+            colcon_args = " ".join(colcon_args)
+        else:
+            colcon_args = None
+
         # Colcon needs to build in an env that does not have the current workspace sourced
         # See https://docs.ros.org/en/galactic/Tutorials/Workspace/Creating-A-Workspace.html#source-the-overlay
         my_env = os.environ.copy()
@@ -203,7 +233,7 @@ class ColconBuilder(Builder):
         # We abuse the name to code the ros distribution if we're building for the first time.
         try:
             process = subprocess.check_call(
-                ["bash", "-c", self.get_build_command(self.name)],
+                ["bash", "-c", self.get_build_command(self.name, colcon_args)],
                 cwd=colcon_dir,
                 env=my_env,
             )
