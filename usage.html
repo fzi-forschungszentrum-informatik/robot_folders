@@ -168,6 +168,9 @@ that, if there’s a colcon workspace this will be built.</p>
 <p>You can also manually specify which workspace to build by using <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">make</span>
 <span class="pre">ros</span></code> or <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">make</span> <span class="pre">colcon</span></code>. When using <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">make</span></code> you don’t have to
 worry about the particular build command at all.</p>
+<p>When building a colcon workspace, you can pass arguments to colcon using the <code class="docutils literal notranslate"><span class="pre">--colcon-args</span></code>
+option. For example to selectivly build a package called <code class="docutils literal notranslate"><span class="pre">foobar</span></code> and install it using symlinks
+you can call <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">make</span> <span class="pre">--colcon-args</span> <span class="pre">--packages-select</span> <span class="pre">foobar</span> <span class="pre">--symlink-install</span></code>.</p>
 <p>Default options for building environments such as the builder for catkin
 workspaces or cmake arguments for a colcon workspace can be set in the
 <a class="reference internal" href="configuration.html#configuration"><span class="std std-ref">Configuration</span></a>.</p>

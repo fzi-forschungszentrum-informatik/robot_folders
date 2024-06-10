@@ -34,7 +34,9 @@ Build options
     Set to catkin_make by default but can be changed to catkin build.
 
 ``colcon_build_options``
-    Options passed to each ``colcon build`` invocation that is piped through ``fzirob make``.
+    Options passed to each ``colcon build`` invocation that is piped through ``fzirob make``. These
+    options can be overriden by using the ``--colcon-args`` option when running
+    ``fzirob make colcon``
 
 
 Directory options

@@ -150,6 +150,10 @@ You can also manually specify which workspace to build by using ``fzirob make
 ros`` or ``fzirob make colcon``. When using ``fzirob make`` you don't have to
 worry about the particular build command at all.
 
+When building a colcon workspace, you can pass arguments to colcon using the ``--colcon-args``
+option. For example to selectivly build a package called ``foobar`` and install it using symlinks
+you can call ``fzirob make --colcon-args --packages-select foobar --symlink-install``.
+
 Default options for building environments such as the builder for catkin
 workspaces or cmake arguments for a colcon workspace can be set in the
 :ref:`configuration:Configuration`.
