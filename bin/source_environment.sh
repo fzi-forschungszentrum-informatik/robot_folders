@@ -73,7 +73,7 @@ fi
 
 if [ -z ${rob_folders_overlay+x} ]; then
   echo "Sourcing environment '$environment_dir'"
-  ROB_FOLDERS_ROOT_ENV=$environment_dir
+  export ROB_FOLDERS_ROOT_ENV=$environment_dir
 fi
 
 # This is the environment's name, which we will print out later
@@ -130,6 +130,8 @@ if [ -d $environment_dir ]; then
       export LD_LIBRARY_PATH=${ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH}
       export QML_IMPORT_PATH=${ROB_FOLDERS_EMPTY_QML_IMPORT_PATH}
       export PYTHONPATH=${ROB_FOLDERS_EMPTY_PYTHONPATH}
+      export AMENT_PREFIX_PATH=${ROB_FOLDERS_EMPTY_AMENT_PREFIX_PATH}
+      export COLCON_PREFIX_PATH=${ROB_FOLDERS_EMPTY_COLCON_PREFIX_PATH}
     fi
   fi
 
