@@ -81,12 +81,27 @@ To activate or source an environment, use the ``fzirob change_environment
 ENV_NAME`` command. This command sources the appropriate setup scripts of the
 environment depending on its contents.
 
+
 You can use tab completion on the environments so typing ``fzirob
 change_environment`` and then pressing :kbd:`Tab` should list all environments
 present.
 
 Executing ``fzirob change_environment`` without any environment specified will
 source the most recently sourced environment.
+
+
+Adding custom source commands
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+In addition to the environment's workspace setup files, each environment contains a
+``setup_local.sh`` file that will get sourced during the ``change_environment`` call.
+
+.. note::
+
+   Using ``fzirob change_environment`` will reset your shell environment before sourcing a
+   ``robot_folders`` environment. If you want to source your environment based on some altered
+   shell environment (e.g. a sourced python virtualenv), please add the required changes to the
+   ``setup_local.sh`` file in the respective environment.
 
 Using underlay environments
 ---------------------------
