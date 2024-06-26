@@ -89,19 +89,30 @@ present.
 Executing ``fzirob change_environment`` without any environment specified will
 source the most recently sourced environment.
 
+.. note::
+
+   Using ``fzirob change_environment`` will reset your shell environment before sourcing a
+   ``robot_folders`` environment. Specifically, the following variables will be reset to the state
+   they have been at the point when robot_folders was sourced (the ``rob_folders_source.sh`` file,
+   usually sourced in the ``~/.bashrc`` file).
+
+   * ``CMAKE_PATH``
+   * ``PATH``
+   * ``LD_LIBRARY_PATH``
+   * ``QML_IMPORT_PATH``
+   * ``PYTHONPATH``
+   * ``AMENT_PREFIX_PATH``
+   * ``COLCON_PREFIX_PATH``
+   * ``PS1``
+
 
 Adding custom source commands
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 In addition to the environment's workspace setup files, each environment contains a
-``setup_local.sh`` file that will get sourced during the ``change_environment`` call.
+``setup_local.sh`` file that will get sourced during the ``change_environment`` call after the
+workspaces in an environment have been sourced.
 
-.. note::
-
-   Using ``fzirob change_environment`` will reset your shell environment before sourcing a
-   ``robot_folders`` environment. If you want to source your environment based on some altered
-   shell environment (e.g. a sourced python virtualenv), please add the required changes to the
-   ``setup_local.sh`` file in the respective environment.
 
 Using underlay environments
 ---------------------------
