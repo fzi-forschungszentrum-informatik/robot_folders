@@ -8,7 +8,7 @@ on:
 
 jobs:
   test:
-    name: run tests
+    name: run tests ${{ matrix.python-version }}
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -46,3 +46,4 @@ jobs:
           name: codecov-umbrella
           fail_ci_if_error: true
           token: ${{ secrets.CODECOV_TOKEN }}
+        if: ${{ !env.ACT }}
