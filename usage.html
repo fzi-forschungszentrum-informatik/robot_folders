@@ -109,6 +109,29 @@ environment depending on its contents.</p>
 present.</p>
 <p>Executing <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">change_environment</span></code> without any environment specified will
 source the most recently sourced environment.</p>
+<div class="admonition note">
+<p class="admonition-title">Note</p>
+<p>Using <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">change_environment</span></code> will reset your shell environment before sourcing a
+<code class="docutils literal notranslate"><span class="pre">robot_folders</span></code> environment. Specifically, the following variables will be reset to the state
+they have been at the point when robot_folders was sourced (the <code class="docutils literal notranslate"><span class="pre">rob_folders_source.sh</span></code> file,
+usually sourced in the <code class="docutils literal notranslate"><span class="pre">~/.bashrc</span></code> file).</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">CMAKE_PATH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PATH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">LD_LIBRARY_PATH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">QML_IMPORT_PATH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PYTHONPATH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">AMENT_PREFIX_PATH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">COLCON_PREFIX_PATH</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">PS1</span></code></p></li>
+</ul>
+</div>
+<section id="adding-custom-source-commands">
+<h3>Adding custom source commands<a class="headerlink" href="#adding-custom-source-commands" title="Link to this heading">¶</a></h3>
+<p>In addition to the environment’s workspace setup files, each environment contains a
+<code class="docutils literal notranslate"><span class="pre">setup_local.sh</span></code> file that will get sourced during the <code class="docutils literal notranslate"><span class="pre">change_environment</span></code> call after the
+workspaces in an environment have been sourced.</p>
+</section>
 </section>
 <section id="using-underlay-environments">
 <h2>Using underlay environments<a class="headerlink" href="#using-underlay-environments" title="Link to this heading">¶</a></h2>
@@ -216,8 +239,6 @@ project. While for colcon workspaces there exist external tools such as
 colcon workspace and misc workspace).</p></li>
 <li><p>Startup scripts are stored inside the exchange format for easy interaction.</p></li>
 </ul>
-<section id="exporting-an-environment">
-<h3>Exporting an environment<a class="headerlink" href="#exporting-an-environment" title="Link to this heading">¶</a></h3>
 <p>To export an environment, use the <code class="docutils literal notranslate"><span class="pre">fzirob</span> <span class="pre">scrape_environment</span></code> command. It scrapes an environment configuration into a config file, facilitating sharing with others. You’ll have to provide the environment name and the target file as arguments e.g.</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fzirob<span class="w"> </span>scrape_environment<span class="w"> </span>env_name<span class="w"> </span>/tmp/env_name.yaml
 </pre></div>
@@ -228,9 +249,6 @@ repository.</p>
 <p>When providing <code class="docutils literal notranslate"><span class="pre">--use_commit_id</span> <span class="pre">true</span></code>, the exact commit IDs get scraped
 instead of branch names. which is rather useful if you want to save a “working
 state” of your whole environment.</p>
-</section>
-<section id="creating-a-new-environment-with-a-configuration">
-<h3>Creating a new environment with a configuration<a class="headerlink" href="#creating-a-new-environment-with-a-configuration" title="Link to this heading">¶</a></h3>
 <p>If you’ve got provided an environment configuration from somebody you can
 create a new environment with that using</p>
 <div class="highlight-bash notranslate"><div class="highlight"><pre><span></span>fzirob<span class="w"> </span>add_environment<span class="w"> </span>--config-file<span class="w"> </span>/tmp/env_name.yaml<span class="w"> </span>other_env
@@ -238,9 +256,6 @@ create a new environment with that using</p>
 </div>
 <p>which will create an environment called <code class="docutils literal notranslate"><span class="pre">other_env</span></code> with the configuration
 from the previously exported <code class="docutils literal notranslate"><span class="pre">env_name</span></code> environment.</p>
-</section>
-<section id="adapting-an-environment-with-a-configuration-file">
-<h3>Adapting an environment with a configuration file<a class="headerlink" href="#adapting-an-environment-with-a-configuration-file" title="Link to this heading">¶</a></h3>
 <p>If you already have an environment but you want to update it to match a config
 file e.g. because some repositories have been added to the environment or some
 branch names have been changed you can do this using the <code class="docutils literal notranslate"><span class="pre">fzirob</span>
@@ -250,7 +265,6 @@ file you will be prompted whether you want to keep those repositories. If
 branches or remotes in the config file differ from those present locally, you
 will also be asked. You can override that to a default behavior using the
 <code class="docutils literal notranslate"><span class="pre">--local_delete_policy</span></code> and <code class="docutils literal notranslate"><span class="pre">--local_override_policy</span></code> options.</p>
-</section>
 </section>
 <section id="deleting-an-environment">
 <h2>Deleting an environment<a class="headerlink" href="#deleting-an-environment" title="Link to this heading">¶</a></h2>
