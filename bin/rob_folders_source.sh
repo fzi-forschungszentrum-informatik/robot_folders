@@ -49,6 +49,9 @@ if [ -z "$ROB_FOLDERS_ACTIVE_ENV" ]; then
   export ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH=${LD_LIBRARY_PATH}
   export ROB_FOLDERS_EMPTY_QML_IMPORT_PATH=${QML_IMPORT_PATH}
   export ROB_FOLDERS_EMPTY_PYTHONPATH=${PYTHONPATH}
+  export ROB_FOLDERS_EMPTY_AMENT_PREFIX_PATH=${AMENT_PREFIX_PATH}
+  export ROB_FOLDERS_EMPTY_COLCON_PREFIX_PATH=${COLCON_PREFIX_PATH}
+  export ROB_FOLDERS_EMPTY_PS1=${PS1}
 
   if [ ! -z "${ROB_FOLDERS_EMPTY_CMAKE_PATH}" ] && [ -z $ROB_FOLDERS_IGNORE_CMAKE_PREFIX_PATH ]
   then
@@ -127,6 +130,8 @@ reset_environment()
   export LD_LIBRARY_PATH=${ROB_FOLDERS_EMPTY_LD_LIBRARY_PATH}
   export QML_IMPORT_PATH=${ROB_FOLDERS_EMPTY_QML_IMPORT_PATH}
   export PYTHONPATH=${ROB_FOLDERS_EMPTY_PYTHONPATH}
+  export AMENT_PREFIX_PATH=${ROB_FOLDERS_EMPTY_AMENT_PREFIX_PATH}
+  export COLCON_PREFIX_PATH=${ROB_FOLDERS_EMPTY_COLCON_PREFIX_PATH}
 }
 
 
@@ -159,6 +164,7 @@ fzirob()
 
       if [ $? -eq 0 ]; then
         if [ $1 = "change_environment" ] && [ "$2" != "--help"  ]; then
+          reset_environment
           checkout_dir=$(rob_folders get_checkout_base_dir)
 
           if [ -f ${checkout_dir}/.cur_env ]; then
@@ -166,9 +172,11 @@ fzirob()
             # running change_environment commands in parallel. Thus it can happen that reading the
             # file returns an empty value. This race condition only occurs on a very high io load
             # and usually this while look should only be entered once.
+            ROB_FOLDERS_ACTIVE_ENV=$(cat "${checkout_dir}"/.cur_env) || true
             while [ -z "$ROB_FOLDERS_ACTIVE_ENV" ]; do
-              export ROB_FOLDERS_ACTIVE_ENV=$(cat ${checkout_dir}/.cur_env)
+              ROB_FOLDERS_ACTIVE_ENV=$(cat "${checkout_dir}"/.cur_env) || true
             done
+            export ROB_FOLDERS_ACTIVE_ENV
             environment_dir="${checkout_dir}/${ROB_FOLDERS_ACTIVE_ENV}"
             if [ -f ${environment_dir}/setup.sh ]; then
               source ${environment_dir}/setup.sh
@@ -186,7 +194,7 @@ fzirob()
             if [ -z "${ROB_FOLDERS_DISABLE_PROMPT_MODIFICATION:-}" ] ; then
                 env_prompt="[${ROB_FOLDERS_ACTIVE_ENV}]"
                 if [ -n "${PS1##*"$env_prompt"*}" ]; then
-                  PS1="${env_prompt} ${PS1:-}"
+                  PS1="${env_prompt} ${ROB_FOLDERS_EMPTY_PS1:-}"
                   export PS1
                 fi
             fi
