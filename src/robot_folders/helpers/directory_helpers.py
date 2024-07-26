@@ -151,6 +151,23 @@ def get_colcon_dir(env_dir=""):
     return os.path.join(cur_env_path, "colcon_ws")
 
 
+def get_misc_dir(env_dir=""):
+    """Tries to find the right misc workspace in the Currently \
+    sourced environment."""
+
+    path = ""
+    cur_env_path = env_dir
+    if env_dir == "":
+        cur_env_path = get_active_env_path()
+
+    valid_names = ["misc_ws"]
+    for path_name in valid_names:
+        path = os.path.join(cur_env_path, path_name)
+        if os.path.exists(path):
+            return path
+    return os.path.join(cur_env_path, "misc_ws")
+
+
 def yes_no_to_bool(bool_str):
     """
     Converts a yes/no string to a bool

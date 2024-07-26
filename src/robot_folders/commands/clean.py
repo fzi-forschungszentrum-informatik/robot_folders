@@ -41,6 +41,9 @@ class CleanChooser(WorkspaceChooser):
                 return clean.CatkinCleaner(name=name, add_help_option=False)
             elif name == "colcon":
                 return clean.ColconCleaner(name=name, add_help_option=False)
+            elif name == "misc":
+                click.error("Misc workspaces have to cleaned by hand. Doing nothing")
+                return None
         else:
             click.echo("Did not find a workspace with the key < {} >.".format(name))
             return None
