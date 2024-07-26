@@ -61,6 +61,8 @@ environment '{}'".format(
                 target_dir = dir_helpers.get_catkin_dir()
             elif name == "colcon":
                 target_dir = dir_helpers.get_colcon_dir()
+            elif name == "misc":
+                target_dir = dir_helpers.get_misc_dir()
         else:
             click.echo(
                 "Did not find a workspace with the key < {} > inside "

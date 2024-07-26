@@ -16,6 +16,8 @@ you get to know them, you'll probably enjoy simply typing ``ce`` instead.
 +---------+---------------------------+
 | cdcol   | fzirob cd colcon          |
 +---------+---------------------------+
+| cdmisc  | fzirob cd misc            |
++---------+---------------------------+
 | cdhome  | fzirob cd                 |
 +---------+---------------------------+
 | makeros | fzirob make ros           |

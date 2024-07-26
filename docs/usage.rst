@@ -206,6 +206,7 @@ stored inside ``~/checkout``:
     fzirob cd        # Env root folder e.g. ~/checkout/env_name
     fzirob cd ros    # Env catkin folder e.g. ~/checkout/env_name/catkin_ws
     fzirob cd colcon # Env colcon folder e.g. ~/checkout/env_name/colcon_ws
+    fzirob cd misc   # Env misc_ws folder e.g. ~/checkout/env_name/misc_ws
 
 Again, tab completion will present the possible options for the currently sourced environment.
 

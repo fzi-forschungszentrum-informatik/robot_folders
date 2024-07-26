@@ -31,6 +31,7 @@ from robot_folders.helpers.directory_helpers import (
     get_active_env_path,
     get_catkin_dir,
     get_colcon_dir,
+    get_misc_dir,
 )
 
 
@@ -58,6 +59,8 @@ class WorkspaceChooser(click.MultiCommand):
             cmds.append("colcon")
         if os.path.exists(get_catkin_dir()):
             cmds.append("ros")
+        if os.path.exists(get_misc_dir()):
+            cmds.append("misc")
 
         return cmds
 
