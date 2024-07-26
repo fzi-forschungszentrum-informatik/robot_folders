@@ -82,6 +82,9 @@ alias cdmisc="fzirob cd misc"
 alias cdhome="fzirob cd"
 alias makeros="fzirob make ros"
 alias makecol="fzirob make colcon"
+alias fm="fzirob make"
+alias fmc="fzirob make colcon"
+alias fmcp="fzirob make colcon --colcon-args --packages-select"
 
 add_fzi_project()
 {
