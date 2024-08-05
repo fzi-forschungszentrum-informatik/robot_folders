@@ -50,4 +50,9 @@ setup(
     license_files=("LICENSE.txt"),
     tests_require=test_deps,
     extras_require=extras,
+    project_urls={
+        "Documentation": "https://fzi-forschungszentrum-informatik.github.io/robot_folders/index.html",
+        "Changelog": "https://github.com/fzi-forschungszentrum-informatik/robot_folders/releases",
+        "Repository": "https://github.com/fzi-forschungszentrum-informatik/robot_folders.git",
+    },
 )
