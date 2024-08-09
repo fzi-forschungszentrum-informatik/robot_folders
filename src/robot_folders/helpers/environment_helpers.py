@@ -148,17 +148,21 @@ class CatkinCreator(object):
         version to use and whether to copy the CMakeLists.txt
         """
         if self.ros_distro == "ask":
-            installed_ros_distros = sorted(installed_ros_1_versions())
-            self.ros_distro = installed_ros_distros[-1]
-            if len(installed_ros_distros) > 1:
-                questions = [
-                    inquirer.List(
-                        "ros_distro",
-                        message="Which ROS distribution would you like to use for catkin?",
-                        choices=installed_ros_distros,
-                    ),
-                ]
-                self.ros_distro = inquirer.prompt(questions)["ros_distro"]
+            installed_ros_distros = installed_ros_1_versions()
+            if installed_ros_distros:
+                installed_ros_distros = sorted(installed_ros_distros)
+                self.ros_distro = installed_ros_distros[-1]
+                if len(installed_ros_distros) > 1:
+                    questions = [
+                        inquirer.List(
+                            "ros_distro",
+                            message="Which ROS distribution would you like to use for catkin?",
+                            choices=installed_ros_distros,
+                        ),
+                    ]
+                    self.ros_distro = inquirer.prompt(questions)["ros_distro"]
+            else:
+                self.ros_distro = None
         click.echo("Using ROS distribution '{}'".format(self.ros_distro))
         if self.copy_cmake_lists == "ask":
             self.copy_cmake_lists = click.confirm(
@@ -277,17 +281,21 @@ class ColconCreator(object):
         version to use
         """
         if self.ros2_distro == "ask":
-            installed_ros_distros = sorted(installed_ros_2_versions())
-            self.ros2_distro = installed_ros_distros[-1]
-            if len(installed_ros_distros) > 1:
-                questions = [
-                    inquirer.List(
-                        "ros_distro",
-                        message="Which ROS2 distribution would you like to use for colcon?",
-                        choices=installed_ros_distros,
-                    ),
-                ]
-                self.ros2_distro = inquirer.prompt(questions)["ros_distro"]
+            installed_ros_distros = installed_ros_2_versions()
+            if installed_ros_distros:
+                installed_ros_distros = sorted(installed_ros_distros)
+                self.ros2_distro = installed_ros_distros[-1]
+                if len(installed_ros_distros) > 1:
+                    questions = [
+                        inquirer.List(
+                            "ros_distro",
+                            message="Which ROS2 distribution would you like to use for colcon?",
+                            choices=installed_ros_distros,
+                        ),
+                    ]
+                    self.ros2_distro = inquirer.prompt(questions)["ros_distro"]
+            else:
+                self.ros2_distro = None
         click.echo("Using ROS2 distribution '{}'".format(self.ros2_distro))
 
     def build(self):
