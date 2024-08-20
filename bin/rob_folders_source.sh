@@ -73,7 +73,7 @@ fi
 
 
 
-# define some legacy aliases from old robot_folders
+# define some aliases for robot_folders
 RED='\033[0;31m'
 NC='\033[0m' # No Color
 alias ce="fzirob change_environment"
