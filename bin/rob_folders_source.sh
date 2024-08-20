@@ -73,15 +73,30 @@ fi
 
 
 
-# define some legacy aliases from old robot_folders
+# define some aliases for robot_folders
+RED='\033[0;31m'
+NC='\033[0m' # No Color
 alias ce="fzirob change_environment"
 alias cdr="fzirob cd"
 alias cdros="fzirob cd ros"
 alias cdcol="fzirob cd colcon"
 alias cdmisc="fzirob cd misc"
 alias cdhome="fzirob cd"
-alias makeros="fzirob make ros"
-alias makecol="fzirob make colcon"
+alias fm="fzirob make"
+alias fmc="fzirob make colcon"
+alias fmr="fzirob make ros"
+alias fmcp="fzirob make colcon --colcon-args --packages-select"
+
+makeros()
+{
+  echo -e "${RED}\`makeros\` is deprecated. Please use \`fmr\` instead.${NC}"
+  fzirob make ros
+}
+makecol()
+{
+  echo -e "${RED}\`makecol\` is deprecated. Please use \`fmc\` instead.${NC}"
+  fzirob make colcon
+}
 
 add_fzi_project()
 {
