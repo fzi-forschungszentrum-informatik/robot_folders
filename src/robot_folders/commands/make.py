@@ -44,7 +44,7 @@ class BuildChooser(WorkspaceChooser):
             elif name == "colcon":
                 return build.ColconBuilder(name=name, add_help_option=True)
             elif name == "misc":
-                click.error("Misc workspaces have to built by hand. Doing nothing")
+                click.echo("Misc workspaces have to built by hand. Doing nothing")
                 return None
         else:
             click.echo("Did not find a workspace with the key < {} >.".format(name))
