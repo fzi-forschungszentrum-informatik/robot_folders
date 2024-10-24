@@ -176,17 +176,21 @@ if [ -d $environment_dir ]; then
     else
       echo "no setup.$shell_type for the catkin workspace found. Sourcing global ROS"
       num_ros_distros=$(find /opt/ros -maxdepth 1 -mindepth 1 -type d | wc -l)
-      if [[ $num_ros_distros -gt 1 ]]; then
-        echo "Found more than one ros_distribution:"
-        echo $(ls /opt/ros/)
-        echo "Please insert the distro that should be used:"
-        read ros_distro
+      if [[ $num_ros_distros -eq 0 ]]; then
+        echo "No ROS installation found in /opt/ros. Assuming you take care about your ROS setup otherwise."
       else
-        ros_distro=$(ls /opt/ros/)
+        if [[ $num_ros_distros -gt 1 ]]; then
+          echo "Found more than one ros_distribution:"
+          ls /opt/ros/
+          echo "Please insert the distro that should be used:"
+          read ros_distro
+        else
+          ros_distro=$(ls /opt/ros/)
+        fi
+        setup_file=/opt/ros/$ros_distro/setup.$shell_type
+        source $setup_file
+        echo "sourced $setup_file"
       fi
-      setup_file=/opt/ros/$ros_distro/setup.$shell_type
-      source $setup_file
-      echo "sourced $setup_file"
     fi
   fi
 
@@ -219,17 +223,21 @@ if [ -d $environment_dir ]; then
     else
       echo "no setup.$shell_type for the colcon workspace found. Sourcing global ROS2"
       num_ros_distros=$(find /opt/ros -maxdepth 1 -mindepth 1 -type d | wc -l)
-      if [[ $num_ros_distros -gt 1 ]]; then
-        echo "Found more than one ros_distribution:"
-        echo $(ls /opt/ros/)
-        echo "Please insert the distro that should be used:"
-        read ros_distro
+      if [[ $num_ros_distros -eq 0 ]]; then
+        echo "No ROS installation found in /opt/ros. Assuming you take care about your ROS setup otherwise."
       else
-        ros_distro=$(ls /opt/ros/)
+        if [[ $num_ros_distros -gt 1 ]]; then
+          echo "Found more than one ros_distribution:"
+          ls /opt/ros/
+          echo "Please insert the distro that should be used:"
+          read ros_distro
+        else
+          ros_distro=$(ls /opt/ros/)
+        fi
+        setup_file=/opt/ros/$ros_distro/setup.$shell_type
+        source $setup_file
+        echo "sourced $setup_file"
       fi
-      setup_file=/opt/ros/$ros_distro/setup.$shell_type
-      source $setup_file
-      echo "sourced $setup_file"
     fi
   fi
 

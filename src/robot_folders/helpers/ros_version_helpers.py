@@ -34,6 +34,8 @@ def installed_ros_distros():
 def installed_ros_1_versions():
     """Returns a list of all installed ROS1 versions"""
     # Check the setup if it contains catkin the ROS Build system
+    if not os.path.exists("/opt/ros"):
+        return None
     temp_installed_ros_distros = os.listdir("/opt/ros")
     installed_ros_distros = []
     for distro in temp_installed_ros_distros:
@@ -45,6 +47,8 @@ def installed_ros_1_versions():
 def installed_ros_2_versions():
     """Returns a list of all installed ROS2 versions"""
     # Check the setup if it contains ament the ROS2 Build system
+    if not os.path.exists("/opt/ros"):
+        return None
     temp_installed_ros_distros = os.listdir("/opt/ros")
     installed_ros_distros = []
     for distro in temp_installed_ros_distros:
