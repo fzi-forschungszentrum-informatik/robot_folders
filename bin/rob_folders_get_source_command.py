@@ -23,11 +23,11 @@
 """Small hacky script to get the correct source_zsh command per click version"""
 
 import argparse
-import click
+import importlib.metadata
 
 
 def get_click_version():
-    click_version = click.__version__
+    click_version = importlib.metadata.version("click")
     click_major_version = click_version.split(".")[0]
     return int(click_major_version)
 
