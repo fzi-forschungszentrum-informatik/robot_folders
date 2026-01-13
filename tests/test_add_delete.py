@@ -31,10 +31,11 @@ import robot_folders.helpers.ros_version_helpers as ros_versions
 import robot_folders.commands.add_environment as add_environment
 import robot_folders.commands.delete_environment as delete_environment
 
-from .fixture_ros_installation import fake_ros_installation
+from .fixture_ros_installation import fake_ros_installation, fake_base_path
 
 
 @pytest.mark.usefixtures("fake_ros_installation")
+@pytest.mark.usefixtures("fake_base_path")
 def test_add_catkin(mocker):
     mocker.patch("subprocess.check_call")
 

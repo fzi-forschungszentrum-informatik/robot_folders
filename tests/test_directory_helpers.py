@@ -124,15 +124,17 @@ def test_nobackup(fs):
     assert result.exit_code == 0
     assert result.return_value == False
 
-    # With no_backup and answered anything it should return True
+    # With no_backup and answered anything it should reprompt for a valid choice
+    # and accept afterwards.
     dir_helpers.mkdir_p(no_backup)
     runner = CliRunner()
     result = runner.invoke(
         test_command,
         args=["--local_build=ask"],
-        input="schuigfdf",
+        input="schuigfdf\nno_backup",
         standalone_mode=False,
     )
+
     assert result.exit_code == 0
     assert result.return_value == True
 

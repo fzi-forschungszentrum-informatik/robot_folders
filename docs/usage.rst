@@ -231,7 +231,7 @@ vcstool2_, ``robot_folders`` provides extended functionality to that:
 * Startup scripts are stored inside the exchange format for easy interaction.
 
 Exporting an environment
-~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^
 
 To export an environment, use the ``fzirob scrape_environment`` command. It scrapes an environment configuration into a config file, facilitating sharing with others. You'll have to provide the environment name and the target file as arguments e.g.
 
@@ -248,7 +248,7 @@ instead of branch names. which is rather useful if you want to save a "working
 state" of your whole environment.
 
 Creating a new environment with a configuration
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you've got provided an environment configuration from somebody you can
 create a new environment with that using
@@ -261,7 +261,7 @@ which will create an environment called ``other_env`` with the configuration
 from the previously exported ``env_name`` environment.
 
 Adapting an environment with a configuration file
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you already have an environment but you want to update it to match a config
 file e.g. because some repositories have been added to the environment or some

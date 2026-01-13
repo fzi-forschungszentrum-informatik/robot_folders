@@ -1,2 +1,3 @@
 sphinx
 sphinx-tabs
+docutils<0.21
