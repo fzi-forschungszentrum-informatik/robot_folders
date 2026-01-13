@@ -19,6 +19,7 @@
 # OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 # THE SOFTWARE.
 #
+import os
 import pytest
 
 
@@ -32,3 +33,11 @@ def fake_ros_installation(fs):
     fs.create_file("/opt/ros/spy/setup.sh", contents="imnotros")
     fs.create_file("/opt/foo/setup.sh", contents="imnotros")
     yield fs
+
+
+@pytest.fixture
+def fake_base_path(fs):
+    config_path = "/fake/app/config.yaml"
+    fs.create_dir("/tmp/checkout")
+    os.environ["ROB_FOLDERS_BASE_DIR"] = "/tmp/checkout"
+    return config_path
