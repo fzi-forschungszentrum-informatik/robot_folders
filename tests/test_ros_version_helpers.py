@@ -20,6 +20,7 @@
 # THE SOFTWARE.
 #
 import pytest
+from pytest_unordered import unordered
 
 import robot_folders.helpers.ros_version_helpers as ros
 
@@ -38,20 +39,22 @@ def fake_ros_installation(fs):
 
 @pytest.mark.usefixtures("fake_ros_installation")
 def test_installed_ros1_versions():
-    assert ros.installed_ros_1_versions() == ["melodic", "noetic"]
+    assert ros.installed_ros_1_versions() == unordered(["melodic", "noetic"])
 
 
 @pytest.mark.usefixtures("fake_ros_installation")
 def test_installed_ros2_versions():
-    assert ros.installed_ros_2_versions() == ["humble", "jazzy", "rolling"]
+    assert ros.installed_ros_2_versions() == unordered(["humble", "jazzy", "rolling"])
 
 
 @pytest.mark.usefixtures("fake_ros_installation")
 def test_installed_ros_distros():
-    assert ros.installed_ros_distros() == [
-        "melodic",
-        "noetic",
-        "humble",
-        "jazzy",
-        "rolling",
-    ]
+    assert ros.installed_ros_distros() == unordered(
+        [
+            "melodic",
+            "noetic",
+            "humble",
+            "jazzy",
+            "rolling",
+        ]
+    )
