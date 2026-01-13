@@ -33,4 +33,5 @@ def test_rob_folders_runs():
     runner = CliRunner()
 
     result = runner.invoke(robot_folders.main.cli)
-    assert result.exit_code == 0
+    # We expect return code 2 as we do not provide a command.
+    assert result.exit_code == 2
