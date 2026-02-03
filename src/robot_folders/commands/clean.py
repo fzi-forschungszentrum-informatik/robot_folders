@@ -80,5 +80,7 @@ before calling the clean function."
         # Build all present workspaces individually
         for workspace in cmd.list_commands(ctx):
             clean_cmd = cmd.get_command(ctx, workspace)
+            if clean_cmd is None:
+                continue
             clean_cmd.invoke(ctx)
     return
