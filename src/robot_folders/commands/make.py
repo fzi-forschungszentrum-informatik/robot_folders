@@ -85,5 +85,7 @@ before calling the make function."
         # Build all present workspaces individually
         for workspace in cmd.list_commands(ctx):
             build_cmd = cmd.get_command(ctx, workspace)
+            if build_cmd is None:
+                continue
             build_cmd.invoke(ctx)
     return
