@@ -23,7 +23,7 @@ extras = {
 
 setup(
     name="robot_folders",
-    version="0.7.0",
+    version="0.8.0",
     python_requires=">=3.10",
     description="robot_folders is your workspace handling utility around the ROS ecosystem.",
     long_description=long_description,
